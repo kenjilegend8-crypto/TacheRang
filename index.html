@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MyHub — Espace Personnel</title>
+    <title>MyHub — Station de Contrôle Totale</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -13,6 +13,7 @@
             --bg-color: #09090b;
             --card-bg: #111113;
             --border-color: #27272a;
+            --card-radius: 0.5rem;
         }
         body {
             font-family: 'Inter', sans-serif;
@@ -24,6 +25,7 @@
         .surface-card {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
+            border-radius: var(--card-radius);
         }
         .link-card {
             transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.15s ease;
@@ -39,6 +41,8 @@
         ::-webkit-scrollbar-track { background: var(--bg-color); }
         ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 2px; }
     </style>
+    <!-- Style CSS injecté dynamiquement par l'admin -->
+    <style id="custom-injected-css"></style>
 </head>
 <body class="min-h-screen flex flex-col selection:bg-zinc-200 selection:text-zinc-950">
 
@@ -49,7 +53,7 @@
                 M
             </div>
             <span class="font-semibold text-base tracking-tight text-zinc-100">MyHub</span>
-            <span id="mode-badge" class="text-[11px] mono px-1.5 py-0.5 rounded bg-zinc-900 text-zinc-500 border border-zinc-800">Espace Privé</span>
+            <span id="mode-badge" class="text-[11px] mono px-1.5 py-0.5 rounded bg-zinc-900 text-zinc-500 border border-zinc-800">Espace Utilisateur</span>
         </div>
 
         <div class="flex items-center gap-2 flex-wrap" id="workspaces-container">
@@ -58,36 +62,84 @@
 
         <div class="flex items-center gap-2">
             <button onclick="toggleAdminPanel()" id="admin-trigger-btn" class="text-xs px-3 py-1.5 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-400 border border-zinc-800 transition flex items-center gap-1.5">
-                <i data-lucide="shield" class="w-3.5 h-3.5"></i> Admin
+                <i data-lucide="sliders" class="w-3.5 h-3.5"></i> Contrôle Admin
             </button>
         </div>
     </header>
 
-    <!-- Admin Customization Panel (Visible only via admin link or password) -->
-    <section id="admin-panel" class="hidden bg-zinc-900/90 border-b border-zinc-800 px-6 py-4">
-        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
-            <div class="flex items-center gap-4">
-                <span class="text-xs font-semibold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
-                    <i data-lucide="sliders" class="w-4 h-4"></i> Panneau de contrôle Propriétaire
+    <!-- Master Control Panel (Admin Only) -->
+    <section id="admin-panel" class="hidden bg-[#0e0e11] border-b border-zinc-800 px-6 py-6 transition-all">
+        <div class="max-w-7xl mx-auto flex flex-col gap-6">
+            <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+                <span class="text-xs font-semibold text-emerald-400 uppercase tracking-wider flex items-center gap-2">
+                    <i data-lucide="shield-check" class="w-4 h-4"></i> Station de Contrôle Totale du Propriétaire
                 </span>
-                <div class="flex items-center gap-2">
-                    <label class="text-xs text-zinc-400">Couleur d'accent :</label>
-                    <input type="color" id="accent-color-picker" value="#fafafa" onchange="changeAccentColor(this.value)" class="w-7 h-7 rounded bg-transparent cursor-pointer border border-zinc-700">
+                <button onclick="toggleAdminPanel()" class="text-xs text-zinc-400 hover:text-white underline">Fermer le panneau</button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Bloc Design & Couleurs -->
+                <div class="surface-card p-4 flex flex-col gap-3">
+                    <h4 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
+                        <i data-lucide="palette" class="w-3.5 h-3.5"></i> Design & Thème
+                    </h4>
+                    <div class="flex items-center justify-between text-xs text-zinc-300">
+                        <span>Couleur d'accent :</span>
+                        <input type="color" id="accent-color-picker" value="#fafafa" onchange="updateSettings('accentColor', this.value)" class="w-8 h-8 rounded bg-transparent cursor-pointer border border-zinc-700">
+                    </div>
+                    <div class="flex items-center justify-between text-xs text-zinc-300">
+                        <span>Rayon des bordures :</span>
+                        <select id="radius-select" onchange="updateSettings('cardRadius', this.value)" class="bg-zinc-900 border border-zinc-700 rounded px-2 py-1 text-xs text-zinc-200">
+                            <option value="0rem">Carré (0px)</option>
+                            <option value="0.375rem">Subtil (6px)</option>
+                            <option value="0.5rem" selected>Standard (8px)</option>
+                            <option value="1rem">Arrondi (16px)</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="flex items-center gap-2">
-                    <label class="text-xs text-zinc-400">Afficher Widget Notes :</label>
-                    <input type="checkbox" id="toggle-notes-widget" checked onchange="toggleWidget('notes', this.checked)" class="rounded bg-zinc-800 border-zinc-700 text-zinc-100">
+
+                <!-- Bloc Widgets -->
+                <div class="surface-card p-4 flex flex-col gap-3">
+                    <h4 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
+                        <i data-lucide="layout" class="w-3.5 h-3.5"></i> Visibilité des Widgets
+                    </h4>
+                    <label class="flex items-center justify-between text-xs text-zinc-300 cursor-pointer">
+                        <span>Widget Notes rapides</span>
+                        <input type="checkbox" id="toggle-notes" checked onchange="updateSettings('showNotes', this.checked)" class="rounded bg-zinc-900 border-zinc-700 text-zinc-100">
+                    </label>
+                    <label class="flex items-center justify-between text-xs text-zinc-300 cursor-pointer">
+                        <span>Smart Capture Bar</span>
+                        <input type="checkbox" id="toggle-capture" checked onchange="updateSettings('showCapture', this.checked)" class="rounded bg-zinc-900 border-zinc-700 text-zinc-100">
+                    </label>
+                </div>
+
+                <!-- Bloc Données & Sauvegarde -->
+                <div class="surface-card p-4 flex flex-col gap-3">
+                    <h4 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
+                        <i data-lucide="database" class="w-3.5 h-3.5"></i> Gestion des Données
+                    </h4>
+                    <div class="flex gap-2">
+                        <button onclick="exportData()" class="flex-1 text-xs py-1.5 px-3 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-700 transition">Exporter JSON</button>
+                        <button onclick="resetDefaultState()" class="flex-1 text-xs py-1.5 px-3 rounded bg-red-950/40 hover:bg-red-900/50 text-red-300 border border-red-900/50 transition">Réinitialiser</button>
+                    </div>
                 </div>
             </div>
-            <button onclick="toggleAdminPanel()" class="text-xs text-zinc-400 hover:text-white underline">Fermer le panneau</button>
+
+            <!-- Bloc CSS Personnalisé en direct -->
+            <div class="surface-card p-4 flex flex-col gap-2">
+                <h4 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
+                    <i data-lucide="code" class="w-3.5 h-3.5"></i> Injecteur de CSS Personnalisé (Contrôle Total du Style)
+                </h4>
+                <textarea id="custom-css-input" rows="2" placeholder="Ex: body { background: #050507; } .surface-card { border-color: #3b82f6; }" oninput="updateCustomCSS(this.value)" class="w-full bg-zinc-950 border border-zinc-800 rounded p-2.5 text-xs mono text-zinc-200 focus:outline-none"></textarea>
+            </div>
         </div>
     </section>
 
     <!-- Main Content -->
     <main class="flex-1 max-w-7xl w-full mx-auto px-6 py-8 flex flex-col gap-8">
 
-        <!-- Capture Bar (Always available for local user) -->
-        <section class="max-w-3xl w-full mx-auto">
+        <!-- Smart Capture Bar -->
+        <section id="capture-section" class="max-w-3xl w-full mx-auto">
             <div class="relative group">
                 <div class="relative flex items-center surface-card border border-zinc-800 focus-within:border-zinc-500 rounded-lg px-4 py-3 transition shadow-lg">
                     <i data-lucide="terminal" class="w-4 h-4 text-zinc-500 mr-3 shrink-0"></i>
@@ -104,15 +156,15 @@
                 </div>
             </div>
             <div class="flex justify-between items-center mt-2 px-1 text-[11px] text-zinc-500">
-                <span>Tes ajouts restent strictement sauvegardés sur ton navigateur</span>
+                <span>Tes données sont sauvegardées localement en toute sécurité</span>
                 <span>Glisse une tâche sur un lien pour les associer</span>
             </div>
         </section>
 
-        <!-- Dynamic Grid Layout -->
+        <!-- Layout Grille -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             
-            <!-- Links Grid (Dynamic sizing based on widgets) -->
+            <!-- Liens -->
             <section id="main-links-section" class="lg:col-span-8 flex flex-col gap-4">
                 <div class="flex items-center justify-between border-b border-zinc-800/80 pb-2.5">
                     <h2 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-2">
@@ -127,15 +179,13 @@
                     </div>
                 </div>
 
-                <div id="links-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                    <!-- Links injected here -->
-                </div>
+                <div id="links-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3"></div>
             </section>
 
-            <!-- Context Sidebar - Tasks & Notes -->
+            <!-- Sidebar (Tâches & Notes) -->
             <aside class="lg:col-span-4 flex flex-col gap-6">
                 
-                <!-- To-Do List -->
+                <!-- Tâches -->
                 <div class="surface-card rounded-lg p-4 flex flex-col gap-3">
                     <div class="flex items-center justify-between border-b border-zinc-800/80 pb-2.5">
                         <h3 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-2">
@@ -146,7 +196,7 @@
                     <ul id="tasks-list" class="flex flex-col gap-2 max-h-64 overflow-y-auto pr-1"></ul>
                 </div>
 
-                <!-- Quick Notes Widget (Can be toggled by admin layout settings) -->
+                <!-- Notes -->
                 <div id="notes-widget-container" class="surface-card rounded-lg p-4 flex flex-col gap-3">
                     <div class="flex items-center justify-between border-b border-zinc-800/80 pb-2.5">
                         <h3 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-2">
@@ -161,7 +211,7 @@
         </div>
     </main>
 
-    <!-- Context Modal -->
+    <!-- Modals -->
     <div id="context-modal" class="fixed inset-0 bg-black/75 z-50 hidden items-center justify-center p-4">
         <div class="surface-card rounded-lg max-w-lg w-full p-6 flex flex-col gap-5 shadow-2xl">
             <div class="flex items-start justify-between gap-4 border-b border-zinc-800 pb-4">
@@ -182,7 +232,6 @@
         </div>
     </div>
 
-    <!-- Workspace Modal -->
     <div id="workspace-modal" class="fixed inset-0 bg-black/75 z-50 hidden items-center justify-center p-4">
         <div class="surface-card rounded-lg max-w-md w-full p-6 flex flex-col gap-4 shadow-2xl">
             <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
@@ -195,30 +244,33 @@
         </div>
     </div>
 
-    <!-- Toast -->
     <div id="toast" class="fixed bottom-5 right-5 accent-bg px-4 py-2.5 rounded shadow-xl text-xs font-medium transform translate-y-20 opacity-0 transition-all duration-200 z-50 flex items-center gap-2">
         <i data-lucide="check" class="w-3.5 h-3.5"></i> <span id="toast-msg">Action effectuée</span>
     </div>
 
     <script>
-        // --- State Local & Global Settings ---
         const defaultState = {
             links: [
                 { id: 'l1', title: 'GitHub', url: 'https://github.com', clicks: 5, attached: [] },
                 { id: 'l2', title: 'YouTube', url: 'https://youtube.com', clicks: 3, attached: [] }
             ],
-            tasks: [{ id: 't1', text: 'Explorer mon nouveau tableau de bord', done: false }],
-            notes: [{ id: 'n1', text: 'Bienvenue ! Tes données restent privées sur ton appareil.' }],
+            tasks: [{ id: 't1', text: 'Explorer ma station de contrôle totale', done: false }],
+            notes: [{ id: 'n1', text: 'Bienvenue ! Ouvre le panneau admin pour tout personnaliser.' }],
             workspaces: [],
-            settings: { accentColor: '#fafafa', showNotes: true }
+            settings: {
+                accentColor: '#fafafa',
+                cardRadius: '0.5rem',
+                showNotes: true,
+                showCapture: true,
+                customCSS: ''
+            }
         };
 
-        let state = JSON.parse(localStorage.getItem('myhub_user_state')) || defaultState;
+        let state = JSON.parse(localStorage.getItem('myhub_control_state')) || defaultState;
         let isAdmin = localStorage.getItem('myhub_is_admin') === 'true';
         let currentModalLinkId = null;
         let draggedItem = null;
 
-        // URL Admin hook (?admin=monpasssecure)
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('admin') === 'monpasssecure') {
             isAdmin = true;
@@ -226,7 +278,7 @@
         }
 
         function saveState() {
-            localStorage.setItem('myhub_user_state', JSON.stringify(state));
+            localStorage.setItem('myhub_control_state', JSON.stringify(state));
             renderAll();
         }
 
@@ -239,11 +291,11 @@
 
         function toggleAdminPanel() {
             if (!isAdmin) {
-                const pass = prompt("Mot de passe propriétaire :");
+                const pass = prompt("Mot de passe administrateur :");
                 if (pass === "monpasssecure") {
                     isAdmin = true;
                     localStorage.setItem('myhub_is_admin', 'true');
-                    showToast('Mode Admin activé');
+                    showToast('Mode Administrateur Activé');
                 } else if (pass !== null) {
                     alert("Mot de passe incorrect.");
                     return;
@@ -255,22 +307,24 @@
             panel.classList.toggle('hidden');
         }
 
-        function changeAccentColor(color) {
-            state.settings.accentColor = color;
+        function updateSettings(key, value) {
+            state.settings[key] = value;
             applySettings();
             saveState();
         }
 
-        function toggleWidget(widgetName, show) {
-            state.settings.showNotes = show;
-            applySettings();
+        function updateCustomCSS(css) {
+            state.settings.customCSS = css;
+            document.getElementById('custom-injected-css').textContent = css;
             saveState();
         }
 
         function applySettings() {
-            if (state.settings.accentColor) {
-                document.documentElement.style.setProperty('--accent-color', state.settings.accentColor);
-            }
+            const root = document.documentElement;
+            if (state.settings.accentColor) root.style.setProperty('--accent-color', state.settings.accentColor);
+            if (state.settings.cardRadius) root.style.setProperty('--card-radius', state.settings.cardRadius);
+
+            // Widgets visibility
             const notesWidget = document.getElementById('notes-widget-container');
             const mainSection = document.getElementById('main-links-section');
             if (notesWidget) {
@@ -281,6 +335,40 @@
                     notesWidget.classList.add('hidden');
                     mainSection.className = "lg:col-span-12 flex flex-col gap-4";
                 }
+            }
+
+            const captureSection = document.getElementById('capture-section');
+            if (captureSection) {
+                captureSection.style.display = state.settings.showCapture ? 'block' : 'none';
+            }
+
+            // Sync inputs values in admin panel
+            if(document.getElementById('accent-color-picker')) document.getElementById('accent-color-picker').value = state.settings.accentColor || '#fafafa';
+            if(document.getElementById('radius-select')) document.getElementById('radius-select').value = state.settings.cardRadius || '0.5rem';
+            if(document.getElementById('toggle-notes')) document.getElementById('toggle-notes').checked = state.settings.showNotes;
+            if(document.getElementById('toggle-capture')) document.getElementById('toggle-capture').checked = state.settings.showCapture;
+            if(document.getElementById('custom-css-input') && document.getElementById('custom-css-input').value === '') {
+                document.getElementById('custom-css-input').value = state.settings.customCSS || '';
+                document.getElementById('custom-injected-css').textContent = state.settings.customCSS || '';
+            }
+        }
+
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
+            const dlAnchorElem = document.createElement('a');
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", "myhub_backup.json");
+            dlAnchorElem.click();
+            showToast('Données exportées !');
+        }
+
+        function resetDefaultState() {
+            if (confirm("Veux-tu vraiment réinitialiser toutes tes données locales ?")) {
+                localStorage.removeItem('myhub_control_state');
+                state = JSON.parse(JSON.stringify(defaultState));
+                applySettings();
+                saveState();
+                showToast('Réinitialisé avec succès');
             }
         }
 
@@ -297,29 +385,31 @@
             return { type: 'note', label: 'Note' };
         }
 
-        smartInput.addEventListener('input', (e) => typeBadge.textContent = detectInputType(e.target.value).label);
-        smartInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && smartInput.value.trim() !== '') {
-                const raw = smartInput.value.trim();
-                const detection = detectInputType(raw);
-                if (detection.type === 'link') {
-                    let url = raw.startsWith('http') ? raw : 'https://' + raw;
-                    let title = new URL(url).hostname.replace('www.', '').split('.')[0];
-                    title = title.charAt(0).toUpperCase() + title.slice(1);
-                    state.links.unshift({ id: 'l_' + Date.now(), title, url, clicks: 1, attached: [] });
-                    showToast('Lien ajouté');
-                } else if (detection.type === 'task') {
-                    state.tasks.unshift({ id: 't_' + Date.now(), text: raw, done: false });
-                    showToast('Tâche ajoutée');
-                } else {
-                    state.notes.unshift({ id: 'n_' + Date.now(), text: raw });
-                    showToast('Note ajoutée');
+        if(smartInput) {
+            smartInput.addEventListener('input', (e) => typeBadge.textContent = detectInputType(e.target.value).label);
+            smartInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && smartInput.value.trim() !== '') {
+                    const raw = smartInput.value.trim();
+                    const detection = detectInputType(raw);
+                    if (detection.type === 'link') {
+                        let url = raw.startsWith('http') ? raw : 'https://' + raw;
+                        let title = new URL(url).hostname.replace('www.', '').split('.')[0];
+                        title = title.charAt(0).toUpperCase() + title.slice(1);
+                        state.links.unshift({ id: 'l_' + Date.now(), title, url, clicks: 1, attached: [] });
+                        showToast('Lien ajouté');
+                    } else if (detection.type === 'task') {
+                        state.tasks.unshift({ id: 't_' + Date.now(), text: raw, done: false });
+                        showToast('Tâche ajoutée');
+                    } else {
+                        state.notes.unshift({ id: 'n_' + Date.now(), text: raw });
+                        showToast('Note ajoutée');
+                    }
+                    smartInput.value = '';
+                    typeBadge.textContent = 'Prêt';
+                    saveState();
                 }
-                smartInput.value = '';
-                typeBadge.textContent = 'Prêt';
-                saveState();
-            }
-        });
+            });
+        }
 
         // --- Rendering ---
         function renderLinks() {
@@ -457,7 +547,6 @@
             if (!val || !currentModalLinkId) return;
             const link = state.links.find(l => l.id === currentModalLinkId);
             if (!link.attached) link.attached = [];
-            link.attached.path?.push?.({ id: 'att_' + Date.now(), type: 'note', text: val });
             link.attached.push({ id: 'att_' + Date.now(), type: 'note', text: val });
             input.value = ''; saveState(); renderModalAttached(link); lucide.createIcons();
         }
