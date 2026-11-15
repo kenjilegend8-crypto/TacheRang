@@ -3,111 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MyHub — Espace de travail</title>
+    <title>MyHub — Espace Cloud</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Import de Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #09090b;
-            color: #fafafa;
-            overflow-x: hidden;
-        }
-        .mono {
-            font-family: 'JetBrains Mono', monospace;
-        }
-        .surface-card {
-            background-color: #111113;
-            border: 1px solid #27272a;
-        }
-        .link-card {
-            transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.15s ease;
-        }
-        .link-card:hover {
-            background-color: #161618;
-            border-color: #3f3f46;
-            transform: translateY(-1px);
-        }
-        .frequent-badge {
-            border-left: 2px solid #fafafa;
-        }
-        ::-webkit-scrollbar {
-            width: 5px;
-            height: 5px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #09090b;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #27272a;
-            border-radius: 2px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #3f3f46;
-        }
+        body { font-family: 'Inter', sans-serif; background-color: #09090b; color: #fafafa; overflow-x: hidden; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .surface-card { background-color: #111113; border: 1px solid #27272a; }
+        .link-card { transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.15s ease; }
+        .link-card:hover { background-color: #161618; border-color: #3f3f46; transform: translateY(-1px); }
+        .frequent-badge { border-left: 2px solid #fafafa; }
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: #09090b; }
+        ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 2px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col selection:bg-zinc-200 selection:text-zinc-950">
 
-    <!-- Top Navigation & Workspaces -->
     <header class="border-b border-zinc-800/80 px-6 py-3.5 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-40 bg-[#09090b]/95 backdrop-blur-sm">
         <div class="flex items-center gap-3">
-            <div class="w-7 h-7 rounded bg-zinc-100 text-zinc-950 flex items-center justify-center font-bold text-sm">
-                M
-            </div>
+            <div class="w-7 h-7 rounded bg-zinc-100 text-zinc-950 flex items-center justify-center font-bold text-sm">M</div>
             <span class="font-semibold text-base tracking-tight text-zinc-100">MyHub</span>
             <span id="owner-status-badge" class="text-[11px] mono px-1.5 py-0.5 rounded bg-zinc-900 text-zinc-500 border border-zinc-800">Public</span>
         </div>
-
-        <!-- Workspaces (Group Launchers) -->
         <div class="flex items-center gap-2 flex-wrap" id="workspaces-container">
             <span class="text-xs text-zinc-500 mr-1 hidden sm:inline">Espaces :</span>
         </div>
-
         <div class="flex items-center gap-2">
             <button id="owner-action-btn" onclick="toggleOwnerMode()" class="text-xs px-3 py-1.5 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 transition flex items-center gap-1.5">
-                <i data-lucide="lock" class="w-3.5 h-3.5"></i>
-                Propriétaire
+                <i data-lucide="lock" class="w-3.5 h-3.5"></i> Propriétaire
             </button>
         </div>
     </header>
 
-    <!-- Main Content -->
     <main class="flex-1 max-w-7xl w-full mx-auto px-6 py-8 flex flex-col gap-8">
-
-        <!-- Smart Universal Capture Bar (Visible only in Owner Mode) -->
         <section id="owner-capture-section" class="max-w-3xl w-full mx-auto hidden">
             <div class="relative group">
                 <div class="relative flex items-center bg-[#111113] border border-zinc-700 rounded-lg px-4 py-3 shadow-lg">
                     <i data-lucide="terminal" class="w-4 h-4 text-zinc-400 mr-3 shrink-0"></i>
-                    <input 
-                        type="text" 
-                        id="smart-input" 
-                        placeholder="[Mode Édition] Coller un lien, ajouter une tâche ou une note..." 
-                        class="w-full bg-transparent text-zinc-100 placeholder-zinc-500 focus:outline-none text-sm"
-                        autocomplete="off"
-                    >
-                    <div id="input-type-badge" class="hidden sm:flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] mono font-medium bg-zinc-900 text-zinc-300 border border-zinc-700 shrink-0 ml-2">
-                        Prêt
-                    </div>
+                    <input type="text" id="smart-input" placeholder="[Cloud Actif] Coller un lien, ajouter une tâche ou une note..." class="w-full bg-transparent text-zinc-100 placeholder-zinc-500 focus:outline-none text-sm" autocomplete="off">
+                    <div id="input-type-badge" class="hidden sm:flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] mono font-medium bg-zinc-900 text-zinc-300 border border-zinc-700 shrink-0 ml-2">Prêt</div>
                 </div>
             </div>
             <div class="flex justify-between items-center mt-2 px-1 text-[11px] text-zinc-400">
-                <span>⚡ Mode propriétaire actif : Ajout instantané activé</span>
+                <span>⚡ Synchronisé en temps réel sur le Cloud</span>
                 <span>Glissez une tâche sur un lien pour les associer</span>
             </div>
         </section>
 
-        <!-- Dynamic Grid Layout -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            
-            <!-- Links Grid (8 cols) -->
             <section class="lg:col-span-8 flex flex-col gap-4">
                 <div class="flex items-center justify-between border-b border-zinc-800/80 pb-2.5">
                     <h2 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-2">
-                        <i data-lucide="layout-grid" class="w-3.5 h-3.5 text-zinc-400"></i>
-                        Accès rapides
+                        <i data-lucide="layout-grid" class="w-3.5 h-3.5 text-zinc-400"></i> Accès rapides
                     </h2>
                     <div class="flex items-center gap-3">
                         <span class="text-xs text-zinc-500" id="links-count">0 liens</span>
@@ -116,141 +68,107 @@
                         </button>
                     </div>
                 </div>
-
-                <div id="links-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                    <!-- Link cards injected via JS -->
-                </div>
+                <div id="links-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3"></div>
             </section>
 
-            <!-- Context Sidebar - Tasks & Notes (4 cols) -->
             <aside class="lg:col-span-4 flex flex-col gap-6">
-                
-                <!-- To-Do List -->
                 <div class="surface-card rounded-lg p-4 flex flex-col gap-3">
                     <div class="flex items-center justify-between border-b border-zinc-800/80 pb-2.5">
                         <h3 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-2">
-                            <i data-lucide="check-square" class="w-3.5 h-3.5 text-zinc-400"></i>
-                            À faire
+                            <i data-lucide="check-square" class="w-3.5 h-3.5 text-zinc-400"></i> À faire
                         </h3>
-                        <span class="text-[11px] text-zinc-500">Tâches</span>
                     </div>
-                    <ul id="tasks-list" class="flex flex-col gap-2 max-h-64 overflow-y-auto pr-1">
-                        <!-- Tasks injected via JS -->
-                    </ul>
+                    <ul id="tasks-list" class="flex flex-col gap-2 max-h-64 overflow-y-auto pr-1"></ul>
                 </div>
 
-                <!-- Quick Notes -->
                 <div class="surface-card rounded-lg p-4 flex flex-col gap-3">
                     <div class="flex items-center justify-between border-b border-zinc-800/80 pb-2.5">
                         <h3 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-2">
-                            <i data-lucide="file-text" class="w-3.5 h-3.5 text-zinc-400"></i>
-                            Notes rapides
+                            <i data-lucide="file-text" class="w-3.5 h-3.5 text-zinc-400"></i> Notes rapides
                         </h3>
-                        <span class="text-[11px] text-zinc-500">Notes</span>
                     </div>
-                    <div id="notes-list" class="flex flex-col gap-2 max-h-72 overflow-y-auto pr-1">
-                        <!-- Notes injected via JS -->
-                    </div>
+                    <div id="notes-list" class="flex flex-col gap-2 max-h-72 overflow-y-auto pr-1"></div>
                 </div>
-
             </aside>
         </div>
     </main>
 
-    <!-- Context Modal for a specific Link -->
+    <!-- Modals -->
     <div id="context-modal" class="fixed inset-0 bg-black/75 z-50 hidden items-center justify-center p-4">
         <div class="bg-[#111113] border border-zinc-800 rounded-lg max-w-lg w-full p-6 flex flex-col gap-5 shadow-2xl">
             <div class="flex items-start justify-between gap-4 border-b border-zinc-800 pb-4">
                 <div class="flex items-center gap-3">
                     <img id="modal-favicon" src="" alt="" class="w-7 h-7 rounded bg-zinc-900 p-1 border border-zinc-800">
                     <div>
-                        <h3 id="modal-title" class="font-semibold text-base text-zinc-100">Titre du lien</h3>
-                        <a id="modal-url" href="#" target="_blank" class="text-xs text-zinc-400 hover:text-zinc-200 underline underline-offset-2 truncate block max-w-xs">https://...</a>
+                        <h3 id="modal-title" class="font-semibold text-base text-zinc-100">Titre</h3>
+                        <a id="modal-url" href="#" target="_blank" class="text-xs text-zinc-400 hover:text-zinc-200 underline truncate block max-w-xs">https://...</a>
                     </div>
                 </div>
-                <button onclick="closeContextModal()" class="text-zinc-500 hover:text-zinc-200 p-1">
-                    <i data-lucide="x" class="w-4 h-4"></i>
-                </button>
+                <button onclick="closeContextModal()" class="text-zinc-500 hover:text-zinc-200 p-1"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
-
-            <div class="flex flex-col gap-3">
-                <h4 class="text-xs font-semibold uppercase tracking-wider text-zinc-500">Éléments associés</h4>
-                <div id="modal-attached-items" class="flex flex-col gap-2 max-h-48 overflow-y-auto">
-                    <!-- Attached notes/tasks -->
-                </div>
-            </div>
-
+            <div id="modal-attached-items" class="flex flex-col gap-2 max-h-48 overflow-y-auto"></div>
             <div id="modal-owner-input-container" class="hidden gap-2 pt-2 border-t border-zinc-800">
-                <input type="text" id="modal-quick-add" placeholder="Ajouter une note ou tâche liée..." class="flex-1 bg-zinc-950 border border-zinc-800 rounded px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-zinc-500">
-                <button onclick="addContextItemFromModal()" class="bg-zinc-100 hover:bg-white text-zinc-950 px-4 py-2 rounded text-sm font-medium transition">Ajouter</button>
+                <input type="text" id="modal-quick-add" placeholder="Ajouter une note liée..." class="flex-1 bg-zinc-950 border border-zinc-800 rounded px-3 py-2 text-sm text-zinc-100 focus:outline-none">
+                <button onclick="addContextItemFromModal()" class="bg-zinc-100 text-zinc-950 px-4 py-2 rounded text-sm font-medium">Ajouter</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal for Creating a Workspace -->
     <div id="workspace-modal" class="fixed inset-0 bg-black/75 z-50 hidden items-center justify-center p-4">
         <div class="bg-[#111113] border border-zinc-800 rounded-lg max-w-md w-full p-6 flex flex-col gap-4 shadow-2xl">
             <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
-                <h3 class="font-semibold text-base text-zinc-100">Créer un espace groupé</h3>
-                <button onclick="closeWorkspaceModal()" class="text-zinc-500 hover:text-zinc-200">
-                    <i data-lucide="x" class="w-4 h-4"></i>
-                </button>
+                <h3 class="font-semibold text-base text-zinc-100">Nouvel espace</h3>
+                <button onclick="closeWorkspaceModal()" class="text-zinc-500"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
-            <input type="text" id="ws-name" placeholder="Nom de l'espace (ex: Travail)" class="bg-zinc-950 border border-zinc-800 rounded px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-zinc-500">
-            <div class="flex flex-col gap-2">
-                <span class="text-xs font-medium text-zinc-400">Liens à inclure :</span>
-                <div id="ws-links-selection" class="flex flex-col gap-1.5 max-h-40 overflow-y-auto bg-zinc-950 p-2.5 rounded border border-zinc-800"></div>
-            </div>
-            <button onclick="saveWorkspace()" class="w-full bg-zinc-100 hover:bg-white text-zinc-950 py-2 rounded text-sm font-medium transition mt-1">Enregistrer</button>
+            <input type="text" id="ws-name" placeholder="Nom de l'espace" class="bg-zinc-950 border border-zinc-800 rounded px-3 py-2 text-sm text-zinc-100 focus:outline-none">
+            <div id="ws-links-selection" class="flex flex-col gap-1.5 max-h-40 overflow-y-auto bg-zinc-950 p-2.5 rounded border border-zinc-800"></div>
+            <button onclick="saveWorkspace()" class="w-full bg-zinc-100 text-zinc-950 py-2 rounded text-sm font-medium">Enregistrer</button>
         </div>
     </div>
 
-    <!-- Toast Notification -->
     <div id="toast" class="fixed bottom-5 right-5 bg-zinc-100 text-zinc-950 px-4 py-2.5 rounded shadow-xl text-xs font-medium transform translate-y-20 opacity-0 transition-all duration-200 z-50 flex items-center gap-2">
-        <i data-lucide="check" class="w-3.5 h-3.5 text-zinc-950"></i>
-        <span id="toast-msg">Action effectuée</span>
+        <i data-lucide="check" class="w-3.5 h-3.5"></i> <span id="toast-msg">Action effectuée</span>
     </div>
 
     <script>
-        // --- State Management ---
-        const defaultState = {
-            links: [
-                { id: 'l1', title: 'GitHub', url: 'https://github.com', clicks: 12, attached: [] },
-                { id: 'l2', title: 'YouTube', url: 'https://youtube.com', clicks: 8, attached: [] }
-            ],
-            tasks: [
-                { id: 't1', text: 'Consulter le tableau de bord', done: false }
-            ],
-            notes: [
-                { id: 'n1', text: 'Bienvenue sur MyHub.' }
-            ],
-            workspaces: []
-        };
+        // --- CONFIGURATION SUPABASE (Sécurisée avec Publishable Key) ---
+        const SUPABASE_URL = 'https://kuqnbobzxvdisgaitns.supabase.co'; 
+        const SUPABASE_ANON_KEY = 'sb_publishable_fxtje-wkPQ5D7xce6ejUZg_NWDw-Usg';
+        
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        let state = JSON.parse(localStorage.getItem('myhub_state_v1')) || defaultState;
+        let state = { links: [], tasks: [], notes: [], workspaces: [] };
         let isOwner = localStorage.getItem('myhub_is_owner') === 'true';
         let currentModalLinkId = null;
         let draggedItem = null;
 
-        // Check URL secret token (ex: ?admin=monsecret)
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('admin') === 'monpasssecure') {
             isOwner = true;
             localStorage.setItem('myhub_is_owner', 'true');
         }
 
-        function saveState() {
-            localStorage.setItem('myhub_state_v1', JSON.stringify(state));
+        // Charger les données depuis le Cloud Supabase
+        async function loadStateFromCloud() {
+            const { data, error } = await _supabase.from('myhub_state').select('content').eq('id', 'main_data').single();
+            if (data && data.content) {
+                state = data.content;
+            }
             renderAll();
+        }
+
+        // Sauvegarder sur le Cloud Supabase
+        async function saveState() {
+            renderAll();
+            const { error } = await _supabase.from('myhub_state').update({ content: state }).eq('id', 'main_data');
+            if (error) console.error("Erreur de sauvegarde cloud :", error);
         }
 
         function showToast(msg) {
             const toast = document.getElementById('toast');
             document.getElementById('toast-msg').textContent = msg;
             toast.classList.remove('translate-y-20', 'opacity-0');
-            setTimeout(() => {
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 2500);
+            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 2500);
         }
 
         function toggleOwnerMode() {
@@ -264,9 +182,7 @@
                     isOwner = true;
                     localStorage.setItem('myhub_is_owner', 'true');
                     showToast('Mode propriétaire activé !');
-                } else if (pass !== null) {
-                    alert("Mot de passe incorrect.");
-                }
+                } else if (pass !== null) alert("Mot de passe incorrect.");
             }
             updateOwnerUI();
         }
@@ -279,28 +195,24 @@
             const modalInput = document.getElementById('modal-owner-input-container');
 
             if (isOwner) {
-                badge.textContent = "Propriétaire";
+                badge.textContent = "Propriétaire Cloud";
                 badge.className = "text-[11px] mono px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800";
                 btn.innerHTML = `<i data-lucide="unlock" class="w-3.5 h-3.5 text-emerald-400"></i> Verrouiller`;
                 capture.classList.remove('hidden');
-                wsBtn.classList.remove('hidden');
-                wsBtn.classList.add('flex');
-                if(modalInput) modalInput.classList.remove('hidden');
-                if(modalInput) modalInput.classList.add('flex');
+                wsBtn.classList.remove('hidden'); wsBtn.classList.add('flex');
+                if(modalInput) { modalInput.classList.remove('hidden'); modalInput.classList.add('flex'); }
             } else {
                 badge.textContent = "Public";
                 badge.className = "text-[11px] mono px-1.5 py-0.5 rounded bg-zinc-900 text-zinc-500 border border-zinc-800";
                 btn.innerHTML = `<i data-lucide="lock" class="w-3.5 h-3.5"></i> Propriétaire`;
                 capture.classList.add('hidden');
-                wsBtn.classList.add('hidden');
-                wsBtn.classList.remove('flex');
-                if(modalInput) modalInput.classList.add('hidden');
-                if(modalInput) modalInput.classList.remove('flex');
+                wsBtn.classList.add('hidden'); wsBtn.classList.remove('flex');
+                if(modalInput) { modalInput.classList.add('hidden'); modalInput.classList.remove('flex'); }
             }
             renderAll();
         }
 
-        // --- Smart Capture ---
+        // --- Smart Input ---
         const smartInput = document.getElementById('smart-input');
         const typeBadge = document.getElementById('input-type-badge');
         const actionVerbs = ['finir', 'faire', 'acheter', 'appeler', 'envoyer', 'réviser', 'préparer', 'lire', 'écrire', 'tester', 'créer'];
@@ -308,37 +220,29 @@
         function detectInputType(val) {
             const trimmed = val.trim();
             if (!trimmed) return { type: 'empty', label: 'Prêt' };
-            const urlPattern = /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w- ./?%&=]*)?$/i;
-            if (urlPattern.test(trimmed) && !trimmed.includes(' ')) return { type: 'link', label: 'Lien URL' };
-            const firstWord = trimmed.split(' ')[0].toLowerCase().replace(/[^a-zà-ÿ]/g, '');
-            if (actionVerbs.includes(firstWord)) return { type: 'task', label: 'Tâche' };
+            if (/^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w- ./?%&=]*)?$/i.test(trimmed) && !trimmed.includes(' ')) return { type: 'link', label: 'Lien URL' };
+            if (actionVerbs.includes(trimmed.split(' ')[0].toLowerCase().replace(/[^a-zà-ÿ]/g, ''))) return { type: 'task', label: 'Tâche' };
             return { type: 'note', label: 'Note' };
         }
 
         if(smartInput) {
-            smartInput.addEventListener('input', (e) => {
-                const detection = detectInputType(e.target.value);
-                typeBadge.textContent = detection.label;
-            });
-
+            smartInput.addEventListener('input', (e) => typeBadge.textContent = detectInputType(e.target.value).label);
             smartInput.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' && smartInput.value.trim() !== '') {
                     const raw = smartInput.value.trim();
                     const detection = detectInputType(raw);
-
                     if (detection.type === 'link') {
                         let url = raw.startsWith('http') ? raw : 'https://' + raw;
-                        let domain = new URL(url).hostname.replace('www.', '');
-                        let title = domain.split('.')[0];
+                        let title = new URL(url).hostname.replace('www.', '').split('.')[0];
                         title = title.charAt(0).toUpperCase() + title.slice(1);
                         state.links.unshift({ id: 'l_' + Date.now(), title, url, clicks: 1, attached: [] });
-                        showToast('Lien ajouté');
+                        showToast('Lien ajouté au Cloud');
                     } else if (detection.type === 'task') {
                         state.tasks.unshift({ id: 't_' + Date.now(), text: raw, done: false });
-                        showToast('Tâche ajoutée');
+                        showToast('Tâche ajoutée au Cloud');
                     } else {
                         state.notes.unshift({ id: 'n_' + Date.now(), text: raw });
-                        showToast('Note ajoutée');
+                        showToast('Note ajoutée au Cloud');
                     }
                     smartInput.value = '';
                     typeBadge.textContent = 'Prêt';
@@ -357,13 +261,10 @@
                 const domain = new URL(link.url).hostname;
                 const favicon = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
                 const attachedCount = link.attached ? link.attached.length : 0;
-
                 return `
-                    <div 
-                        class="link-card surface-card rounded-lg p-3.5 flex flex-col justify-between gap-3 relative group cursor-pointer"
+                    <div class="link-card surface-card rounded-lg p-3.5 flex flex-col justify-between gap-3 relative group cursor-pointer"
                         onclick="openLink('${link.id}', '${link.url}')"
-                        ${isOwner ? `ondragover="handleDragOver(event, this)" ondragleave="handleDragLeave(this)" ondrop="handleDropOnLink(event, '${link.id}', this)"` : ''}
-                    >
+                        ${isOwner ? `ondragover="handleDragOver(event, this)" ondragleave="handleDragLeave(this)" ondrop="handleDropOnLink(event, '${link.id}', this)"` : ''}>
                         <div class="flex items-start justify-between gap-2">
                             <div class="flex items-center gap-3 overflow-hidden">
                                 <img src="${favicon}" alt="" class="w-6 h-6 rounded bg-zinc-900 p-0.5 border border-zinc-800 shrink-0">
@@ -372,208 +273,111 @@
                                     <p class="text-[11px] text-zinc-500 truncate">${domain}</p>
                                 </div>
                             </div>
-                            
                             <div class="flex items-center gap-1" onclick="event.stopPropagation()">
-                                <button onclick="openContextModal('${link.id}')" title="Voir contenu" class="p-1.5 rounded hover:bg-zinc-800 text-zinc-400 hover:text-zinc-100">
-                                    <i data-lucide="layers" class="w-3.5 h-3.5"></i>
-                                </button>
-                                ${isOwner ? `
-                                    <button onclick="deleteLink('${link.id}')" title="Supprimer" class="p-1.5 rounded hover:bg-zinc-800 text-zinc-500 hover:text-red-400">
-                                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                                    </button>
-                                ` : ''}
+                                <button onclick="openContextModal('${link.id}')" title="Contenu" class="p-1.5 rounded hover:bg-zinc-800 text-zinc-400"><i data-lucide="layers" class="w-3.5 h-3.5"></i></button>
+                                ${isOwner ? `<button onclick="deleteLink('${link.id}')" title="Supprimer" class="p-1.5 rounded hover:bg-zinc-800 text-zinc-500 hover:text-red-400"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>` : ''}
                             </div>
                         </div>
-
                         <div class="flex items-center justify-between text-[11px] pt-2 border-t border-zinc-800/80">
-                            <span class="text-zinc-500 flex items-center gap-1">
-                                <i data-lucide="arrow-up-right" class="w-3 h-3"></i> ${link.clicks}
-                            </span>
-                            ${attachedCount > 0 ? `
-                                <span class="px-2 py-0.5 rounded bg-zinc-900 text-zinc-300 border border-zinc-800 flex items-center gap-1">
-                                    <i data-lucide="paperclip" class="w-2.5 h-2.5"></i> ${attachedCount}
-                                </span>
-                            ` : ''}
+                            <span class="text-zinc-500 flex items-center gap-1"><i data-lucide="arrow-up-right" class="w-3 h-3"></i> ${link.clicks}</span>
+                            ${attachedCount > 0 ? `<span class="px-2 py-0.5 rounded bg-zinc-900 text-zinc-300 border border-zinc-800"><i data-lucide="paperclip" class="w-2.5 h-2.5"></i> ${attachedCount}</span>` : ''}
                         </div>
-                    </div>
-                `;
+                    </div>`;
             }).join('');
         }
 
         function renderTasks() {
             const list = document.getElementById('tasks-list');
-            if (state.tasks.length === 0) {
-                list.innerHTML = `<li class="text-xs text-zinc-600 py-2">Aucune tâche.</li>`;
-                return;
-            }
+            if (state.tasks.length === 0) { list.innerHTML = `<li class="text-xs text-zinc-600 py-2">Aucune tâche.</li>`; return; }
             list.innerHTML = state.tasks.map(task => `
-                <li 
-                    ${isOwner ? `draggable="true" ondragstart="handleDragStart(event, 'task', '${task.id}')"` : ''}
-                    class="flex items-center justify-between gap-2 p-2 rounded bg-zinc-950/60 hover:bg-zinc-900 border border-zinc-800/80 ${isOwner ? 'cursor-grab active:cursor-grabbing' : ''} group"
-                >
+                <li ${isOwner ? `draggable="true" ondragstart="handleDragStart(event, 'task', '${task.id}')"` : ''} class="flex items-center justify-between gap-2 p-2 rounded bg-zinc-950/60 border border-zinc-800/80 ${isOwner ? 'cursor-grab' : ''} group">
                     <div class="flex items-center gap-2.5 overflow-hidden">
                         <input type="checkbox" ${task.done ? 'checked' : ''} onchange="toggleTask('${task.id}')" class="rounded border-zinc-700 bg-zinc-900 text-zinc-100 cursor-pointer">
                         <span class="text-xs ${task.done ? 'line-through text-zinc-600' : 'text-zinc-200'} truncate">${task.text}</span>
                     </div>
-                    ${isOwner ? `
-                        <button onclick="deleteTask('${task.id}')" class="opacity-0 group-hover:opacity-100 text-zinc-600 hover:text-red-400 transition">
-                            <i data-lucide="x" class="w-3.5 h-3.5"></i>
-                        </button>
-                    ` : ''}
-                </li>
-            `).join('');
+                    ${isOwner ? `<button onclick="deleteTask('${task.id}')" class="opacity-0 group-hover:opacity-100 text-zinc-600 hover:text-red-400"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>` : ''}
+                </li>`).join('');
         }
 
         function renderNotes() {
             const list = document.getElementById('notes-list');
-            if (state.notes.length === 0) {
-                list.innerHTML = `<p class="text-xs text-zinc-600 py-2">Aucune note.</p>`;
-                return;
-            }
+            if (state.notes.length === 0) { list.innerHTML = `<p class="text-xs text-zinc-600 py-2">Aucune note.</p>`; return; }
             list.innerHTML = state.notes.map(note => `
-                <div 
-                    ${isOwner ? `draggable="true" ondragstart="handleDragStart(event, 'note', '${note.id}')"` : ''}
-                    class="p-2.5 rounded bg-zinc-950/60 hover:bg-zinc-900 border border-zinc-800/80 text-xs text-zinc-300 flex justify-between items-start gap-2 ${isOwner ? 'cursor-grab active:cursor-grabbing' : ''} group"
-                >
+                <div ${isOwner ? `draggable="true" ondragstart="handleDragStart(event, 'note', '${note.id}')"` : ''} class="p-2.5 rounded bg-zinc-950/60 border border-zinc-800/80 text-xs text-zinc-300 flex justify-between items-start gap-2 ${isOwner ? 'cursor-grab' : ''} group">
                     <p class="leading-relaxed">${note.text}</p>
-                    ${isOwner ? `
-                        <button onclick="deleteNote('${note.id}')" class="opacity-0 group-hover:opacity-100 text-zinc-600 hover:text-red-400 shrink-0 transition">
-                            <i data-lucide="x" class="w-3.5 h-3.5"></i>
-                        </button>
-                    ` : ''}
-                </div>
-            `).join('');
+                    ${isOwner ? `<button onclick="deleteNote('${note.id}')" class="opacity-0 group-hover:opacity-100 text-zinc-600 hover:text-red-400"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>` : ''}
+                </div>`).join('');
         }
 
         function renderWorkspaces() {
             const container = document.getElementById('workspaces-container');
-            const label = `<span class="text-xs text-zinc-500 mr-1 hidden sm:inline">Espaces :</span>`;
-            const buttons = state.workspaces.map(ws => `
-                <div class="inline-flex items-center rounded bg-zinc-900 border border-zinc-800 transition overflow-hidden">
-                    <button onclick="launchWorkspace('${ws.id}')" class="px-2.5 py-1 text-xs font-medium text-zinc-200 hover:text-white flex items-center gap-1.5">
-                        <i data-lucide="play" class="w-2.5 h-2.5 text-zinc-400"></i> ${ws.name}
-                    </button>
-                    ${isOwner ? `
-                        <button onclick="deleteWorkspace('${ws.id}')" class="px-1.5 py-1 text-zinc-600 hover:text-red-400 border-l border-zinc-800">
-                            <i data-lucide="x" class="w-2.5 h-2.5"></i>
-                        </button>
-                    ` : ''}
-                </div>
-            `).join('');
-            container.innerHTML = label + buttons;
+            container.innerHTML = `<span class="text-xs text-zinc-500 mr-1 hidden sm:inline">Espaces :</span>` + state.workspaces.map(ws => `
+                <div class="inline-flex items-center rounded bg-zinc-900 border border-zinc-800 overflow-hidden">
+                    <button onclick="launchWorkspace('${ws.id}')" class="px-2.5 py-1 text-xs font-medium text-zinc-200 hover:text-white flex items-center gap-1.5"><i data-lucide="play" class="w-2.5 h-2.5 text-zinc-400"></i> ${ws.name}</button>
+                    ${isOwner ? `<button onclick="deleteWorkspace('${ws.id}')" class="px-1.5 py-1 text-zinc-600 hover:text-red-400 border-l border-zinc-800"><i data-lucide="x" class="w-2.5 h-2.5"></i></button>` : ''}
+                </div>`).join('');
         }
 
         function renderAll() {
-            renderLinks();
-            renderTasks();
-            renderNotes();
-            renderWorkspaces();
+            renderLinks(); renderTasks(); renderNotes(); renderWorkspaces();
             lucide.createIcons();
         }
 
-        // --- Actions ---
         function openLink(id, url) {
             const link = state.links.find(l => l.id === id);
             if (link) { link.clicks += 1; saveState(); }
             window.open(url, '_blank');
         }
 
-        function deleteLink(id) {
-            if (!isOwner) return;
-            state.links = state.links.filter(l => l.id !== id);
-            saveState();
-            showToast('Lien supprimé');
-        }
-
-        function toggleTask(id) {
-            const task = state.tasks.find(t => t.id === id);
-            if (task) { task.done = !task.done; saveState(); }
-        }
-
-        function deleteTask(id) {
-            if (!isOwner) return;
-            state.tasks = state.tasks.filter(t => t.id !== id);
-            saveState();
-        }
-
-        function deleteNote(id) {
-            if (!isOwner) return;
-            state.notes = state.notes.filter(n => n.id !== id);
-            saveState();
-        }
-
+        function deleteLink(id) { if (!isOwner) return; state.links = state.links.filter(l => l.id !== id); saveState(); showToast('Lien supprimé'); }
+        function toggleTask(id) { const t = state.tasks.find(t => t.id === id); if (t) { t.done = !t.done; saveState(); } }
+        function deleteTask(id) { if (!isOwner) return; state.tasks = state.tasks.filter(t => t.id !== id); saveState(); }
+        function deleteNote(id) { if (!isOwner) return; state.notes = state.notes.filter(n => n.id !== id); saveState(); }
         function launchWorkspace(wsId) {
             const ws = state.workspaces.find(w => w.id === wsId);
-            if (!ws) return;
-            ws.linkIds.map(id => state.links.find(l => l.id === id)?.url).filter(Boolean).forEach(url => window.open(url, '_blank'));
+            if (ws) ws.linkIds.map(id => state.links.find(l => l.id === id)?.url).filter(Boolean).forEach(url => window.open(url, '_blank'));
         }
+        function deleteWorkspace(wsId) { if (!isOwner) return; state.workspaces = state.workspaces.filter(w => w.id !== wsId); saveState(); }
 
-        function deleteWorkspace(wsId) {
-            if (!isOwner) return;
-            state.workspaces = state.workspaces.filter(w => w.id !== wsId);
-            saveState();
-        }
-
-        // --- Drag & Drop ---
-        function handleDragStart(e, type, id) {
-            if (!isOwner) return;
-            draggedItem = { type, id };
-        }
+        // Drag & Drop
+        function handleDragStart(e, type, id) { if (isOwner) draggedItem = { type, id }; }
         function handleDragOver(e, el) { if (isOwner) { e.preventDefault(); el.classList.add('border-zinc-400'); } }
         function handleDragLeave(el) { el.classList.remove('border-zinc-400'); }
         function handleDropOnLink(e, linkId, el) {
-            e.preventDefault();
-            el.classList.remove('border-zinc-400');
+            e.preventDefault(); el.classList.remove('border-zinc-400');
             if (!isOwner || !draggedItem) return;
-            const targetLink = state.links.find(l => l.id === linkId);
-            if (!targetLink.attached) targetLink.attached = [];
-
+            const target = state.links.find(l => l.id === linkId);
+            if (!target.attached) target.attached = [];
             if (draggedItem.type === 'task') {
                 const idx = state.tasks.findIndex(t => t.id === draggedItem.id);
-                if (idx > -1) {
-                    const [t] = state.tasks.splice(idx, 1);
-                    targetLink.attached.push({ id: 'att_' + Date.now(), type: 'task', text: t.text, done: t.done });
-                }
-            } else if (draggedItem.type === 'note') {
+                if (idx > -1) { const [t] = state.tasks.splice(idx, 1); target.attached.push({ id: 'att_'+Date.now(), type: 'task', text: t.text, done: t.done }); }
+            } else {
                 const idx = state.notes.findIndex(n => n.id === draggedItem.id);
-                if (idx > -1) {
-                    const [n] = state.notes.splice(idx, 1);
-                    targetLink.attached.push({ id: 'att_' + Date.now(), type: 'note', text: n.text });
-                }
+                if (idx > -1) { const [n] = state.notes.splice(idx, 1); target.attached.push({ id: 'att_'+Date.now(), type: 'note', text: n.text }); }
             }
-            draggedItem = null;
-            saveState();
-            showToast('Élément associé au lien');
+            draggedItem = null; saveState(); showToast('Fusionné !');
         }
 
-        // --- Modal ---
         function openContextModal(linkId) {
             currentModalLinkId = linkId;
             const link = state.links.find(l => l.id === linkId);
             if (!link) return;
-            const domain = new URL(link.url).hostname;
-            document.getElementById('modal-favicon').src = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+            document.getElementById('modal-favicon').src = `https://www.google.com/s2/favicons?domain=${new URL(link.url).hostname}&sz=64`;
             document.getElementById('modal-title').textContent = link.title;
-            const urlEl = document.getElementById('modal-url');
-            urlEl.textContent = link.url; urlEl.href = link.url;
+            const urlEl = document.getElementById('modal-url'); urlEl.textContent = link.url; urlEl.href = link.url;
             renderModalAttached(link);
-            document.getElementById('context-modal').classList.remove('hidden');
-            document.getElementById('context-modal').classList.add('flex');
+            document.getElementById('context-modal').classList.remove('hidden'); document.getElementById('context-modal').classList.add('flex');
             lucide.createIcons();
         }
 
         function renderModalAttached(link) {
             const container = document.getElementById('modal-attached-items');
-            if (!link.attached || link.attached.length === 0) {
-                container.innerHTML = `<p class="text-xs text-zinc-500">Aucun élément associé.</p>`;
-                return;
-            }
+            if (!link.attached || link.attached.length === 0) { container.innerHTML = `<p class="text-xs text-zinc-500">Aucun élément associé.</p>`; return; }
             container.innerHTML = link.attached.map(item => `
                 <div class="flex items-center justify-between gap-2 p-2 rounded bg-zinc-950 border border-zinc-800 text-xs">
                     <span class="text-zinc-200">${item.text}</span>
                     ${isOwner ? `<button onclick="removeAttachedItem('${item.id}')" class="text-zinc-600 hover:text-red-400"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>` : ''}
-                </div>
-            `).join('');
+                </div>`).join('');
         }
 
         function addContextItemFromModal() {
@@ -584,10 +388,7 @@
             const link = state.links.find(l => l.id === currentModalLinkId);
             if (!link.attached) link.attached = [];
             link.attached.push({ id: 'att_' + Date.now(), type: 'note', text: val });
-            input.value = '';
-            saveState();
-            renderModalAttached(link);
-            lucide.createIcons();
+            input.value = ''; saveState(); renderModalAttached(link); lucide.createIcons();
         }
 
         function removeAttachedItem(attId) {
@@ -595,49 +396,30 @@
             const link = state.links.find(l => l.id === currentModalLinkId);
             if (!link) return;
             link.attached = link.attached.filter(a => a.id !== attId);
-            saveState();
-            renderModalAttached(link);
-            lucide.createIcons();
+            saveState(); renderModalAttached(link); lucide.createIcons();
         }
 
-        function closeContextModal() {
-            document.getElementById('context-modal').classList.add('hidden');
-            document.getElementById('context-modal').classList.remove('flex');
-            currentModalLinkId = null;
-        }
-
+        function closeContextModal() { document.getElementById('context-modal').classList.add('hidden'); document.getElementById('context-modal').classList.remove('flex'); currentModalLinkId = null; }
         function openWorkspaceModal() {
             if (!isOwner) return;
-            const container = document.getElementById('ws-links-selection');
-            container.innerHTML = state.links.map(l => `
+            document.getElementById('ws-links-selection').innerHTML = state.links.map(l => `
                 <label class="flex items-center gap-2 text-xs text-zinc-300 cursor-pointer p-1">
-                    <input type="checkbox" value="${l.id}" class="ws-link-cb rounded border-zinc-700 bg-zinc-900 text-zinc-100">
-                    <span>${l.title}</span>
-                </label>
-            `).join('');
-            document.getElementById('workspace-modal').classList.remove('hidden');
-            document.getElementById('workspace-modal').classList.add('flex');
+                    <input type="checkbox" value="${l.id}" class="ws-link-cb rounded border-zinc-700 bg-zinc-900 text-zinc-100"> <span>${l.title}</span>
+                </label>`).join('');
+            document.getElementById('workspace-modal').classList.remove('hidden'); document.getElementById('workspace-modal').classList.add('flex');
         }
-
-        function closeWorkspaceModal() {
-            document.getElementById('workspace-modal').classList.add('hidden');
-            document.getElementById('workspace-modal').classList.remove('flex');
-        }
-
+        function closeWorkspaceModal() { document.getElementById('workspace-modal').classList.add('hidden'); document.getElementById('workspace-modal').classList.remove('flex'); }
         function saveWorkspace() {
             if (!isOwner) return;
             const name = document.getElementById('ws-name').value.trim();
             const checked = Array.from(document.querySelectorAll('.ws-link-cb:checked')).map(cb => cb.value);
             if (!name || checked.length === 0) return;
             state.workspaces.push({ id: 'w_' + Date.now(), name, linkIds: checked });
-            document.getElementById('ws-name').value = '';
-            closeWorkspaceModal();
-            saveState();
-            showToast('Espace créé');
+            document.getElementById('ws-name').value = ''; closeWorkspaceModal(); saveState(); showToast('Espace créé');
         }
 
-        // Init
-        updateOwnerUI();
+        // Lancement au chargement de la page
+        loadStateFromCloud();
     </script>
 </body>
 </html>
