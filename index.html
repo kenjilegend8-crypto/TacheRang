@@ -3,57 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MyHub — Station de Contrôle Totale</title>
+    <title>MyHub — Contrôle Absolu de A à Z</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
-            --accent-color: #fafafa;
             --bg-color: #09090b;
             --card-bg: #111113;
             --border-color: #27272a;
+            --accent-color: #fafafa;
             --card-radius: 0.5rem;
+            --text-main: #fafafa;
+            --text-muted: #a1a1aa;
         }
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-color);
-            color: #fafafa;
+            color: var(--text-main);
             overflow-x: hidden;
+            transition: background-color 0.2s ease;
         }
         .mono { font-family: 'JetBrains Mono', monospace; }
         .surface-card {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: var(--card-radius);
+            transition: background-color 0.2s ease, border-color 0.2s ease, border-radius 0.2s ease;
         }
         .link-card {
             transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.15s ease;
         }
         .link-card:hover {
-            background-color: #161618;
-            border-color: #3f3f46;
+            border-color: var(--accent-color);
             transform: translateY(-1px);
         }
         .accent-text { color: var(--accent-color); }
-        .accent-bg { background-color: var(--accent-color); color: #09090b; }
+        .accent-bg { background-color: var(--accent-color); color: var(--bg-color); }
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: var(--bg-color); }
         ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 2px; }
     </style>
-    <!-- Style CSS injecté dynamiquement par l'admin -->
     <style id="custom-injected-css"></style>
 </head>
-<body class="min-h-screen flex flex-col selection:bg-zinc-200 selection:text-zinc-950">
+<body class="min-h-screen flex flex-col">
 
     <!-- Header -->
-    <header class="border-b border-zinc-800/80 px-6 py-3.5 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-40 bg-[#09090b]/95 backdrop-blur-sm">
+    <header class="border-b border-zinc-800/80 px-6 py-3.5 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-40 bg-zinc-950/90 backdrop-blur-sm">
         <div class="flex items-center gap-3">
             <div id="logo-box" class="w-7 h-7 rounded accent-bg flex items-center justify-center font-bold text-sm">
                 M
             </div>
-            <span class="font-semibold text-base tracking-tight text-zinc-100">MyHub</span>
-            <span id="mode-badge" class="text-[11px] mono px-1.5 py-0.5 rounded bg-zinc-900 text-zinc-500 border border-zinc-800">Espace Utilisateur</span>
+            <span class="font-semibold text-base tracking-tight">MyHub</span>
+            <span id="mode-badge" class="text-[11px] mono px-1.5 py-0.5 rounded bg-zinc-900 text-zinc-500 border border-zinc-800">Espace Privé</span>
         </div>
 
         <div class="flex items-center gap-2 flex-wrap" id="workspaces-container">
@@ -61,76 +63,104 @@
         </div>
 
         <div class="flex items-center gap-2">
-            <button onclick="toggleAdminPanel()" id="admin-trigger-btn" class="text-xs px-3 py-1.5 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-400 border border-zinc-800 transition flex items-center gap-1.5">
-                <i data-lucide="sliders" class="w-3.5 h-3.5"></i> Contrôle Admin
+            <!-- Bouton affiché uniquement si admin -->
+            <button onclick="toggleAdminPanel()" id="admin-trigger-btn" class="hidden text-xs px-3 py-1.5 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 transition items-center gap-1.5">
+                <i data-lucide="sliders" class="w-3.5 h-3.5 text-emerald-400"></i> Console Design Admin
             </button>
         </div>
     </header>
 
-    <!-- Master Control Panel (Admin Only) -->
-    <section id="admin-panel" class="hidden bg-[#0e0e11] border-b border-zinc-800 px-6 py-6 transition-all">
+    <!-- Console de Contrôle Absolu (Admin Panel) -->
+    <section id="admin-panel" class="hidden bg-[#0c0c0e] border-b border-zinc-800 px-6 py-6 transition-all shadow-2xl">
         <div class="max-w-7xl mx-auto flex flex-col gap-6">
             <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
                 <span class="text-xs font-semibold text-emerald-400 uppercase tracking-wider flex items-center gap-2">
-                    <i data-lucide="shield-check" class="w-4 h-4"></i> Station de Contrôle Totale du Propriétaire
+                    <i data-lucide="cpu" class="w-4 h-4"></i> Studio de Contrôle Total (De A à Z)
                 </span>
-                <button onclick="toggleAdminPanel()" class="text-xs text-zinc-400 hover:text-white underline">Fermer le panneau</button>
+                <div class="flex items-center gap-4">
+                    <button onclick="lockAdminSession()" class="text-xs px-2.5 py-1 rounded bg-red-950/60 hover:bg-red-900/60 text-red-300 border border-red-900/50 transition flex items-center gap-1">
+                        <i data-lucide="lock" class="w-3 h-3"></i> Verrouiller (Mode Visiteur)
+                    </button>
+                    <button onclick="toggleAdminPanel()" class="text-xs text-zinc-400 hover:text-white underline">Fermer</button>
+                </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Bloc Design & Couleurs -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <!-- 1. Couleurs -->
                 <div class="surface-card p-4 flex flex-col gap-3">
                     <h4 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
-                        <i data-lucide="palette" class="w-3.5 h-3.5"></i> Design & Thème
+                        <i data-lucide="palette" class="w-3.5 h-3.5"></i> Couleurs Globales
                     </h4>
+                    <div class="flex items-center justify-between text-xs text-zinc-300">
+                        <span>Fond de page :</span>
+                        <input type="color" id="bg-color-picker" value="#09090b" onchange="updateStyleSetting('bgColor', this.value)" class="w-7 h-7 rounded bg-transparent cursor-pointer border border-zinc-700">
+                    </div>
+                    <div class="flex items-center justify-between text-xs text-zinc-300">
+                        <span>Fond des cartes :</span>
+                        <input type="color" id="card-bg-picker" value="#111113" onchange="updateStyleSetting('cardBg', this.value)" class="w-7 h-7 rounded bg-transparent cursor-pointer border border-zinc-700">
+                    </div>
                     <div class="flex items-center justify-between text-xs text-zinc-300">
                         <span>Couleur d'accent :</span>
-                        <input type="color" id="accent-color-picker" value="#fafafa" onchange="updateSettings('accentColor', this.value)" class="w-8 h-8 rounded bg-transparent cursor-pointer border border-zinc-700">
+                        <input type="color" id="accent-color-picker" value="#fafafa" onchange="updateStyleSetting('accentColor', this.value)" class="w-7 h-7 rounded bg-transparent cursor-pointer border border-zinc-700">
                     </div>
+                </div>
+
+                <!-- 2. Formes & Style -->
+                <div class="surface-card p-4 flex flex-col gap-3">
+                    <h4 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
+                        <i data-lucide="square" class="w-3.5 h-3.5"></i> Formes & Géométrie
+                    </h4>
                     <div class="flex items-center justify-between text-xs text-zinc-300">
-                        <span>Rayon des bordures :</span>
-                        <select id="radius-select" onchange="updateSettings('cardRadius', this.value)" class="bg-zinc-900 border border-zinc-700 rounded px-2 py-1 text-xs text-zinc-200">
-                            <option value="0rem">Carré (0px)</option>
+                        <span>Arrondi des cartes :</span>
+                        <select id="radius-select" onchange="updateStyleSetting('cardRadius', this.value)" class="bg-zinc-900 border border-zinc-700 rounded px-2 py-1 text-xs text-zinc-200">
+                            <option value="0rem">Carré pur (0px)</option>
                             <option value="0.375rem">Subtil (6px)</option>
                             <option value="0.5rem" selected>Standard (8px)</option>
-                            <option value="1rem">Arrondi (16px)</option>
+                            <option value="1rem">Arrondi fort (16px)</option>
+                            <option value="1.5rem">Pilule / Maximum (24px)</option>
                         </select>
                     </div>
-                </div>
-
-                <!-- Bloc Widgets -->
-                <div class="surface-card p-4 flex flex-col gap-3">
-                    <h4 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
-                        <i data-lucide="layout" class="w-3.5 h-3.5"></i> Visibilité des Widgets
-                    </h4>
-                    <label class="flex items-center justify-between text-xs text-zinc-300 cursor-pointer">
-                        <span>Widget Notes rapides</span>
-                        <input type="checkbox" id="toggle-notes" checked onchange="updateSettings('showNotes', this.checked)" class="rounded bg-zinc-900 border-zinc-700 text-zinc-100">
-                    </label>
-                    <label class="flex items-center justify-between text-xs text-zinc-300 cursor-pointer">
-                        <span>Smart Capture Bar</span>
-                        <input type="checkbox" id="toggle-capture" checked onchange="updateSettings('showCapture', this.checked)" class="rounded bg-zinc-900 border-zinc-700 text-zinc-100">
-                    </label>
-                </div>
-
-                <!-- Bloc Données & Sauvegarde -->
-                <div class="surface-card p-4 flex flex-col gap-3">
-                    <h4 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
-                        <i data-lucide="database" class="w-3.5 h-3.5"></i> Gestion des Données
-                    </h4>
-                    <div class="flex gap-2">
-                        <button onclick="exportData()" class="flex-1 text-xs py-1.5 px-3 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-700 transition">Exporter JSON</button>
-                        <button onclick="resetDefaultState()" class="flex-1 text-xs py-1.5 px-3 rounded bg-red-950/40 hover:bg-red-900/50 text-red-300 border border-red-900/50 transition">Réinitialiser</button>
+                    <div class="flex items-center justify-between text-xs text-zinc-300">
+                        <span>Bordures nettes :</span>
+                        <input type="color" id="border-color-picker" value="#27272a" onchange="updateStyleSetting('borderColor', this.value)" class="w-7 h-7 rounded bg-transparent cursor-pointer border border-zinc-700">
                     </div>
+                </div>
+
+                <!-- 3. Position & Disposition des Widgets -->
+                <div class="surface-card p-4 flex flex-col gap-3">
+                    <h4 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
+                        <i data-lucide="layout" class="w-3.5 h-3.5"></i> Disposition & Widgets
+                    </h4>
+                    <label class="flex items-center justify-between text-xs text-zinc-300 cursor-pointer">
+                        <span>Afficher Barre de Capture</span>
+                        <input type="checkbox" id="toggle-capture" checked onchange="updateToggleSetting('showCapture', this.checked)" class="rounded bg-zinc-900 border-zinc-700">
+                    </label>
+                    <label class="flex items-center justify-between text-xs text-zinc-300 cursor-pointer">
+                        <span>Afficher Notes Rapides</span>
+                        <input type="checkbox" id="toggle-notes" checked onchange="updateToggleSetting('showNotes', this.checked)" class="rounded bg-zinc-900 border-zinc-700">
+                    </label>
+                    <label class="flex items-center justify-between text-xs text-zinc-300 cursor-pointer">
+                        <span>Inverser Colonnes (Sidebar à gauche)</span>
+                        <input type="checkbox" id="toggle-reverse-layout" onchange="updateToggleSetting('reverseLayout', this.checked)" class="rounded bg-zinc-900 border-zinc-700">
+                    </label>
+                </div>
+
+                <!-- 4. Données & Système -->
+                <div class="surface-card p-4 flex flex-col gap-3">
+                    <h4 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
+                        <i data-lucide="database" class="w-3.5 h-3.5"></i> Données & Backup
+                    </h4>
+                    <button onclick="exportData()" class="text-xs py-1.5 px-3 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-700 transition">Exporter mon JSON</button>
+                    <button onclick="resetDefaultState()" class="text-xs py-1.5 px-3 rounded bg-red-950/40 hover:bg-red-900/50 text-red-300 border border-red-900/50 transition">Réinitialiser</button>
                 </div>
             </div>
 
-            <!-- Bloc CSS Personnalisé en direct -->
+            <!-- Injecteur CSS Pro -->
             <div class="surface-card p-4 flex flex-col gap-2">
                 <h4 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
-                    <i data-lucide="code" class="w-3.5 h-3.5"></i> Injecteur de CSS Personnalisé (Contrôle Total du Style)
+                    <i data-lucide="code" class="w-3.5 h-3.5"></i> Injecteur CSS Personnalisé
                 </h4>
-                <textarea id="custom-css-input" rows="2" placeholder="Ex: body { background: #050507; } .surface-card { border-color: #3b82f6; }" oninput="updateCustomCSS(this.value)" class="w-full bg-zinc-950 border border-zinc-800 rounded p-2.5 text-xs mono text-zinc-200 focus:outline-none"></textarea>
+                <textarea id="custom-css-input" rows="2" placeholder="Ex: body { font-family: monospace; }" oninput="updateCustomCSS(this.value)" class="w-full bg-zinc-950 border border-zinc-800 rounded p-2.5 text-xs mono text-zinc-200 focus:outline-none"></textarea>
             </div>
         </div>
     </section>
@@ -141,7 +171,7 @@
         <!-- Smart Capture Bar -->
         <section id="capture-section" class="max-w-3xl w-full mx-auto">
             <div class="relative group">
-                <div class="relative flex items-center surface-card border border-zinc-800 focus-within:border-zinc-500 rounded-lg px-4 py-3 transition shadow-lg">
+                <div class="relative flex items-center surface-card border px-4 py-3 shadow-lg">
                     <i data-lucide="terminal" class="w-4 h-4 text-zinc-500 mr-3 shrink-0"></i>
                     <input 
                         type="text" 
@@ -155,14 +185,10 @@
                     </div>
                 </div>
             </div>
-            <div class="flex justify-between items-center mt-2 px-1 text-[11px] text-zinc-500">
-                <span>Tes données sont sauvegardées localement en toute sécurité</span>
-                <span>Glisse une tâche sur un lien pour les associer</span>
-            </div>
         </section>
 
-        <!-- Layout Grille -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <!-- Layout Grille Dynamique -->
+        <div id="main-grid-container" class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             
             <!-- Liens -->
             <section id="main-links-section" class="lg:col-span-8 flex flex-col gap-4">
@@ -183,7 +209,7 @@
             </section>
 
             <!-- Sidebar (Tâches & Notes) -->
-            <aside class="lg:col-span-4 flex flex-col gap-6">
+            <aside id="sidebar-section" class="lg:col-span-4 flex flex-col gap-6">
                 
                 <!-- Tâches -->
                 <div class="surface-card rounded-lg p-4 flex flex-col gap-3">
@@ -254,31 +280,51 @@
                 { id: 'l1', title: 'GitHub', url: 'https://github.com', clicks: 5, attached: [] },
                 { id: 'l2', title: 'YouTube', url: 'https://youtube.com', clicks: 3, attached: [] }
             ],
-            tasks: [{ id: 't1', text: 'Explorer ma station de contrôle totale', done: false }],
-            notes: [{ id: 'n1', text: 'Bienvenue ! Ouvre le panneau admin pour tout personnaliser.' }],
+            tasks: [{ id: 't1', text: 'Prendre le contrôle total de mon dashboard', done: false }],
+            notes: [{ id: 'n1', text: 'Bienvenue ! Ouvre la console design admin pour tout personnaliser.' }],
             workspaces: [],
             settings: {
+                bgColor: '#09090b',
+                cardBg: '#111113',
+                borderColor: '#27272a',
                 accentColor: '#fafafa',
                 cardRadius: '0.5rem',
                 showNotes: true,
                 showCapture: true,
+                reverseLayout: false,
                 customCSS: ''
             }
         };
 
-        let state = JSON.parse(localStorage.getItem('myhub_control_state')) || defaultState;
-        let isAdmin = localStorage.getItem('myhub_is_admin') === 'true';
-        let currentModalLinkId = null;
-        let draggedItem = null;
-
+        let state = JSON.parse(localStorage.getItem('myhub_absolute_state')) || defaultState;
+        
+        // Sécurisation stricte de l'admin
         const urlParams = new URLSearchParams(window.location.search);
+        let isAdmin = false;
+
         if (urlParams.get('admin') === 'monpasssecure') {
             isAdmin = true;
             localStorage.setItem('myhub_is_admin', 'true');
+        } else if (localStorage.getItem('myhub_is_admin') === 'true') {
+            isAdmin = true;
+        }
+
+        // Fonction pour se verrouiller (revenir en mode visiteur sur son propre PC)
+        function lockAdminSession() {
+            localStorage.removeItem('myhub_is_admin');
+            isAdmin = false;
+            document.getElementById('admin-panel').classList.add('hidden');
+            document.getElementById('admin-trigger-btn').classList.add('hidden');
+            showToast('Session verrouillée en mode visiteur');
+        }
+
+        // Afficher ou masquer le bouton d'accès admin dans le header
+        if (isAdmin) {
+            document.getElementById('admin-trigger-btn').classList.remove('hidden');
         }
 
         function saveState() {
-            localStorage.setItem('myhub_control_state', JSON.stringify(state));
+            localStorage.setItem('myhub_absolute_state', JSON.stringify(state));
             renderAll();
         }
 
@@ -290,24 +336,18 @@
         }
 
         function toggleAdminPanel() {
-            if (!isAdmin) {
-                const pass = prompt("Mot de passe administrateur :");
-                if (pass === "monpasssecure") {
-                    isAdmin = true;
-                    localStorage.setItem('myhub_is_admin', 'true');
-                    showToast('Mode Administrateur Activé');
-                } else if (pass !== null) {
-                    alert("Mot de passe incorrect.");
-                    return;
-                } else {
-                    return;
-                }
-            }
+            if (!isAdmin) return;
             const panel = document.getElementById('admin-panel');
             panel.classList.toggle('hidden');
         }
 
-        function updateSettings(key, value) {
+        function updateStyleSetting(key, value) {
+            state.settings[key] = value;
+            applySettings();
+            saveState();
+        }
+
+        function updateToggleSetting(key, value) {
             state.settings[key] = value;
             applySettings();
             saveState();
@@ -321,35 +361,56 @@
 
         function applySettings() {
             const root = document.documentElement;
-            if (state.settings.accentColor) root.style.setProperty('--accent-color', state.settings.accentColor);
-            if (state.settings.cardRadius) root.style.setProperty('--card-radius', state.settings.cardRadius);
+            const s = state.settings;
 
-            // Widgets visibility
+            if (s.bgColor) root.style.setProperty('--bg-color', s.bgColor);
+            if (s.cardBg) root.style.setProperty('--card-bg', s.cardBg);
+            if (s.borderColor) root.style.setProperty('--border-color', s.borderColor);
+            if (s.accentColor) root.style.setProperty('--accent-color', s.accentColor);
+            if (s.cardRadius) root.style.setProperty('--card-radius', s.cardRadius);
+
             const notesWidget = document.getElementById('notes-widget-container');
             const mainSection = document.getElementById('main-links-section');
+            const sidebarSection = document.getElementById('sidebar-section');
+            const gridContainer = document.getElementById('main-grid-container');
+
             if (notesWidget) {
-                if (state.settings.showNotes) {
-                    notesWidget.classList.remove('hidden');
-                    mainSection.className = "lg:col-span-8 flex flex-col gap-4";
-                } else {
-                    notesWidget.classList.add('hidden');
+                notesWidget.style.display = s.showNotes ? 'flex' : 'none';
+                if (!s.showNotes) {
                     mainSection.className = "lg:col-span-12 flex flex-col gap-4";
+                } else {
+                    mainSection.className = "lg:col-span-8 flex flex-col gap-4";
                 }
             }
 
             const captureSection = document.getElementById('capture-section');
             if (captureSection) {
-                captureSection.style.display = state.settings.showCapture ? 'block' : 'none';
+                captureSection.style.display = s.showCapture ? 'block' : 'none';
             }
 
-            // Sync inputs values in admin panel
-            if(document.getElementById('accent-color-picker')) document.getElementById('accent-color-picker').value = state.settings.accentColor || '#fafafa';
-            if(document.getElementById('radius-select')) document.getElementById('radius-select').value = state.settings.cardRadius || '0.5rem';
-            if(document.getElementById('toggle-notes')) document.getElementById('toggle-notes').checked = state.settings.showNotes;
-            if(document.getElementById('toggle-capture')) document.getElementById('toggle-capture').checked = state.settings.showCapture;
+            if (gridContainer && sidebarSection && mainSection) {
+                if (s.reverseLayout) {
+                    gridContainer.style.direction = 'rtl';
+                    mainSection.style.direction = 'ltr';
+                    sidebarSection.style.direction = 'ltr';
+                } else {
+                    gridContainer.style.direction = 'ltr';
+                    mainSection.style.direction = 'ltr';
+                    sidebarSection.style.direction = 'ltr';
+                }
+            }
+
+            if(document.getElementById('bg-color-picker')) document.getElementById('bg-color-picker').value = s.bgColor || '#09090b';
+            if(document.getElementById('card-bg-picker')) document.getElementById('card-bg-picker').value = s.cardBg || '#111113';
+            if(document.getElementById('border-color-picker')) document.getElementById('border-color-picker').value = s.borderColor || '#27272a';
+            if(document.getElementById('accent-color-picker')) document.getElementById('accent-color-picker').value = s.accentColor || '#fafafa';
+            if(document.getElementById('radius-select')) document.getElementById('radius-select').value = s.cardRadius || '0.5rem';
+            if(document.getElementById('toggle-notes')) document.getElementById('toggle-notes').checked = s.showNotes;
+            if(document.getElementById('toggle-capture')) document.getElementById('toggle-capture').checked = s.showCapture;
+            if(document.getElementById('toggle-reverse-layout')) document.getElementById('toggle-reverse-layout').checked = s.reverseLayout;
             if(document.getElementById('custom-css-input') && document.getElementById('custom-css-input').value === '') {
-                document.getElementById('custom-css-input').value = state.settings.customCSS || '';
-                document.getElementById('custom-injected-css').textContent = state.settings.customCSS || '';
+                document.getElementById('custom-css-input').value = s.customCSS || '';
+                document.getElementById('custom-injected-css').textContent = s.customCSS || '';
             }
         }
 
@@ -357,14 +418,14 @@
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
             const dlAnchorElem = document.createElement('a');
             dlAnchorElem.setAttribute("href", dataStr);
-            dlAnchorElem.setAttribute("download", "myhub_backup.json");
+            dlAnchorElem.setAttribute("download", "myhub_absolute_backup.json");
             dlAnchorElem.click();
-            showToast('Données exportées !');
+            showToast('Export réussi !');
         }
 
         function resetDefaultState() {
-            if (confirm("Veux-tu vraiment réinitialiser toutes tes données locales ?")) {
-                localStorage.removeItem('myhub_control_state');
+            if (confirm("Réinitialiser tous les paramètres et données ?")) {
+                localStorage.removeItem('myhub_absolute_state');
                 state = JSON.parse(JSON.stringify(defaultState));
                 applySettings();
                 saveState();
@@ -372,7 +433,6 @@
             }
         }
 
-        // --- Smart Input ---
         const smartInput = document.getElementById('smart-input');
         const typeBadge = document.getElementById('input-type-badge');
         const actionVerbs = ['finir', 'faire', 'acheter', 'appeler', 'envoyer', 'réviser', 'préparer', 'lire', 'écrire', 'tester', 'créer'];
@@ -411,7 +471,6 @@
             });
         }
 
-        // --- Rendering ---
         function renderLinks() {
             const grid = document.getElementById('links-grid');
             document.getElementById('links-count').textContent = `${state.links.length} lien${state.links.length > 1 ? 's' : ''}`;
@@ -422,15 +481,15 @@
                 const favicon = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
                 const attachedCount = link.attached ? link.attached.length : 0;
                 return `
-                    <div class="link-card surface-card rounded-lg p-3.5 flex flex-col justify-between gap-3 relative group cursor-pointer"
+                    <div class="link-card surface-card p-3.5 flex flex-col justify-between gap-3 relative group cursor-pointer"
                         onclick="openLink('${link.id}', '${link.url}')"
                         ondragover="handleDragOver(event, this)" ondragleave="handleDragLeave(this)" ondrop="handleDropOnLink(event, '${link.id}', this)">
                         <div class="flex items-start justify-between gap-2">
                             <div class="flex items-center gap-3 overflow-hidden">
                                 <img src="${favicon}" alt="" class="w-6 h-6 rounded bg-zinc-900 p-0.5 border border-zinc-800 shrink-0">
                                 <div class="truncate">
-                                    <h3 class="font-medium text-zinc-100 text-sm truncate">${link.title}</h3>
-                                    <p class="text-[11px] text-zinc-500 truncate">${domain}</p>
+                                    <h3 class="font-medium text-sm truncate" style="color: var(--text-main);">${link.title}</h3>
+                                    <p class="text-[11px] truncate" style="color: var(--text-muted);">${domain}</p>
                                 </div>
                             </div>
                             <div class="flex items-center gap-1" onclick="event.stopPropagation()">
@@ -438,7 +497,7 @@
                                 <button onclick="deleteLink('${link.id}')" title="Supprimer" class="p-1.5 rounded hover:bg-zinc-800 text-zinc-500 hover:text-red-400"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
                             </div>
                         </div>
-                        <div class="flex items-center justify-between text-[11px] pt-2 border-t border-zinc-800/80">
+                        <div class="flex items-center justify-between text-[11px] pt-2 border-t" style="border-color: var(--border-color);">
                             <span class="text-zinc-500 flex items-center gap-1"><i data-lucide="arrow-up-right" class="w-3 h-3"></i> ${link.clicks}</span>
                             ${attachedCount > 0 ? `<span class="px-2 py-0.5 rounded bg-zinc-900 text-zinc-300 border border-zinc-800"><i data-lucide="paperclip" class="w-2.5 h-2.5"></i> ${attachedCount}</span>` : ''}
                         </div>
@@ -500,7 +559,7 @@
         }
         function deleteWorkspace(wsId) { state.workspaces = state.workspaces.filter(w => w.id !== wsId); saveState(); }
 
-        // Drag & Drop
+        let draggedItem = null;
         function handleDragStart(e, type, id) { draggedItem = { type, id }; }
         function handleDragOver(e, el) { e.preventDefault(); el.classList.add('border-zinc-400'); }
         function handleDragLeave(el) { el.classList.remove('border-zinc-400'); }
@@ -519,6 +578,7 @@
             draggedItem = null; saveState(); showToast('Fusionné !');
         }
 
+        let currentModalLinkId = null;
         function openContextModal(linkId) {
             currentModalLinkId = linkId;
             const link = state.links.find(l => l.id === linkId);
@@ -576,7 +636,6 @@
             document.getElementById('ws-name').value = ''; closeWorkspaceModal(); saveState(); showToast('Espace créé');
         }
 
-        // Init App
         applySettings();
         renderAll();
     </script>
