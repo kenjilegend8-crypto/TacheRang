@@ -3,968 +3,665 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus — Espace Intelligent</title>
-    <!-- Chargement de Tailwind CSS -->
+    <title>MyHub — Espace de travail</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Police Google Fonts Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Lucide Icons pour une iconographie nette et moderne -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        nexus: {
-                            bg: '#09090b',
-                            surface: '#121216',
-                            card: '#18181d',
-                            border: '#27272f',
-                            accent: '#6366f1',
-                            accentHover: '#4f46e5',
-                            glow: 'rgba(99, 102, 241, 0.25)'
-                        }
-                    },
-                    animation: {
-                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                        'fade-in': 'fadeIn 0.25s ease-out forwards',
-                    },
-                    keyframes: {
-                        fadeIn: {
-                            '0%': { opacity: '0', transform: 'translateY(8px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)' },
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        /* Barres de défilement personnalisées discrètes */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #09090b;
+            color: #fafafa;
+            overflow-x: hidden;
+        }
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .surface-card {
+            background-color: #111113;
+            border: 1px solid #27272a;
+        }
+        .link-card {
+            transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.15s ease;
+        }
+        .link-card:hover {
+            background-color: #161618;
+            border-color: #3f3f46;
+            transform: translateY(-1px);
+        }
+        .link-card.drag-over {
+            border: 1px dashed #fafafa;
+            background-color: #18181b;
+        }
+        .frequent-badge {
+            border-left: 2px solid #fafafa;
+        }
         ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+            width: 5px;
+            height: 5px;
         }
         ::-webkit-scrollbar-track {
             background: #09090b;
         }
         ::-webkit-scrollbar-thumb {
-            background: #27272f;
-            border-radius: 9999px;
+            background: #27272a;
+            border-radius: 2px;
         }
         ::-webkit-scrollbar-thumb:hover {
             background: #3f3f46;
         }
-        
-        /* Effet de lueur dynamique pour les éléments les plus utilisés */
-        .heat-high {
-            box-shadow: 0 0 25px -5px rgba(99, 102, 241, 0.35);
-            border-color: rgba(99, 102, 241, 0.5) !important;
-        }
-        .heat-medium {
-            box-shadow: 0 0 15px -5px rgba(168, 85, 247, 0.2);
-            border-color: rgba(168, 85, 247, 0.3) !important;
-        }
     </style>
 </head>
-<body class="bg-nexus-bg text-zinc-100 font-sans antialiased min-h-screen flex flex-col selection:bg-indigo-500/30 selection:text-indigo-200">
+<body class="min-h-screen flex flex-col selection:bg-zinc-200 selection:text-zinc-950">
 
-    <!-- Zone de notification Toast (remplace alert/confirm) -->
-    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
-
-    <!-- Barre Supérieure & Espaces de Travail (Lancement groupé) -->
-    <header class="sticky top-0 z-30 backdrop-blur-xl bg-nexus-bg/80 border-b border-nexus-border px-4 sm:px-8 py-4">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <!-- Identité & Horloge contextuelle -->
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-                        <i data-lucide="orbit" class="w-6 h-6 text-white"></i>
-                    </div>
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <h1 class="text-lg font-bold tracking-tight text-white">NEXUS</h1>
-                            <span class="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-400 border border-indigo-500/30">Intelligent</span>
-                        </div>
-                        <p id="dynamic-greeting" class="text-xs text-zinc-400">Espace adaptatif prêt</p>
-                    </div>
-                </div>
-
-                <!-- Bouton réinitialisation démo sur mobile -->
-                <button onclick="resetDemoData()" title="Réinitialiser les données de démonstration" class="md:hidden p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800/60 transition">
-                    <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
-                </button>
+    <!-- Top Navigation & Workspaces -->
+    <header class="border-b border-zinc-800/80 px-6 py-3.5 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-40 bg-[#09090b]/95 backdrop-blur-sm">
+        <div class="flex items-center gap-3">
+            <div class="w-7 h-7 rounded bg-zinc-100 text-zinc-950 flex items-center justify-center font-bold text-sm">
+                M
             </div>
+            <span class="font-semibold text-base tracking-tight text-zinc-100">MyHub</span>
+            <span class="text-[11px] mono px-1.5 py-0.5 rounded bg-zinc-900 text-zinc-400 border border-zinc-800">v1</span>
+        </div>
 
-            <!-- Barre des Espaces de Travail (Lancement groupé en 1 clic) -->
-            <div class="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0">
-                <span class="text-xs font-medium text-zinc-500 uppercase tracking-wider mr-1 hidden sm:inline">Espaces :</span>
-                <div id="workspaces-bar" class="flex items-center gap-2">
-                    <!-- Généré dynamiquement en JS -->
-                </div>
-                <button onclick="openWorkspaceModal()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-zinc-800/80 hover:bg-zinc-700 text-zinc-300 border border-zinc-700/60 transition shrink-0">
-                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-                    <span>Créer un espace</span>
-                </button>
-                <button onclick="resetDemoData()" title="Réinitialiser la démo" class="hidden md:flex p-2 rounded-xl text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800/60 transition ml-1">
-                    <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
-                </button>
-            </div>
+        <!-- Workspaces (Group Launchers) -->
+        <div class="flex items-center gap-2 flex-wrap" id="workspaces-container">
+            <span class="text-xs text-zinc-500 mr-1 hidden sm:inline">Espaces :</span>
+            <!-- Injected via JS -->
+        </div>
+
+        <div class="flex items-center gap-2">
+            <button onclick="openWorkspaceModal()" class="text-xs px-3 py-1.5 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-800 transition flex items-center gap-1.5">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                Nouvel espace
+            </button>
         </div>
     </header>
 
-    <!-- Contenu Principal -->
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-8 py-6 space-y-8">
+    <!-- Main Content -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-6 py-8 flex flex-col gap-8">
 
-        <!-- SECTION 1 : CAPTURE INTELLIGENTE UNIVERSELLE (Zéro menu) -->
-        <section class="relative">
-            <div id="omni-dropzone" class="relative group rounded-2xl bg-nexus-surface border border-nexus-border focus-within:border-indigo-500/70 focus-within:ring-4 focus-within:ring-indigo-500/10 transition-all duration-300 shadow-2xl">
-                <div class="flex items-center px-4 py-3.5 gap-3">
-                    <div id="omni-type-badge" class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-800 text-zinc-400 text-xs font-medium transition-colors shrink-0">
-                        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-indigo-400"></i>
-                        <span id="omni-type-label">Capture Auto</span>
-                    </div>
-                    
+        <!-- Smart Universal Capture Bar -->
+        <section class="max-w-3xl w-full mx-auto">
+            <div class="relative group">
+                <div class="relative flex items-center bg-[#111113] border border-zinc-800 focus-within:border-zinc-500 rounded-lg px-4 py-3 transition">
+                    <i data-lucide="terminal" class="w-4 h-4 text-zinc-500 mr-3 shrink-0"></i>
                     <input 
                         type="text" 
-                        id="omni-input" 
-                        placeholder="Collez un lien (https://...), tapez une action ('Acheter...', 'Finir...') ou écrivez une note libre..." 
-                        class="w-full bg-transparent text-sm sm:text-base text-white placeholder-zinc-500 focus:outline-none"
+                        id="smart-input" 
+                        placeholder="Coller un lien, ajouter une tâche ('Finir...') ou écrire une note..." 
+                        class="w-full bg-transparent text-zinc-100 placeholder-zinc-500 focus:outline-none text-sm"
                         autocomplete="off"
                     >
-
-                    <!-- Sélecteur rapide de lien cible pour fusion directe (optionnel) -->
-                    <select id="omni-target-link" title="Associer directement à un lien existant" class="hidden sm:block max-w-[160px] bg-zinc-800/90 text-xs text-zinc-300 rounded-lg px-2.5 py-1.5 border border-zinc-700/70 focus:outline-none focus:border-indigo-500">
-                        <option value="">Espace général</option>
-                    </select>
-
-                    <button 
-                        onclick="handleOmniSubmit()" 
-                        class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white text-xs sm:text-sm font-medium transition flex items-center gap-1.5 shrink-0 shadow-md shadow-indigo-600/20"
-                    >
-                        <span>Ajouter</span>
-                        <i data-lucide="corner-down-left" class="w-3.5 h-3.5 opacity-80"></i>
-                    </button>
-                </div>
-
-                <!-- Barre d'astuces intelligentes contextuelles -->
-                <div class="px-4 py-2 border-t border-nexus-border/60 flex flex-wrap items-center justify-between gap-2 text-[11px] text-zinc-500 bg-zinc-900/30 rounded-b-2xl">
-                    <div class="flex flex-wrap items-center gap-3">
-                        <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span> URL détectée = Raccourci intelligent</span>
-                        <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Verbe ou <code>[]</code> = Tâche</span>
-                        <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> Texte libre = Note rapide</span>
+                    <div id="input-type-badge" class="hidden sm:flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] mono font-medium bg-zinc-900 text-zinc-400 border border-zinc-800 shrink-0 ml-2">
+                        Prêt
                     </div>
-                    <span class="text-zinc-400 hidden md:inline">Astuce : Glissez une tâche ou une note <strong>sur un lien</strong> pour les fusionner !</span>
                 </div>
+            </div>
+            <div class="flex justify-between items-center mt-2 px-1 text-[11px] text-zinc-500">
+                <span>Détection automatique : URL, action ou note rapide</span>
+                <span>Glissez une tâche sur un lien pour les associer</span>
             </div>
         </section>
 
-        <!-- GRILLE PRINCIPALE ADAPTATIVE -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-
-            <!-- COLONNE GAUCHE / PRINCIPALE : HUB DE LIENS INTELLIGENTS (8 colonnes sur desktop) -->
-            <div class="lg:col-span-8 space-y-4">
-                <div class="flex flex-wrap items-center justify-between gap-2">
-                    <div class="flex items-center gap-2">
-                        <i data-lucide="zap" class="w-4 h-4 text-indigo-400"></i>
-                        <h2 class="text-sm font-semibold uppercase tracking-wider text-zinc-300">Hub de Liens & Contextes</h2>
-                        <span id="links-count" class="text-xs px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400">0</span>
-                    </div>
-
-                    <!-- Filtre de tri : Dynamique (Usage) vs Récent -->
-                    <div class="flex items-center gap-1.5 bg-nexus-surface p-1 rounded-xl border border-nexus-border">
-                        <button id="sort-dynamic-btn" onclick="setSortMode('dynamic')" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-indigo-600 text-white transition">
-                            Priorité Dynamique
-                        </button>
-                        <button id="sort-recent-btn" onclick="setSortMode('recent')" class="px-2.5 py-1 rounded-lg text-xs font-medium text-zinc-400 hover:text-white transition">
-                            Plus Récents
-                        </button>
-                    </div>
+        <!-- Dynamic Grid Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            <!-- Left/Center: Smart Links Grid (8 cols) -->
+            <section class="lg:col-span-8 flex flex-col gap-4">
+                <div class="flex items-center justify-between border-b border-zinc-800/80 pb-2.5">
+                    <h2 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-2">
+                        <i data-lucide="layout-grid" class="w-3.5 h-3.5 text-zinc-400"></i>
+                        Accès rapides
+                    </h2>
+                    <span class="text-xs text-zinc-500" id="links-count">0 liens</span>
                 </div>
 
-                <!-- Grille des cartes de liens (avec mise en avant selon l'utilisation) -->
-                <div id="links-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <!-- Cartes injectées par JS -->
+                <div id="links-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                    <!-- Link cards injected via JS -->
                 </div>
-            </div>
+            </section>
 
-            <!-- COLONNE DROITE : TÂCHES & NOTES RAPIDES FUSIONNABLES (4 colonnes sur desktop) -->
-            <div class="lg:col-span-4 space-y-6">
+            <!-- Right: Context Sidebar - Tasks & Notes (4 cols) -->
+            <aside class="lg:col-span-4 flex flex-col gap-6">
                 
-                <!-- Bloc Tâches Actionnables -->
-                <div class="rounded-2xl bg-nexus-surface border border-nexus-border p-4 sm:p-5 space-y-4 shadow-lg">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <i data-lucide="check-square" class="w-4 h-4 text-emerald-400"></i>
-                            <h2 class="text-sm font-semibold uppercase tracking-wider text-zinc-300">À Faire</h2>
-                        </div>
-                        <span id="tasks-stats" class="text-xs text-zinc-400">0/0</span>
+                <!-- To-Do List -->
+                <div class="surface-card rounded-lg p-4 flex flex-col gap-3">
+                    <div class="flex items-center justify-between border-b border-zinc-800/80 pb-2.5">
+                        <h3 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-2">
+                            <i data-lucide="check-square" class="w-3.5 h-3.5 text-zinc-400"></i>
+                            À faire
+                        </h3>
+                        <span class="text-[11px] text-zinc-500">Glisser vers un lien</span>
                     </div>
+                    <ul id="tasks-list" class="flex flex-col gap-2 max-h-64 overflow-y-auto pr-1">
+                        <!-- Tasks injected via JS -->
+                    </ul>
+                </div>
 
-                    <div id="tasks-list" class="space-y-2 max-h-[300px] overflow-y-auto pr-1">
-                        <!-- Tâches injectées par JS -->
+                <!-- Quick Notes -->
+                <div class="surface-card rounded-lg p-4 flex flex-col gap-3">
+                    <div class="flex items-center justify-between border-b border-zinc-800/80 pb-2.5">
+                        <h3 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-2">
+                            <i data-lucide="file-text" class="w-3.5 h-3.5 text-zinc-400"></i>
+                            Notes rapides
+                        </h3>
+                        <span class="text-[11px] text-zinc-500">Glisser vers un lien</span>
+                    </div>
+                    <div id="notes-list" class="flex flex-col gap-2 max-h-72 overflow-y-auto pr-1">
+                        <!-- Notes injected via JS -->
                     </div>
                 </div>
 
-                <!-- Bloc Notes Éclair -->
-                <div class="rounded-2xl bg-nexus-surface border border-nexus-border p-4 sm:p-5 space-y-4 shadow-lg">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <i data-lucide="sticky-note" class="w-4 h-4 text-amber-400"></i>
-                            <h2 class="text-sm font-semibold uppercase tracking-wider text-zinc-300">Notes Éclair</h2>
-                        </div>
-                        <span id="notes-count" class="text-xs text-zinc-400">0</span>
-                    </div>
-
-                    <div id="notes-list" class="space-y-2.5 max-h-[320px] overflow-y-auto pr-1">
-                        <!-- Notes injectées par JS -->
-                    </div>
-                </div>
-
-            </div>
+            </aside>
         </div>
     </main>
 
-    <!-- MODALE : CONTEXTE FUSIONNÉ D'UN LIEN (Voir / Ajouter notes & tâches liées à un lien) -->
-    <div id="link-context-modal" class="fixed inset-0 z-40 hidden items-center justify-center bg-black/75 backdrop-blur-sm p-4">
-        <div class="bg-nexus-surface border border-nexus-border rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-5 animate-fade-in">
-            <div class="flex items-start justify-between gap-3">
+    <!-- Context Drawer / Modal for a specific Link -->
+    <div id="context-modal" class="fixed inset-0 bg-black/75 z-50 hidden items-center justify-center p-4">
+        <div class="bg-[#111113] border border-zinc-800 rounded-lg max-w-lg w-full p-6 flex flex-col gap-5 shadow-2xl">
+            <div class="flex items-start justify-between gap-4 border-b border-zinc-800 pb-4">
                 <div class="flex items-center gap-3">
-                    <img id="modal-link-favicon" src="" alt="" class="w-8 h-8 rounded-lg bg-zinc-800 p-1 object-contain">
+                    <img id="modal-favicon" src="" alt="" class="w-7 h-7 rounded bg-zinc-900 p-1 border border-zinc-800">
                     <div>
-                        <h3 id="modal-link-title" class="text-base font-bold text-white">Titre du lien</h3>
-                        <a id="modal-link-url" href="#" target="_blank" rel="noopener noreferrer" class="text-xs text-indigo-400 hover:underline break-all">https://...</a>
+                        <h3 id="modal-title" class="font-semibold text-base text-zinc-100">Titre du lien</h3>
+                        <a id="modal-url" href="#" target="_blank" class="text-xs text-zinc-400 hover:text-zinc-200 underline underline-offset-2 truncate block max-w-xs">https://...</a>
                     </div>
                 </div>
-                <button onclick="closeContextModal()" class="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800">
-                    <i data-lucide="x" class="w-5 h-5"></i>
+                <button onclick="closeContextModal()" class="text-zinc-500 hover:text-zinc-200 p-1">
+                    <i data-lucide="x" class="w-4 h-4"></i>
                 </button>
             </div>
 
-            <!-- Ajout rapide directement dans ce contexte -->
-            <div class="flex gap-2">
-                <input type="text" id="modal-context-input" placeholder="Ajouter une note ou tâche liée à ce site..." class="flex-1 bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500">
-                <button onclick="addContextItemFromModal('task')" title="Ajouter comme tâche liée" class="px-3 py-2 rounded-xl bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-600/30 text-xs font-medium transition">
-                    + Tâche
-                </button>
-                <button onclick="addContextItemFromModal('note')" title="Ajouter comme note liée" class="px-3 py-2 rounded-xl bg-amber-600/20 text-amber-400 border border-amber-500/30 hover:bg-amber-600/30 text-xs font-medium transition">
-                    + Note
-                </button>
-            </div>
-
-            <!-- Liste des éléments fusionnés -->
-            <div class="space-y-3 max-h-64 overflow-y-auto pr-1">
-                <div>
-                    <h4 class="text-xs font-semibold uppercase text-zinc-400 mb-2">Tâches associées</h4>
-                    <div id="modal-linked-tasks" class="space-y-1.5"></div>
-                </div>
-                <div>
-                    <h4 class="text-xs font-semibold uppercase text-zinc-400 mb-2">Notes associées</h4>
-                    <div id="modal-linked-notes" class="space-y-1.5"></div>
+            <div class="flex flex-col gap-3">
+                <h4 class="text-xs font-semibold uppercase tracking-wider text-zinc-500">Éléments associés</h4>
+                <div id="modal-attached-items" class="flex flex-col gap-2 max-h-48 overflow-y-auto">
+                    <!-- Attached notes/tasks -->
                 </div>
             </div>
 
-            <div class="pt-2 border-t border-nexus-border flex justify-between items-center">
-                <button id="modal-delete-link-btn" class="text-xs text-rose-400 hover:text-rose-300 flex items-center gap-1">
-                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Supprimer ce lien
-                </button>
-                <a id="modal-open-link-btn" href="#" target="_blank" rel="noopener noreferrer" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold flex items-center gap-1.5 transition">
-                    <span>Ouvrir le site</span>
-                    <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
-                </a>
+            <div class="flex gap-2 pt-2 border-t border-zinc-800">
+                <input type="text" id="modal-quick-add" placeholder="Ajouter une note ou tâche liée..." class="flex-1 bg-zinc-950 border border-zinc-800 rounded px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-zinc-500">
+                <button onclick="addContextItemFromModal()" class="bg-zinc-100 hover:bg-white text-zinc-950 px-4 py-2 rounded text-sm font-medium transition">Ajouter</button>
             </div>
         </div>
     </div>
 
-    <!-- MODALE : CRÉATION D'UN ESPACE DE TRAVAIL GROUPÉ -->
-    <div id="workspace-modal" class="fixed inset-0 z-40 hidden items-center justify-center bg-black/75 backdrop-blur-sm p-4">
-        <div class="bg-nexus-surface border border-nexus-border rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 animate-fade-in">
-            <div class="flex items-center justify-between">
-                <h3 class="text-base font-bold text-white flex items-center gap-2">
-                    <i data-lucide="layers" class="w-4 h-4 text-indigo-400"></i>
-                    Nouvel Espace de Travail Groupé
-                </h3>
-                <button onclick="closeWorkspaceModal()" class="p-1 rounded-lg text-zinc-400 hover:text-white">
-                    <i data-lucide="x" class="w-5 h-5"></i>
+    <!-- Modal for Creating a Workspace (Group Launcher) -->
+    <div id="workspace-modal" class="fixed inset-0 bg-black/75 z-50 hidden items-center justify-center p-4">
+        <div class="bg-[#111113] border border-zinc-800 rounded-lg max-w-md w-full p-6 flex flex-col gap-4 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+                <h3 class="font-semibold text-base text-zinc-100">Créer un espace groupé</h3>
+                <button onclick="closeWorkspaceModal()" class="text-zinc-500 hover:text-zinc-200">
+                    <i data-lucide="x" class="w-4 h-4"></i>
                 </button>
             </div>
-            <p class="text-xs text-zinc-400">Ouvrez simultanément plusieurs liens stratégiques en un seul clic.</p>
+            <p class="text-xs text-zinc-400">Ouvrez plusieurs liens simultanément en un clic.</p>
+            <input type="text" id="ws-name" placeholder="Nom de l'espace (ex: Travail, Veille)" class="bg-zinc-950 border border-zinc-800 rounded px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-zinc-500">
             
-            <div class="space-y-3">
-                <div>
-                    <label class="block text-xs font-medium text-zinc-300 mb-1">Nom de l'espace (ex: Révisions, Matin, Création)</label>
-                    <input type="text" id="ws-name-input" placeholder="Ex: Mode Focus Projet" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-zinc-300 mb-1.5">Sélectionnez les liens à lancer ensemble :</label>
-                    <div id="ws-links-selector" class="space-y-1.5 max-h-44 overflow-y-auto bg-zinc-900/60 p-2.5 rounded-xl border border-zinc-800">
-                        <!-- Cases à cocher générées en JS -->
-                    </div>
+            <div class="flex flex-col gap-2">
+                <span class="text-xs font-medium text-zinc-400">Liens à inclure :</span>
+                <div id="ws-links-selection" class="flex flex-col gap-1.5 max-h-40 overflow-y-auto bg-zinc-950 p-2.5 rounded border border-zinc-800">
+                    <!-- Checkboxes injected via JS -->
                 </div>
             </div>
 
-            <div class="flex justify-end gap-2 pt-2">
-                <button onclick="closeWorkspaceModal()" class="px-4 py-2 rounded-xl text-xs font-medium text-zinc-400 hover:text-white">Annuler</button>
-                <button onclick="saveNewWorkspace()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold">Enregistrer l'espace</button>
-            </div>
+            <button onclick="saveWorkspace()" class="w-full bg-zinc-100 hover:bg-white text-zinc-950 py-2 rounded text-sm font-medium transition mt-1">
+                Enregistrer l'espace
+            </button>
         </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-zinc-100 text-zinc-950 px-4 py-2.5 rounded shadow-xl text-xs font-medium transform translate-y-20 opacity-0 transition-all duration-200 z-50 flex items-center gap-2">
+        <i data-lucide="check" class="w-3.5 h-3.5 text-zinc-950"></i>
+        <span id="toast-msg">Action effectuée</span>
     </div>
 
     <script>
-        /**
-         * NEXUS - ESPACE INTELLIGENT
-         * Architecture : État centralisé synchronisé avec localStorage,
-         * moteur de détection sémantique sans menu, fusion contextuelle par Drag & Drop,
-         * et algorithme de priorisation dynamique selon l'usage.
-         */
-
-        const STORAGE_KEY = 'nexus_intelligent_workspace_v1';
-
-        // Données initiales de démonstration pour une expérience immédiate
-        const DEFAULT_STATE = {
-            sortMode: 'dynamic',
+        // --- State Management ---
+        const defaultState = {
             links: [
                 {
-                    id: 'link-1',
-                    title: 'GitHub — Projets & Code',
+                    id: 'l1',
+                    title: 'GitHub',
                     url: 'https://github.com',
-                    clicks: 18,
-                    lastUsed: Date.now() - 1000 * 60 * 15,
-                    createdAt: Date.now() - 86400000 * 5
+                    clicks: 12,
+                    attached: [
+                        { id: 'a1', type: 'task', text: 'Mettre à jour le dépôt MyHub', done: false }
+                    ]
                 },
                 {
-                    id: 'link-2',
-                    title: 'ChatGPT / Assistant IA',
-                    url: 'https://chatgpt.com',
-                    clicks: 14,
-                    lastUsed: Date.now() - 1000 * 60 * 45,
-                    createdAt: Date.now() - 86400000 * 4
+                    id: 'l2',
+                    title: 'YouTube',
+                    url: 'https://youtube.com',
+                    clicks: 8,
+                    attached: [
+                        { id: 'a2', type: 'note', text: 'Tutoriels JavaScript et design minimaliste' }
+                    ]
                 },
                 {
-                    id: 'link-3',
-                    title: 'Figma — Design UI/UX',
-                    url: 'https://www.figma.com',
-                    clicks: 7,
-                    lastUsed: Date.now() - 1000 * 60 * 180,
-                    createdAt: Date.now() - 86400000 * 3
-                },
-                {
-                    id: 'link-4',
-                    title: 'YouTube — Veille & Tutoriels',
-                    url: 'https://www.youtube.com',
-                    clicks: 3,
-                    lastUsed: Date.now() - 1000 * 60 * 600,
-                    createdAt: Date.now() - 86400000 * 2
+                    id: 'l3',
+                    title: 'Wikipedia',
+                    url: 'https://fr.wikipedia.org',
+                    clicks: 5,
+                    attached: []
                 }
             ],
             tasks: [
-                {
-                    id: 'task-1',
-                    text: 'Pousser la nouvelle version du prototype sur le dépôt',
-                    done: false,
-                    linkedLinkId: 'link-1',
-                    createdAt: Date.now() - 3600000
-                },
-                {
-                    id: 'task-2',
-                    text: 'Tester la fusion par glisser-déposer sur une carte lien',
-                    done: false,
-                    linkedLinkId: null,
-                    createdAt: Date.now() - 1800000
-                },
-                {
-                    id: 'task-3',
-                    text: 'Préparer les maquettes sombres',
-                    done: true,
-                    linkedLinkId: 'link-3',
-                    createdAt: Date.now() - 7200000
-                }
+                { id: 't1', text: 'Tester le glisser-déposer sur une carte', done: false },
+                { id: 't2', text: 'Ajouter mes sites favoris dans la barre', done: false }
             ],
             notes: [
-                {
-                    id: 'note-1',
-                    content: 'Prompt clé : Toujours demander une architecture modulaire et réactive.',
-                    linkedLinkId: 'link-2',
-                    createdAt: Date.now() - 5400000
-                },
-                {
-                    id: 'note-2',
-                    content: 'Idée : Utiliser les espaces de travail groupés le matin pour ouvrir mes 3 outils principaux d’un coup.',
-                    linkedLinkId: null,
-                    createdAt: Date.now() - 1200000
-                }
+                { id: 'n1', text: 'Astuce : glissez une note sur un lien pour les fusionner.' }
             ],
             workspaces: [
-                {
-                    id: 'ws-1',
-                    name: 'Mode Création',
-                    icon: 'rocket',
-                    linkIds: ['link-1', 'link-2', 'link-3']
-                },
-                {
-                    id: 'ws-2',
-                    name: 'Veille & IA',
-                    icon: 'sparkles',
-                    linkIds: ['link-2', 'link-4']
-                }
+                { id: 'w1', name: 'Routine', linkIds: ['l1', 'l3'] }
             ]
         };
 
-        let state = loadState();
-        let activeModalLinkId = null;
+        let state = JSON.parse(localStorage.getItem('myhub_state_v1')) || defaultState;
+        let currentModalLinkId = null;
+        let draggedItem = null;
 
-        // Chargement sécurisé depuis localStorage
-        function loadState() {
-            try {
-                const raw = localStorage.getItem(STORAGE_KEY);
-                if (!raw) return JSON.parse(JSON.stringify(DEFAULT_STATE));
-                return JSON.parse(raw);
-            } catch (e) {
-                console.error("Erreur de lecture localStorage:", e);
-                return JSON.parse(JSON.stringify(DEFAULT_STATE));
-            }
-        }
-
-        // Sauvegarde automatique
         function saveState() {
-            try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-            } catch (e) {
-                console.error("Erreur de sauvegarde localStorage:", e);
-            }
-        }
-
-        // Réinitialisation des données de démonstration
-        function resetDemoData() {
-            state = JSON.parse(JSON.stringify(DEFAULT_STATE));
-            saveState();
-            renderAll();
-            showToast("Espace réinitialisé avec les exemples intelligents", "info");
-        }
-
-        /**
-         * MOTEUR DE DÉTECTION INTELLIGENTE (Capture sans menu)
-         * Analyse en temps réel ce que l'utilisateur tape ou colle :
-         * - URL -> Lien rapide
-         * - Verbe d'action à l'infinitif ou préfixe [] / todo -> Tâche
-         * - Autre texte -> Note rapide
-         */
-        function detectInputIntent(text) {
-            const trimmed = text.trim();
-            if (!trimmed) return { type: 'empty', label: 'Capture Auto', color: 'text-indigo-400', icon: 'sparkles' };
-
-            // 1. Détection d'URL (avec ou sans http/https)
-            const urlRegex = /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w- ./?%&=+#@]*)?$/i;
-            if (urlRegex.test(trimmed) && !trimmed.includes(' ')) {
-                return { type: 'link', label: 'Lien détecté', color: 'text-indigo-400', icon: 'link' };
-            }
-
-            // 2. Détection de Tâche (préfixes explicites ou verbes d'action courants en français)
-            const taskPrefixRegex = /^(\[\s?\]|-\s?\[\s?\]|todo:|tâche:|faire:)/i;
-            const actionVerbsRegex = /^(acheter|finir|terminer|appeler|envoyer|préparer|réviser|coder|créer|vérifier|lire|écrire|payer|organiser|contacter|mettre|tester|nettoyer|planifier)\b/i;
-            
-            if (taskPrefixRegex.test(trimmed) || actionVerbsRegex.test(trimmed)) {
-                return { type: 'task', label: 'Tâche détectée', color: 'text-emerald-400', icon: 'check-circle-2' };
-            }
-
-            // 3. Par défaut : Note instantanée
-            return { type: 'note', label: 'Note rapide', color: 'text-amber-400', icon: 'sticky-note' };
-        }
-
-        // Mise à jour visuelle du badge pendant la saisie
-        const omniInput = document.getElementById('omni-input');
-        omniInput.addEventListener('input', (e) => {
-            const intent = detectInputIntent(e.target.value);
-            const badgeLabel = document.getElementById('omni-type-label');
-            const badgeContainer = document.getElementById('omni-type-badge');
-            
-            badgeLabel.textContent = intent.label;
-            badgeContainer.className = `flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-800 text-xs font-medium transition-colors shrink-0 ${intent.color}`;
-        });
-
-        // Validation avec la touche Entrée
-        omniInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                handleOmniSubmit();
-            }
-        });
-
-        // Traitement de l'ajout intelligent
-        function handleOmniSubmit() {
-            const rawText = omniInput.value.trim();
-            if (!rawText) return;
-
-            const intent = detectInputIntent(rawText);
-            const targetLinkId = document.getElementById('omni-target-link').value || null;
-
-            if (intent.type === 'link') {
-                let normalizedUrl = rawText;
-                if (!/^https?:\/\//i.test(normalizedUrl)) {
-                    normalizedUrl = 'https://' + normalizedUrl;
-                }
-                let domainTitle = normalizedUrl;
-                try {
-                    const urlObj = new URL(normalizedUrl);
-                    domainTitle = urlObj.hostname.replace(/^www\./, '');
-                    domainTitle = domainTitle.charAt(0).toUpperCase() + domainTitle.slice(1);
-                } catch (e) {}
-
-                const newLink = {
-                    id: 'link-' + Date.now(),
-                    title: domainTitle,
-                    url: normalizedUrl,
-                    clicks: 1,
-                    lastUsed: Date.now(),
-                    createdAt: Date.now()
-                };
-                state.links.unshift(newLink);
-                showToast(`Raccourci "${domainTitle}" créé automatiquement`, "success");
-            } 
-            else if (intent.type === 'task') {
-                const cleanTaskText = rawText.replace(/^(\[\s?\]|-\s?\[\s?\]|todo:|tâche:|faire:)\s*/i, '');
-                state.tasks.unshift({
-                    id: 'task-' + Date.now(),
-                    text: cleanTaskText,
-                    done: false,
-                    linkedLinkId: targetLinkId,
-                    createdAt: Date.now()
-                });
-                showToast(targetLinkId ? "Tâche ajoutée et fusionnée au lien !" : "Tâche ajoutée à votre liste", "success");
-            } 
-            else {
-                state.notes.unshift({
-                    id: 'note-' + Date.now(),
-                    content: rawText,
-                    linkedLinkId: targetLinkId,
-                    createdAt: Date.now()
-                });
-                showToast(targetLinkId ? "Note fusionnée avec le lien !" : "Note éclair enregistrée", "success");
-            }
-
-            omniInput.value = '';
-            omniInput.dispatchEvent(new Event('input'));
-            saveState();
+            localStorage.setItem('myhub_state_v1', JSON.stringify(state));
             renderAll();
         }
 
-        /**
-         * ALGORITHME DE PRIORISATION DYNAMIQUE
-         * Calcule un score de pertinence combinant la fréquence d'utilisation (clics)
-         * et la récence d'accès pour faire remonter automatiquement les liens vitaux.
-         */
-        function getDynamicScore(link) {
-            const hoursSinceLastUse = Math.max(0.5, (Date.now() - link.lastUsed) / (1000 * 60 * 60));
-            return (link.clicks * 10) / Math.pow(hoursSinceLastUse, 0.35);
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').textContent = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 2500);
         }
 
-        function setSortMode(mode) {
-            state.sortMode = mode;
-            saveState();
-            renderLinks();
-        }
+        // --- Smart Capture Detection ---
+        const smartInput = document.getElementById('smart-input');
+        const typeBadge = document.getElementById('input-type-badge');
+        const actionVerbs = ['finir', 'faire', 'acheter', 'appeler', 'envoyer', 'réviser', 'préparer', 'lire', 'écrire', 'nettoyer', 'vérifier', 'tester', 'créer'];
 
-        // Ouverture d'un lien et incrémentation de son poids dynamique
-        function trackLinkClick(linkId) {
-            const link = state.links.find(l => l.id === linkId);
-            if (link) {
-                link.clicks += 1;
-                link.lastUsed = Date.now();
-                saveState();
-                // Légère temporisation avant re-rendu pour ne pas perturber le clic
-                setTimeout(() => renderLinks(), 250);
+        function detectInputType(val) {
+            const trimmed = val.trim();
+            if (!trimmed) return { type: 'empty', label: 'Prêt' };
+            
+            const urlPattern = /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w- ./?%&=]*)?$/i;
+            if (urlPattern.test(trimmed) && !trimmed.includes(' ')) {
+                return { type: 'link', label: 'Lien URL' };
             }
-        }
 
-        // Récupération du favicon haute définition via Google S2
-        function getFaviconUrl(url) {
-            try {
-                const domain = new URL(url).hostname;
-                return `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
-            } catch (e) {
-                return '';
+            const firstWord = trimmed.split(' ')[0].toLowerCase().replace(/[^a-zà-ÿ]/g, '');
+            if (actionVerbs.includes(firstWord) || trimmed.startsWith('- ') || trimmed.startsWith('[]')) {
+                return { type: 'task', label: 'Tâche' };
             }
+
+            return { type: 'note', label: 'Note' };
         }
 
-        /**
-         * FUSION CONTEXTUELLE PAR GLISSER-DÉPOSER (Drag & Drop)
-         * Permet de glisser une tâche ou une note directement sur une carte de lien
-         * pour les associer instantanément.
-         */
-        function handleDragStart(event, itemType, itemId) {
-            event.dataTransfer.setData('text/plain', JSON.stringify({ itemType, itemId }));
-            event.dataTransfer.effectAllowed = 'move';
-        }
+        smartInput.addEventListener('input', (e) => {
+            const detection = detectInputType(e.target.value);
+            typeBadge.textContent = detection.label;
+            if (detection.type !== 'empty') {
+                typeBadge.classList.remove('text-zinc-400', 'border-zinc-800');
+                typeBadge.classList.add('text-zinc-100', 'border-zinc-600');
+            } else {
+                typeBadge.classList.add('text-zinc-400', 'border-zinc-800');
+                typeBadge.classList.remove('text-zinc-100', 'border-zinc-600');
+            }
+        });
 
-        function handleDragOver(event, cardEl) {
-            event.preventDefault();
-            event.dataTransfer.dropEffect = 'move';
-            cardEl.classList.add('ring-2', 'ring-indigo-400', 'scale-[1.02]');
-        }
+        smartInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && smartInput.value.trim() !== '') {
+                const raw = smartInput.value.trim();
+                const detection = detectInputType(raw);
 
-        function handleDragLeave(cardEl) {
-            cardEl.classList.remove('ring-2', 'ring-indigo-400', 'scale-[1.02]');
-        }
+                if (detection.type === 'link') {
+                    let url = raw.startsWith('http') ? raw : 'https://' + raw;
+                    let domain = new URL(url).hostname.replace('www.', '');
+                    let title = domain.split('.')[0];
+                    title = title.charAt(0).toUpperCase() + title.slice(1);
 
-        function handleDropOnLink(event, targetLinkId, cardEl) {
-            event.preventDefault();
-            handleDragLeave(cardEl);
-            try {
-                const data = JSON.parse(event.dataTransfer.getData('text/plain'));
-                const targetLink = state.links.find(l => l.id === targetLinkId);
-                if (!targetLink) return;
-
-                if (data.itemType === 'task') {
-                    const task = state.tasks.find(t => t.id === data.itemId);
-                    if (task) {
-                        task.linkedLinkId = targetLinkId;
-                        showToast(`Tâche fusionnée avec "${targetLink.title}"`, "success");
-                    }
-                } else if (data.itemType === 'note') {
-                    const note = state.notes.find(n => n.id === data.itemId);
-                    if (note) {
-                        note.linkedLinkId = targetLinkId;
-                        showToast(`Note fusionnée avec "${targetLink.title}"`, "success");
-                    }
+                    state.links.unshift({
+                        id: 'l_' + Date.now(),
+                        title: title,
+                        url: url,
+                        clicks: 1,
+                        attached: []
+                    });
+                    showToast(`Lien "${title}" ajouté`);
+                } else if (detection.type === 'task') {
+                    const cleanText = raw.replace(/^(-|\[\])\s*/, '');
+                    state.tasks.unshift({
+                        id: 't_' + Date.now(),
+                        text: cleanText,
+                        done: false
+                    });
+                    showToast('Tâche ajoutée');
+                } else {
+                    state.notes.unshift({
+                        id: 'n_' + Date.now(),
+                        text: raw
+                    });
+                    showToast('Note ajoutée');
                 }
-                saveState();
-                renderAll();
-            } catch (e) {
-                console.error("Erreur lors de la fusion:", e);
-            }
-        }
 
-        // Rendu des cartes de liens avec mise en avant dynamique
+                smartInput.value = '';
+                typeBadge.textContent = 'Prêt';
+                saveState();
+            }
+        });
+
+        // --- Rendering ---
         function renderLinks() {
             const grid = document.getElementById('links-grid');
-            const countBadge = document.getElementById('links-count');
-            const targetSelect = document.getElementById('omni-target-link');
-
-            // Mise à jour des boutons de tri
-            const btnDynamic = document.getElementById('sort-dynamic-btn');
-            const btnRecent = document.getElementById('sort-recent-btn');
-            if (state.sortMode === 'dynamic') {
-                btnDynamic.className = "px-2.5 py-1 rounded-lg text-xs font-medium bg-indigo-600 text-white transition";
-                btnRecent.className = "px-2.5 py-1 rounded-lg text-xs font-medium text-zinc-400 hover:text-white transition";
-            } else {
-                btnRecent.className = "px-2.5 py-1 rounded-lg text-xs font-medium bg-indigo-600 text-white transition";
-                btnDynamic.className = "px-2.5 py-1 rounded-lg text-xs font-medium text-zinc-400 hover:text-white transition";
-            }
-
-            // Tri des liens
-            const sortedLinks = [...state.links].sort((a, b) => {
-                if (state.sortMode === 'dynamic') {
-                    return getDynamicScore(b) - getDynamicScore(a);
-                }
-                return b.createdAt - a.createdAt;
-            });
-
-            countBadge.textContent = sortedLinks.length;
-
-            // Mise à jour du menu déroulant de fusion rapide
-            const currentSelectVal = targetSelect.value;
-            targetSelect.innerHTML = `<option value="">Espace général</option>` + 
-                sortedLinks.map(l => `<option value="${l.id}">Lier à : ${escapeHtml(l.title)}</option>`).join('');
-            targetSelect.value = currentSelectVal;
-
-            if (sortedLinks.length === 0) {
-                grid.innerHTML = `
-                    <div class="col-span-full rounded-2xl border border-dashed border-zinc-800 p-8 text-center text-zinc-500 text-sm">
-                        Aucun lien enregistré. Collez une URL dans la barre ci-dessus pour commencer !
-                    </div>`;
-                return;
-            }
-
-            // Calcul du score max pour attribuer les niveaux visuels de mise en avant
-            const maxScore = Math.max(...sortedLinks.map(getDynamicScore), 1);
+            document.getElementById('links-count').textContent = `${state.links.length} lien${state.links.length > 1 ? 's' : ''}`;
+            
+            const sortedLinks = [...state.links].sort((a, b) => b.clicks - a.clicks);
 
             grid.innerHTML = sortedLinks.map((link, index) => {
-                const linkedTasks = state.tasks.filter(t => t.linkedLinkId === link.id && !t.done);
-                const linkedNotes = state.notes.filter(n => n.linkedLinkId === link.id);
-                const scoreRatio = getDynamicScore(link) / maxScore;
-
-                // Classe de mise en avant dynamique selon l'utilisation
-                let heatClass = 'border-nexus-border';
-                let priorityBadge = '';
-                if (state.sortMode === 'dynamic' && index === 0 && link.clicks > 2) {
-                    heatClass = 'heat-high';
-                    priorityBadge = `<span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 flex items-center gap-1"><i data-lucide="flame" class="w-3 h-3 text-indigo-400"></i> Top usage</span>`;
-                } else if (state.sortMode === 'dynamic' && scoreRatio > 0.55 && link.clicks > 2) {
-                    heatClass = 'heat-medium';
-                }
-
-                // Aperçu des éléments fusionnés directement sur la carte
-                let contextPreviewHtml = '';
-                if (linkedTasks.length > 0 || linkedNotes.length > 0) {
-                    contextPreviewHtml = `
-                        <div class="mt-3 pt-2.5 border-t border-zinc-800/80 flex flex-wrap items-center gap-2 text-[11px]">
-                            ${linkedTasks.length > 0 ? `
-                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                                    <i data-lucide="check-square" class="w-3 h-3"></i> ${linkedTasks.length} tâche${linkedTasks.length > 1 ? 's' : ''}
-                                </span>` : ''}
-                            ${linkedNotes.length > 0 ? `
-                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                                    <i data-lucide="sticky-note" class="w-3 h-3"></i> ${linkedNotes.length} note${linkedNotes.length > 1 ? 's' : ''}
-                                </span>` : ''}
-                            <span class="text-zinc-500 ml-auto truncate max-w-[140px]">
-                                ${escapeHtml(linkedTasks[0]?.text || linkedNotes[0]?.content || '')}
-                            </span>
-                        </div>
-                    `;
-                } else {
-                    contextPreviewHtml = `
-                        <div class="mt-3 pt-2 border-t border-zinc-800/40 flex items-center justify-between text-[11px] text-zinc-600">
-                            <span>Glissez une note ou tâche ici</span>
-                            <span>${link.clicks} ouverture${link.clicks > 1 ? 's' : ''}</span>
-                        </div>
-                    `;
-                }
+                const domain = new URL(link.url).hostname;
+                const favicon = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+                const isFrequent = index < 2 && link.clicks > 3;
+                const attachedCount = link.attached ? link.attached.length : 0;
 
                 return `
                     <div 
-                        ondragover="handleDragOver(event, this)" 
-                        ondragleave="handleDragLeave(this)" 
+                        class="link-card surface-card rounded-lg p-3.5 flex flex-col justify-between gap-3 relative group cursor-pointer ${isFrequent ? 'frequent-badge' : ''}"
+                        onclick="openLink('${link.id}', '${link.url}')"
+                        ondragover="handleDragOver(event, this)"
+                        ondragleave="handleDragLeave(this)"
                         ondrop="handleDropOnLink(event, '${link.id}', this)"
-                        class="group relative rounded-2xl bg-nexus-card border ${heatClass} p-4 hover:bg-zinc-800/70 transition-all duration-200 flex flex-col justify-between"
                     >
-                        <div class="flex items-start justify-between gap-3">
-                            <a 
-                                href="${escapeHtml(link.url)}" 
-                                target="_blank" 
-                                rel="noopener noreferrer" 
-                                onclick="trackLinkClick('${link.id}')"
-                                class="flex items-center gap-3 flex-1 min-w-0 group/link"
-                            >
-                                <div class="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center shrink-0 overflow-hidden group-hover/link:border-indigo-500/50 transition">
-                                    <img 
-                                        src="${getFaviconUrl(link.url)}" 
-                                        alt="" 
-                                        onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
-                                        class="w-5 h-5 object-contain"
-                                    >
-                                    <i data-lucide="globe" class="w-5 h-5 text-zinc-500 hidden"></i>
+                        <div class="flex items-start justify-between gap-2">
+                            <div class="flex items-center gap-3 overflow-hidden">
+                                <img src="${favicon}" alt="" class="w-6 h-6 rounded bg-zinc-900 p-0.5 border border-zinc-800 shrink-0">
+                                <div class="truncate">
+                                    <h3 class="font-medium text-zinc-100 text-sm truncate">${link.title}</h3>
+                                    <p class="text-[11px] text-zinc-500 truncate">${domain}</p>
                                 </div>
-                                <div class="min-w-0 flex-1">
-                                    <div class="flex items-center gap-2">
-                                        <h3 class="text-sm font-semibold text-zinc-100 truncate group-hover/link:text-indigo-400 transition">
-                                            ${escapeHtml(link.title)}
-                                        </h3>
-                                        ${priorityBadge}
-                                    </div>
-                                    <p class="text-xs text-zinc-500 truncate mt-0.5">${escapeHtml(link.url.replace(/^https?:\/\//, ''))}</p>
-                                </div>
-                            </a>
-
-                            <!-- Bouton d'ouverture du contexte fusionné -->
-                            <button 
-                                onclick="openContextModal('${link.id}')" 
-                                title="Gérer les notes et tâches fusionnées"
-                                class="p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-700/70 transition shrink-0"
-                            >
-                                <i data-lucide="layers" class="w-4 h-4"></i>
-                            </button>
+                            </div>
+                            
+                            <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity" onclick="event.stopPropagation()">
+                                <button onclick="openContextModal('${link.id}')" title="Notes & Tâches liées" class="p-1.5 rounded hover:bg-zinc-800 text-zinc-400 hover:text-zinc-100">
+                                    <i data-lucide="layers" class="w-3.5 h-3.5"></i>
+                                </button>
+                                <button onclick="deleteLink('${link.id}')" title="Supprimer" class="p-1.5 rounded hover:bg-zinc-800 text-zinc-500 hover:text-red-400">
+                                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
                         </div>
 
-                        ${contextPreviewHtml}
+                        <div class="flex items-center justify-between text-[11px] pt-2 border-t border-zinc-800/80">
+                            <span class="text-zinc-500 flex items-center gap-1">
+                                <i data-lucide="arrow-up-right" class="w-3 h-3"></i> ${link.clicks}
+                            </span>
+                            ${attachedCount > 0 ? `
+                                <button onclick="event.stopPropagation(); openContextModal('${link.id}')" class="px-2 py-0.5 rounded bg-zinc-900 text-zinc-300 border border-zinc-800 hover:border-zinc-600 flex items-center gap-1 transition">
+                                    <i data-lucide="paperclip" class="w-2.5 h-2.5"></i> ${attachedCount} lié${attachedCount > 1 ? 's' : ''}
+                                </button>
+                            ` : `<span class="text-zinc-700">Glisser ici</span>`}
+                        </div>
                     </div>
                 `;
             }).join('');
         }
 
-        // Rendu des tâches actionnables (glissables vers les liens)
         function renderTasks() {
             const list = document.getElementById('tasks-list');
-            const stats = document.getElementById('tasks-stats');
-            
-            const doneCount = state.tasks.filter(t => t.done).length;
-            stats.textContent = `${doneCount}/${state.tasks.length} terminées`;
-
             if (state.tasks.length === 0) {
-                list.innerHTML = `<p class="text-xs text-zinc-500 text-center py-4">Aucune tâche en cours.</p>`;
+                list.innerHTML = `<li class="text-xs text-zinc-600 py-2">Aucune tâche en attente.</li>`;
                 return;
             }
-
-            // Trier : non terminées en haut
-            const sortedTasks = [...state.tasks].sort((a, b) => Number(a.done) - Number(b.done));
-
-            list.innerHTML = sortedTasks.map(task => {
-                const parentLink = task.linkedLinkId ? state.links.find(l => l.id === task.linkedLinkId) : null;
-                return `
-                    <div 
-                        draggable="true" 
-                        ondragstart="handleDragStart(event, 'task', '${task.id}')"
-                        class="group flex items-start justify-between gap-2.5 p-2.5 rounded-xl bg-zinc-900/70 border border-zinc-800/80 hover:border-zinc-700 cursor-grab active:cursor-grabbing transition"
-                    >
-                        <button onclick="toggleTask('${task.id}')" class="mt-0.5 shrink-0 text-zinc-400 hover:text-emerald-400 transition">
-                            <i data-lucide="${task.done ? 'check-circle-2' : 'circle'}" class="w-4 h-4 ${task.done ? 'text-emerald-500' : ''}"></i>
-                        </button>
-                        
-                        <div class="flex-1 min-w-0">
-                            <p class="text-xs sm:text-sm leading-snug ${task.done ? 'line-through text-zinc-500' : 'text-zinc-200'}">
-                                ${escapeHtml(task.text)}
-                            </p>
-                            ${parentLink ? `
-                                <span class="inline-flex items-center gap-1 mt-1 text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/15 text-indigo-300">
-                                    <i data-lucide="link" class="w-2.5 h-2.5"></i> ${escapeHtml(parentLink.title)}
-                                </span>
-                            ` : ''}
-                        </div>
-
-                        <button onclick="deleteTask('${task.id}')" class="opacity-0 group-hover:opacity-100 p-1 text-zinc-500 hover:text-rose-400 transition">
-                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                        </button>
+            list.innerHTML = state.tasks.map(task => `
+                <li 
+                    draggable="true"
+                    ondragstart="handleDragStart(event, 'task', '${task.id}')"
+                    class="flex items-center justify-between gap-2 p-2 rounded bg-zinc-950/60 hover:bg-zinc-900 border border-zinc-800/80 cursor-grab active:cursor-grabbing group"
+                >
+                    <div class="flex items-center gap-2.5 overflow-hidden">
+                        <input type="checkbox" ${task.done ? 'checked' : ''} onchange="toggleTask('${task.id}')" class="rounded border-zinc-700 bg-zinc-900 text-zinc-100 focus:ring-0 cursor-pointer">
+                        <span class="text-xs ${task.done ? 'line-through text-zinc-600' : 'text-zinc-200'} truncate">${task.text}</span>
                     </div>
-                `;
-            }).join('');
+                    <button onclick="deleteTask('${task.id}')" class="opacity-0 group-hover:opacity-100 text-zinc-600 hover:text-red-400 transition">
+                        <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                    </button>
+                </li>
+            `).join('');
         }
 
-        function toggleTask(taskId) {
-            const task = state.tasks.find(t => t.id === taskId);
+        function renderNotes() {
+            const list = document.getElementById('notes-list');
+            if (state.notes.length === 0) {
+                list.innerHTML = `<p class="text-xs text-zinc-600 py-2">Aucune note rapide.</p>`;
+                return;
+            }
+            list.innerHTML = state.notes.map(note => `
+                <div 
+                    draggable="true"
+                    ondragstart="handleDragStart(event, 'note', '${note.id}')"
+                    class="p-2.5 rounded bg-zinc-950/60 hover:bg-zinc-900 border border-zinc-800/80 text-xs text-zinc-300 flex justify-between items-start gap-2 cursor-grab active:cursor-grabbing group"
+                >
+                    <p class="leading-relaxed">${note.text}</p>
+                    <button onclick="deleteNote('${note.id}')" class="opacity-0 group-hover:opacity-100 text-zinc-600 hover:text-red-400 shrink-0 transition">
+                        <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function renderWorkspaces() {
+            const container = document.getElementById('workspaces-container');
+            const label = `<span class="text-xs text-zinc-500 mr-1 hidden sm:inline">Espaces :</span>`;
+            const buttons = state.workspaces.map(ws => `
+                <div class="inline-flex items-center rounded bg-zinc-900 border border-zinc-800 hover:border-zinc-600 transition overflow-hidden">
+                    <button onclick="launchWorkspace('${ws.id}')" class="px-2.5 py-1 text-xs font-medium text-zinc-200 hover:text-white flex items-center gap-1.5" title="Ouvrir ${ws.linkIds.length} onglets">
+                        <i data-lucide="play" class="w-2.5 h-2.5 text-zinc-400"></i>
+                        ${ws.name}
+                    </button>
+                    <button onclick="deleteWorkspace('${ws.id}')" class="px-1.5 py-1 text-zinc-600 hover:text-red-400 border-l border-zinc-800">
+                        <i data-lucide="x" class="w-2.5 h-2.5"></i>
+                    </button>
+                </div>
+            `).join('');
+            container.innerHTML = label + buttons;
+        }
+
+        function renderAll() {
+            renderLinks();
+            renderTasks();
+            renderNotes();
+            renderWorkspaces();
+            lucide.createIcons();
+        }
+
+        // --- Actions ---
+        function openLink(id, url) {
+            const link = state.links.find(l => l.id === id);
+            if (link) {
+                link.clicks += 1;
+                saveState();
+            }
+            window.open(url, '_blank');
+        }
+
+        function deleteLink(id) {
+            state.links = state.links.filter(l => l.id !== id);
+            saveState();
+            showToast('Lien supprimé');
+        }
+
+        function toggleTask(id) {
+            const task = state.tasks.find(t => t.id === id);
             if (task) {
                 task.done = !task.done;
                 saveState();
-                renderAll();
             }
         }
 
-        function deleteTask(taskId) {
-            state.tasks = state.tasks.filter(t => t.id !== taskId);
+        function deleteTask(id) {
+            state.tasks = state.tasks.filter(t => t.id !== id);
             saveState();
-            renderAll();
         }
 
-        // Rendu des notes éclair (glissables vers les liens)
-        function renderNotes() {
-            const list = document.getElementById('notes-list');
-            const count = document.getElementById('notes-count');
-            count.textContent = state.notes.length;
-
-            if (state.notes.length === 0) {
-                list.innerHTML = `<p class="text-xs text-zinc-500 text-center py-4">Aucune note enregistrée.</p>`;
-                return;
-            }
-
-            list.innerHTML = state.notes.map(note => {
-                const parentLink = note.linkedLinkId ? state.links.find(l => l.id === note.linkedLinkId) : null;
-                return `
-                    <div 
-                        draggable="true" 
-                        ondragstart="handleDragStart(event, 'note', '${note.id}')"
-                        class="group relative p-3 rounded-xl bg-amber-500/5 border border-amber-500/15 hover:border-amber-500/35 cursor-grab active:cursor-grabbing transition"
-                    >
-                        <div class="flex items-start justify-between gap-2">
-                            <p class="text-xs text-zinc-200 leading-relaxed whitespace-pre-wrap">${escapeHtml(note.content)}</p>
-                            <button onclick="deleteNote('${note.id}')" class="opacity-0 group-hover:opacity-100 p-1 text-zinc-500 hover:text-rose-400 transition shrink-0">
-                                <i data-lucide="x" class="w-3.5 h-3.5"></i>
-                            </button>
-                        </div>
-                        ${parentLink ? `
-                            <div class="mt-2 pt-1.5 border-t border-amber-500/10 flex items-center gap-1 text-[10px] text-indigo-300">
-                                <i data-lucide="link" class="w-2.5 h-2.5"></i>
-                                <span>Fusionnée avec ${escapeHtml(parentLink.title)}</span>
-                            </div>
-                        ` : ''}
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function deleteNote(noteId) {
-            state.notes = state.notes.filter(n => n.id !== noteId);
+        function deleteNote(id) {
+            state.notes = state.notes.filter(n => n.id !== id);
             saveState();
-            renderAll();
-        }
-
-        /**
-         * ESPACES DE TRAVAIL GROUPÉS (Lancement simultané en 1 clic)
-         */
-        function renderWorkspaces() {
-            const bar = document.getElementById('workspaces-bar');
-            bar.innerHTML = state.workspaces.map(ws => {
-                const validLinks = ws.linkIds
-                    .map(id => state.links.find(l => l.id === id))
-                    .filter(Boolean);
-
-                return `
-                    <div class="group flex items-center bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 rounded-xl transition shrink-0">
-                        <button 
-                            onclick="launchWorkspace('${ws.id}')" 
-                            title="Ouvrir les ${validLinks.length} liens de cet espace en 1 clic"
-                            class="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-indigo-300"
-                        >
-                            <i data-lucide="play" class="w-3 h-3 fill-indigo-400 text-indigo-400"></i>
-                            <span>${escapeHtml(ws.name)}</span>
-                            <span class="text-[10px] px-1.5 py-0.2 rounded-full bg-indigo-500/20 text-indigo-200">${validLinks.length}</span>
-                        </button>
-                        <button 
-                            onclick="deleteWorkspace('${ws.id}')" 
-                            title="Supprimer cet espace"
-                            class="pr-2 pl-1 py-1.5 text-indigo-400/50 hover:text-rose-400 transition"
-                        >
-                            <i data-lucide="x" class="w-3 h-3"></i>
-                        </button>
-                    </div>
-                `;
-            }).join('');
         }
 
         function launchWorkspace(wsId) {
             const ws = state.workspaces.find(w => w.id === wsId);
             if (!ws) return;
-
-            const linksToOpen = ws.linkIds
-                .map(id => state.links.find(l => l.id === id))
-                .filter(Boolean);
-
-            if (linksToOpen.length === 0) {
-                showToast("Cet espace ne contient plus de liens valides.", "warning");
+            const urls = ws.linkIds.map(id => state.links.find(l => l.id === id)?.url).filter(Boolean);
+            if (urls.length === 0) {
+                showToast('Aucun lien valide dans cet espace');
                 return;
             }
-
-            let blockedCount = 0;
-            linksToOpen.forEach(link => {
-                trackLinkClick(link.id);
-                const win = window.open(link.url, '_blank', 'noopener,noreferrer');
-                if (!win) blockedCount++;
-            });
-
-            if (blockedCount > 0) {
-                showToast(`Espace "${ws.name}" lancé (${blockedCount} onglet(s) bloqué(s) par le navigateur — autorisez les pop-ups pour ce site).`, "warning");
-            } else {
-                showToast(`Espace "${ws.name}" déployé (${linksToOpen.length} onglets ouverts) !`, "success");
-            }
+            urls.forEach(url => window.open(url, '_blank'));
+            showToast(`Espace "${ws.name}" lancé (${urls.length} onglets)`);
         }
 
         function deleteWorkspace(wsId) {
             state.workspaces = state.workspaces.filter(w => w.id !== wsId);
             saveState();
-            renderWorkspaces();
-            lucide.createIcons();
         }
 
-        // Modale création d'espace de travail
-        function openWorkspaceModal() {
-            const modal = document.getElementById('workspace-modal');
-            const selector = document.getElementById('ws-links-selector');
-            document.getElementById('ws-name-input').value = '';
+        // --- Drag & Drop Contextual Fusion ---
+        function handleDragStart(e, type, id) {
+            draggedItem = { type, id };
+            e.dataTransfer.effectAllowed = 'move';
+        }
 
-            selector.innerHTML = state.links.map(link => `
-                <label class="flex items-center gap-2.5 p-2 rounded-lg hover:bg-zinc-800 cursor-pointer text-xs text-zinc-200">
-                    <input type="checkbox" value="${link.id}" class="ws-link-checkbox rounded border-zinc-600 bg-zinc-800 text-indigo-600 focus:ring-indigo-500">
-                    <span class="truncate">${escapeHtml(link.title)}</span>
-                </label>
-            `).join('');
+        function handleDragOver(e, el) {
+            e.preventDefault();
+            el.classList.add('drag-over');
+        }
 
+        function handleDragLeave(el) {
+            el.classList.remove('drag-over');
+        }
+
+        function handleDropOnLink(e, linkId, el) {
+            e.preventDefault();
+            el.classList.remove('drag-over');
+            if (!draggedItem) return;
+
+            const targetLink = state.links.find(l => l.id === linkId);
+            if (!targetLink) return;
+            if (!targetLink.attached) targetLink.attached = [];
+
+            if (draggedItem.type === 'task') {
+                const taskIndex = state.tasks.findIndex(t => t.id === draggedItem.id);
+                if (taskIndex > -1) {
+                    const [task] = state.tasks.splice(taskIndex, 1);
+                    targetLink.attached.push({ id: 'att_' + Date.now(), type: 'task', text: task.text, done: task.done });
+                    showToast(`Tâche fusionnée avec ${targetLink.title}`);
+                }
+            } else if (draggedItem.type === 'note') {
+                const noteIndex = state.notes.findIndex(n => n.id === draggedItem.id);
+                if (noteIndex > -1) {
+                    const [note] = state.notes.splice(noteIndex, 1);
+                    targetLink.attached.push({ id: 'att_' + Date.now(), type: 'note', text: note.text });
+                    showToast(`Note fusionnée avec ${targetLink.title}`);
+                }
+            }
+
+            draggedItem = null;
+            saveState();
+        }
+
+        // --- Context Modal ---
+        function openContextModal(linkId) {
+            currentModalLinkId = linkId;
+            const link = state.links.find(l => l.id === linkId);
+            if (!link) return;
+
+            const domain = new URL(link.url).hostname;
+            document.getElementById('modal-favicon').src = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+            document.getElementById('modal-title').textContent = link.title;
+            const urlEl = document.getElementById('modal-url');
+            urlEl.textContent = link.url;
+            urlEl.href = link.url;
+
+            renderModalAttached(link);
+            const modal = document.getElementById('context-modal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
             lucide.createIcons();
+        }
+
+        function renderModalAttached(link) {
+            const container = document.getElementById('modal-attached-items');
+            if (!link.attached || link.attached.length === 0) {
+                container.innerHTML = `<p class="text-xs text-zinc-500">Aucun élément associé à ce lien.</p>`;
+                return;
+            }
+            container.innerHTML = link.attached.map(item => `
+                <div class="flex items-center justify-between gap-2 p-2.5 rounded bg-zinc-950 border border-zinc-800 text-xs">
+                    <div class="flex items-center gap-2">
+                        <span class="px-1.5 py-0.5 rounded text-[10px] mono bg-zinc-900 text-zinc-400 border border-zinc-800">
+                            ${item.type === 'task' ? 'TÂCHE' : 'NOTE'}
+                        </span>
+                        <span class="text-zinc-200">${item.text}</span>
+                    </div>
+                    <button onclick="removeAttachedItem('${item.id}')" class="text-zinc-600 hover:text-red-400">
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function addContextItemFromModal() {
+            const input = document.getElementById('modal-quick-add');
+            const val = input.value.trim();
+            if (!val || !currentModalLinkId) return;
+
+            const link = state.links.find(l => l.id === currentModalLinkId);
+            if (!link) return;
+            if (!link.attached) link.attached = [];
+
+            const detection = detectInputType(val);
+            link.attached.push({
+                id: 'att_' + Date.now(),
+                type: detection.type === 'task' ? 'task' : 'note',
+                text: val
+            });
+
+            input.value = '';
+            saveState();
+            renderModalAttached(link);
+            lucide.createIcons();
+        }
+
+        function removeAttachedItem(attId) {
+            const link = state.links.find(l => l.id === currentModalLinkId);
+            if (!link) return;
+            link.attached = link.attached.filter(a => a.id !== attId);
+            saveState();
+            renderModalAttached(link);
+            lucide.createIcons();
+        }
+
+        function closeContextModal() {
+            const modal = document.getElementById('context-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            currentModalLinkId = null;
+        }
+
+        // --- Workspace Modal ---
+        function openWorkspaceModal() {
+            const container = document.getElementById('ws-links-selection');
+            container.innerHTML = state.links.map(l => `
+                <label class="flex items-center gap-2 text-xs text-zinc-300 cursor-pointer hover:text-white p-1">
+                    <input type="checkbox" value="${l.id}" class="ws-link-cb rounded border-zinc-700 bg-zinc-900 text-zinc-100">
+                    <span>${l.title}</span>
+                </label>
+            `).join('');
+            const modal = document.getElementById('workspace-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
         }
 
         function closeWorkspaceModal() {
@@ -973,186 +670,26 @@
             modal.classList.remove('flex');
         }
 
-        function saveNewWorkspace() {
-            const name = document.getElementById('ws-name-input').value.trim();
-            const checkedBoxes = Array.from(document.querySelectorAll('.ws-link-checkbox:checked'));
-            const linkIds = checkedBoxes.map(cb => cb.value);
-
-            if (!name) {
-                showToast("Donnez un nom à votre espace de travail.", "warning");
+        function saveWorkspace() {
+            const name = document.getElementById('ws-name').value.trim();
+            const checked = Array.from(document.querySelectorAll('.ws-link-cb:checked')).map(cb => cb.value);
+            if (!name || checked.length === 0) {
+                showToast('Donnez un nom et cochez au moins un lien');
                 return;
             }
-            if (linkIds.length === 0) {
-                showToast("Sélectionnez au moins un lien.", "warning");
-                return;
-            }
-
             state.workspaces.push({
-                id: 'ws-' + Date.now(),
-                name,
-                icon: 'layers',
-                linkIds
+                id: 'w_' + Date.now(),
+                name: name,
+                linkIds: checked
             });
-            saveState();
+            document.getElementById('ws-name').value = '';
             closeWorkspaceModal();
-            renderWorkspaces();
-            lucide.createIcons();
-            showToast(`Espace "${name}" créé !`, "success");
-        }
-
-        /**
-         * MODALE DE CONTEXTE FUSIONNÉ D'UN LIEN
-         */
-        function openContextModal(linkId) {
-            const link = state.links.find(l => l.id === linkId);
-            if (!link) return;
-
-            activeModalLinkId = linkId;
-            document.getElementById('modal-link-title').textContent = link.title;
-            const urlEl = document.getElementById('modal-link-url');
-            urlEl.textContent = link.url;
-            urlEl.href = link.url;
-            document.getElementById('modal-open-link-btn').href = link.url;
-            document.getElementById('modal-link-favicon').src = getFaviconUrl(link.url);
-
-            document.getElementById('modal-delete-link-btn').onclick = () => {
-                state.links = state.links.filter(l => l.id !== linkId);
-                // Détacher les notes/tâches associées
-                state.tasks.forEach(t => { if (t.linkedLinkId === linkId) t.linkedLinkId = null; });
-                state.notes.forEach(n => { if (n.linkedLinkId === linkId) n.linkedLinkId = null; });
-                saveState();
-                closeContextModal();
-                renderAll();
-                showToast("Lien supprimé", "info");
-            };
-
-            renderModalContextItems();
-
-            const modal = document.getElementById('link-context-modal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            lucide.createIcons();
-        }
-
-        function closeContextModal() {
-            const modal = document.getElementById('link-context-modal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-            activeModalLinkId = null;
-        }
-
-        function renderModalContextItems() {
-            if (!activeModalLinkId) return;
-            const linkedTasks = state.tasks.filter(t => t.linkedLinkId === activeModalLinkId);
-            const linkedNotes = state.notes.filter(n => n.linkedLinkId === activeModalLinkId);
-
-            const tasksContainer = document.getElementById('modal-linked-tasks');
-            tasksContainer.innerHTML = linkedTasks.length ? linkedTasks.map(t => `
-                <div class="flex items-center justify-between p-2 rounded-lg bg-zinc-900 border border-zinc-800 text-xs">
-                    <span class="${t.done ? 'line-through text-zinc-500' : 'text-zinc-200'}">${escapeHtml(t.text)}</span>
-                    <button onclick="toggleTask('${t.id}'); renderModalContextItems();" class="text-emerald-400 hover:underline ml-2">
-                        ${t.done ? 'Rouvrir' : 'Terminer'}
-                    </button>
-                </div>
-            `).join('') : `<p class="text-xs text-zinc-600 italic">Aucune tâche associée à ce lien.</p>`;
-
-            const notesContainer = document.getElementById('modal-linked-notes');
-            notesContainer.innerHTML = linkedNotes.length ? linkedNotes.map(n => `
-                <div class="p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-xs text-zinc-200">
-                    ${escapeHtml(n.content)}
-                </div>
-            `).join('') : `<p class="text-xs text-zinc-600 italic">Aucune note associée à ce lien.</p>`;
-        }
-
-        function addContextItemFromModal(type) {
-            const input = document.getElementById('modal-context-input');
-            const val = input.value.trim();
-            if (!val || !activeModalLinkId) return;
-
-            if (type === 'task') {
-                state.tasks.unshift({
-                    id: 'task-' + Date.now(),
-                    text: val,
-                    done: false,
-                    linkedLinkId: activeModalLinkId,
-                    createdAt: Date.now()
-                });
-            } else {
-                state.notes.unshift({
-                    id: 'note-' + Date.now(),
-                    content: val,
-                    linkedLinkId: activeModalLinkId,
-                    createdAt: Date.now()
-                });
-            }
-
-            input.value = '';
             saveState();
-            renderModalContextItems();
-            renderAll();
+            showToast(`Espace "${name}" créé`);
         }
 
-        // Message d'accueil contextuel selon l'heure
-        function updateDynamicGreeting() {
-            const hour = new Date().getHours();
-            const greetingEl = document.getElementById('dynamic-greeting');
-            if (hour < 12) {
-                greetingEl.textContent = "Mode Matin • Vos outils prioritaires sont prêts";
-            } else if (hour < 18) {
-                greetingEl.textContent = "Mode Après-midi • Focus & Exécution";
-            } else {
-                greetingEl.textContent = "Mode Soirée • Veille & Organisation";
-            }
-        }
-
-        // Système de notifications Toast non-intrusif
-        function showToast(message, type = 'info') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            
-            const colors = {
-                success: 'bg-zinc-900 border-emerald-500/40 text-emerald-300',
-                warning: 'bg-zinc-900 border-amber-500/40 text-amber-300',
-                info: 'bg-zinc-900 border-indigo-500/40 text-indigo-300'
-            };
-
-            toast.className = `pointer-events-auto px-4 py-2.5 rounded-xl border shadow-xl text-xs font-medium flex items-center gap-2 animate-fade-in ${colors[type] || colors.info}`;
-            toast.innerHTML = `<span>${escapeHtml(message)}</span>`;
-            
-            container.appendChild(toast);
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translateY(6px)';
-                toast.style.transition = 'all 0.25s ease';
-                setTimeout(() => toast.remove(), 250);
-            }, 3200);
-        }
-
-        // Échappement HTML contre les injections XSS
-        function escapeHtml(str) {
-            if (!str) return '';
-            return String(str)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
-        }
-
-        // Rendu global de l'interface
-        function renderAll() {
-            updateDynamicGreeting();
-            renderWorkspaces();
-            renderLinks();
-            renderTasks();
-            renderNotes();
-            lucide.createIcons();
-        }
-
-        // Initialisation au chargement de la page
-        window.addEventListener('DOMContentLoaded', () => {
-            renderAll();
-        });
+        // Initial Render
+        renderAll();
     </script>
 </body>
 </html>
