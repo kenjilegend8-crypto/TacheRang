@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MyHub — Contrôle Absolu de A à Z</title>
+    <title id="page-title">MyHub — Personnalisation Totale</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -44,17 +44,16 @@
         ::-webkit-scrollbar-track { background: var(--bg-color); }
         ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 2px; }
     </style>
-    <style id="custom-injected-css"></style>
 </head>
 <body class="min-h-screen flex flex-col">
 
     <!-- Header -->
-    <header class="border-b border-zinc-800/80 px-6 py-3.5 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-40 bg-zinc-950/90 backdrop-blur-sm">
+    <header class="border-b px-6 py-3.5 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-40 bg-zinc-950/90 backdrop-blur-sm" style="border-color: var(--border-color);">
         <div class="flex items-center gap-3">
             <div id="logo-box" class="w-7 h-7 rounded accent-bg flex items-center justify-center font-bold text-sm">
                 M
             </div>
-            <span class="font-semibold text-base tracking-tight">MyHub</span>
+            <span id="header-brand-name" class="font-semibold text-base tracking-tight">MyHub</span>
             <span id="mode-badge" class="text-[11px] mono px-1.5 py-0.5 rounded bg-zinc-900 text-zinc-500 border border-zinc-800">Espace Privé</span>
         </div>
 
@@ -63,19 +62,18 @@
         </div>
 
         <div class="flex items-center gap-2">
-            <!-- Bouton affiché uniquement si admin -->
             <button onclick="toggleAdminPanel()" id="admin-trigger-btn" class="hidden text-xs px-3 py-1.5 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 transition items-center gap-1.5">
-                <i data-lucide="sliders" class="w-3.5 h-3.5 text-emerald-400"></i> Console Design Admin
+                <i data-lucide="sliders" class="w-3.5 h-3.5 text-emerald-400"></i> Studio Admin 100%
             </button>
         </div>
     </header>
 
-    <!-- Console de Contrôle Absolu (Admin Panel) -->
+    <!-- Studio de Contrôle Total & Textes (Admin Panel) -->
     <section id="admin-panel" class="hidden bg-[#0c0c0e] border-b border-zinc-800 px-6 py-6 transition-all shadow-2xl">
         <div class="max-w-7xl mx-auto flex flex-col gap-6">
             <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
                 <span class="text-xs font-semibold text-emerald-400 uppercase tracking-wider flex items-center gap-2">
-                    <i data-lucide="cpu" class="w-4 h-4"></i> Studio de Contrôle Total (De A à Z)
+                    <i data-lucide="sliders" class="w-4 h-4"></i> Studio de Personnalisation Absolue (Textes, Couleurs, Formes)
                 </span>
                 <div class="flex items-center gap-4">
                     <button onclick="lockAdminSession()" class="text-xs px-2.5 py-1 rounded bg-red-950/60 hover:bg-red-900/60 text-red-300 border border-red-900/50 transition flex items-center gap-1">
@@ -85,8 +83,37 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <!-- 1. Couleurs -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- 1. Personnalisation des Textes -->
+                <div class="surface-card p-4 flex flex-col gap-3 md:col-span-3">
+                    <h4 class="text-xs font-semibold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                        <i data-lucide="type" class="w-3.5 h-3.5"></i> Personnalisation de tous les Textes du Site
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                        <div class="flex flex-col gap-1">
+                            <label class="text-[11px] text-zinc-400">Nom du site (Header) :</label>
+                            <input type="text" id="txt-brand" oninput="updateTextSetting('brandName', this.value)" class="bg-zinc-950 border border-zinc-800 rounded px-2.5 py-1.5 text-xs text-zinc-200">
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <label class="text-[11px] text-zinc-400">Titre Bloc Liens :</label>
+                            <input type="text" id="txt-links" oninput="updateTextSetting('linksTitle', this.value)" class="bg-zinc-950 border border-zinc-800 rounded px-2.5 py-1.5 text-xs text-zinc-200">
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <label class="text-[11px] text-zinc-400">Titre Bloc Tâches :</label>
+                            <input type="text" id="txt-tasks" oninput="updateTextSetting('tasksTitle', this.value)" class="bg-zinc-950 border border-zinc-800 rounded px-2.5 py-1.5 text-xs text-zinc-200">
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <label class="text-[11px] text-zinc-400">Titre Bloc Notes :</label>
+                            <input type="text" id="txt-notes" oninput="updateTextSetting('notesTitle', this.value)" class="bg-zinc-950 border border-zinc-800 rounded px-2.5 py-1.5 text-xs text-zinc-200">
+                        </div>
+                        <div class="flex flex-col gap-1 md:col-span-2">
+                            <label class="text-[11px] text-zinc-400">Texte d'indication de la barre de recherche :</label>
+                            <input type="text" id="txt-placeholder" oninput="updateTextSetting('searchPlaceholder', this.value)" class="bg-zinc-950 border border-zinc-800 rounded px-2.5 py-1.5 text-xs text-zinc-200">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Couleurs -->
                 <div class="surface-card p-4 flex flex-col gap-3">
                     <h4 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
                         <i data-lucide="palette" class="w-3.5 h-3.5"></i> Couleurs Globales
@@ -105,7 +132,7 @@
                     </div>
                 </div>
 
-                <!-- 2. Formes & Style -->
+                <!-- 3. Formes & Style -->
                 <div class="surface-card p-4 flex flex-col gap-3">
                     <h4 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
                         <i data-lucide="square" class="w-3.5 h-3.5"></i> Formes & Géométrie
@@ -121,46 +148,26 @@
                         </select>
                     </div>
                     <div class="flex items-center justify-between text-xs text-zinc-300">
-                        <span>Bordures nettes :</span>
+                        <span>Couleur des bordures :</span>
                         <input type="color" id="border-color-picker" value="#27272a" onchange="updateStyleSetting('borderColor', this.value)" class="w-7 h-7 rounded bg-transparent cursor-pointer border border-zinc-700">
                     </div>
                 </div>
 
-                <!-- 3. Position & Disposition des Widgets -->
+                <!-- 4. Widgets & Disposition -->
                 <div class="surface-card p-4 flex flex-col gap-3">
                     <h4 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
                         <i data-lucide="layout" class="w-3.5 h-3.5"></i> Disposition & Widgets
                     </h4>
                     <label class="flex items-center justify-between text-xs text-zinc-300 cursor-pointer">
-                        <span>Afficher Barre de Capture</span>
+                        <span>Afficher Barre de Recherche</span>
                         <input type="checkbox" id="toggle-capture" checked onchange="updateToggleSetting('showCapture', this.checked)" class="rounded bg-zinc-900 border-zinc-700">
                     </label>
                     <label class="flex items-center justify-between text-xs text-zinc-300 cursor-pointer">
-                        <span>Afficher Notes Rapides</span>
+                        <span>Afficher Widget Notes</span>
                         <input type="checkbox" id="toggle-notes" checked onchange="updateToggleSetting('showNotes', this.checked)" class="rounded bg-zinc-900 border-zinc-700">
                     </label>
-                    <label class="flex items-center justify-between text-xs text-zinc-300 cursor-pointer">
-                        <span>Inverser Colonnes (Sidebar à gauche)</span>
-                        <input type="checkbox" id="toggle-reverse-layout" onchange="updateToggleSetting('reverseLayout', this.checked)" class="rounded bg-zinc-900 border-zinc-700">
-                    </label>
+                    <button onclick="exportData()" class="mt-2 text-xs py-1.5 px-3 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-700 transition">Exporter ma configuration (JSON)</button>
                 </div>
-
-                <!-- 4. Données & Système -->
-                <div class="surface-card p-4 flex flex-col gap-3">
-                    <h4 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
-                        <i data-lucide="database" class="w-3.5 h-3.5"></i> Données & Backup
-                    </h4>
-                    <button onclick="exportData()" class="text-xs py-1.5 px-3 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-700 transition">Exporter mon JSON</button>
-                    <button onclick="resetDefaultState()" class="text-xs py-1.5 px-3 rounded bg-red-950/40 hover:bg-red-900/50 text-red-300 border border-red-900/50 transition">Réinitialiser</button>
-                </div>
-            </div>
-
-            <!-- Injecteur CSS Pro -->
-            <div class="surface-card p-4 flex flex-col gap-2">
-                <h4 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
-                    <i data-lucide="code" class="w-3.5 h-3.5"></i> Injecteur CSS Personnalisé
-                </h4>
-                <textarea id="custom-css-input" rows="2" placeholder="Ex: body { font-family: monospace; }" oninput="updateCustomCSS(this.value)" class="w-full bg-zinc-950 border border-zinc-800 rounded p-2.5 text-xs mono text-zinc-200 focus:outline-none"></textarea>
             </div>
         </div>
     </section>
@@ -187,13 +194,13 @@
             </div>
         </section>
 
-        <!-- Layout Grille Dynamique -->
+        <!-- Layout Grille -->
         <div id="main-grid-container" class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             
             <!-- Liens -->
             <section id="main-links-section" class="lg:col-span-8 flex flex-col gap-4">
                 <div class="flex items-center justify-between border-b border-zinc-800/80 pb-2.5">
-                    <h2 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-2">
+                    <h2 id="title-links-heading" class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-2">
                         <i data-lucide="layout-grid" class="w-3.5 h-3.5 text-zinc-400"></i>
                         Accès rapides
                     </h2>
@@ -214,7 +221,7 @@
                 <!-- Tâches -->
                 <div class="surface-card rounded-lg p-4 flex flex-col gap-3">
                     <div class="flex items-center justify-between border-b border-zinc-800/80 pb-2.5">
-                        <h3 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-2">
+                        <h3 id="title-tasks-heading" class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-2">
                             <i data-lucide="check-square" class="w-3.5 h-3.5 text-zinc-400"></i>
                             À faire
                         </h3>
@@ -225,7 +232,7 @@
                 <!-- Notes -->
                 <div id="notes-widget-container" class="surface-card rounded-lg p-4 flex flex-col gap-3">
                     <div class="flex items-center justify-between border-b border-zinc-800/80 pb-2.5">
-                        <h3 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-2">
+                        <h3 id="title-notes-heading" class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-2">
                             <i data-lucide="file-text" class="w-3.5 h-3.5 text-zinc-400"></i>
                             Notes rapides
                         </h3>
@@ -280,25 +287,27 @@
                 { id: 'l1', title: 'GitHub', url: 'https://github.com', clicks: 5, attached: [] },
                 { id: 'l2', title: 'YouTube', url: 'https://youtube.com', clicks: 3, attached: [] }
             ],
-            tasks: [{ id: 't1', text: 'Prendre le contrôle total de mon dashboard', done: false }],
-            notes: [{ id: 'n1', text: 'Bienvenue ! Ouvre la console design admin pour tout personnaliser.' }],
+            tasks: [{ id: 't1', text: 'Personnaliser mes textes et mon design', done: false }],
+            notes: [{ id: 'n1', text: 'Bienvenue dans ton dashboard 100% personnalisable !' }],
             workspaces: [],
             settings: {
+                brandName: 'MyHub',
+                linksTitle: 'Accès rapides',
+                tasksTitle: 'À faire',
+                notesTitle: 'Notes rapides',
+                searchPlaceholder: "Coller un lien, ajouter une tâche ('Finir...') ou écrire une note...",
                 bgColor: '#09090b',
                 cardBg: '#111113',
                 borderColor: '#27272a',
                 accentColor: '#fafafa',
                 cardRadius: '0.5rem',
                 showNotes: true,
-                showCapture: true,
-                reverseLayout: false,
-                customCSS: ''
+                showCapture: true
             }
         };
 
-        let state = JSON.parse(localStorage.getItem('myhub_absolute_state')) || defaultState;
+        let state = JSON.parse(localStorage.getItem('myhub_ultimate_state')) || defaultState;
         
-        // Sécurisation stricte de l'admin
         const urlParams = new URLSearchParams(window.location.search);
         let isAdmin = false;
 
@@ -309,7 +318,6 @@
             isAdmin = true;
         }
 
-        // Fonction pour se verrouiller (revenir en mode visiteur sur son propre PC)
         function lockAdminSession() {
             localStorage.removeItem('myhub_is_admin');
             isAdmin = false;
@@ -318,13 +326,12 @@
             showToast('Session verrouillée en mode visiteur');
         }
 
-        // Afficher ou masquer le bouton d'accès admin dans le header
         if (isAdmin) {
             document.getElementById('admin-trigger-btn').classList.remove('hidden');
         }
 
         function saveState() {
-            localStorage.setItem('myhub_absolute_state', JSON.stringify(state));
+            localStorage.setItem('myhub_ultimate_state', JSON.stringify(state));
             renderAll();
         }
 
@@ -347,15 +354,15 @@
             saveState();
         }
 
-        function updateToggleSetting(key, value) {
+        function updateTextSetting(key, value) {
             state.settings[key] = value;
             applySettings();
             saveState();
         }
 
-        function updateCustomCSS(css) {
-            state.settings.customCSS = css;
-            document.getElementById('custom-injected-css').textContent = css;
+        function updateToggleSetting(key, value) {
+            state.settings[key] = value;
+            applySettings();
             saveState();
         }
 
@@ -363,42 +370,27 @@
             const root = document.documentElement;
             const s = state.settings;
 
+            // Couleurs et Formes CSS
             if (s.bgColor) root.style.setProperty('--bg-color', s.bgColor);
             if (s.cardBg) root.style.setProperty('--card-bg', s.cardBg);
             if (s.borderColor) root.style.setProperty('--border-color', s.borderColor);
             if (s.accentColor) root.style.setProperty('--accent-color', s.accentColor);
             if (s.cardRadius) root.style.setProperty('--card-radius', s.cardRadius);
 
-            const notesWidget = document.getElementById('notes-widget-container');
-            const mainSection = document.getElementById('main-links-section');
-            const sidebarSection = document.getElementById('sidebar-section');
-            const gridContainer = document.getElementById('main-grid-container');
+            // Textes dynamiques
+            if(document.getElementById('header-brand-name')) document.getElementById('header-brand-name').textContent = s.brandName || 'MyHub';
+            if(document.getElementById('page-title')) document.getElementById('page-title').textContent = (s.brandName || 'MyHub') + ' — Dashboard';
+            if(document.getElementById('title-links-heading')) document.getElementById('title-links-heading').innerHTML = `<i data-lucide="layout-grid" class="w-3.5 h-3.5 text-zinc-400"></i> ${s.linksTitle || 'Accès rapides'}`;
+            if(document.getElementById('title-tasks-heading')) document.getElementById('title-tasks-heading').innerHTML = `<i data-lucide="check-square" class="w-3.5 h-3.5 text-zinc-400"></i> ${s.tasksTitle || 'À faire'}`;
+            if(document.getElementById('title-notes-heading')) document.getElementById('title-notes-heading').innerHTML = `<i data-lucide="file-text" class="w-3.5 h-3.5 text-zinc-400"></i> ${s.notesTitle || 'Notes rapides'}`;
+            if(document.getElementById('smart-input')) document.getElementById('smart-input').placeholder = s.searchPlaceholder || '';
 
-            if (notesWidget) {
-                notesWidget.style.display = s.showNotes ? 'flex' : 'none';
-                if (!s.showNotes) {
-                    mainSection.className = "lg:col-span-12 flex flex-col gap-4";
-                } else {
-                    mainSection.className = "lg:col-span-8 flex flex-col gap-4";
-                }
-            }
-
-            const captureSection = document.getElementById('capture-section');
-            if (captureSection) {
-                captureSection.style.display = s.showCapture ? 'block' : 'none';
-            }
-
-            if (gridContainer && sidebarSection && mainSection) {
-                if (s.reverseLayout) {
-                    gridContainer.style.direction = 'rtl';
-                    mainSection.style.direction = 'ltr';
-                    sidebarSection.style.direction = 'ltr';
-                } else {
-                    gridContainer.style.direction = 'ltr';
-                    mainSection.style.direction = 'ltr';
-                    sidebarSection.style.direction = 'ltr';
-                }
-            }
+            // Synchronisation des champs du panneau admin
+            if(document.getElementById('txt-brand')) document.getElementById('txt-brand').value = s.brandName || '';
+            if(document.getElementById('txt-links')) document.getElementById('txt-links').value = s.linksTitle || '';
+            if(document.getElementById('txt-tasks')) document.getElementById('txt-tasks').value = s.tasksTitle || '';
+            if(document.getElementById('txt-notes')) document.getElementById('txt-notes').value = s.notesTitle || '';
+            if(document.getElementById('txt-placeholder')) document.getElementById('txt-placeholder').value = s.searchPlaceholder || '';
 
             if(document.getElementById('bg-color-picker')) document.getElementById('bg-color-picker').value = s.bgColor || '#09090b';
             if(document.getElementById('card-bg-picker')) document.getElementById('card-bg-picker').value = s.cardBg || '#111113';
@@ -407,30 +399,29 @@
             if(document.getElementById('radius-select')) document.getElementById('radius-select').value = s.cardRadius || '0.5rem';
             if(document.getElementById('toggle-notes')) document.getElementById('toggle-notes').checked = s.showNotes;
             if(document.getElementById('toggle-capture')) document.getElementById('toggle-capture').checked = s.showCapture;
-            if(document.getElementById('toggle-reverse-layout')) document.getElementById('toggle-reverse-layout').checked = s.reverseLayout;
-            if(document.getElementById('custom-css-input') && document.getElementById('custom-css-input').value === '') {
-                document.getElementById('custom-css-input').value = s.customCSS || '';
-                document.getElementById('custom-injected-css').textContent = s.customCSS || '';
+
+            // Widgets
+            const notesWidget = document.getElementById('notes-widget-container');
+            const mainSection = document.getElementById('main-links-section');
+            if (notesWidget) {
+                notesWidget.style.display = s.showNotes ? 'flex' : 'none';
+                mainSection.className = s.showNotes ? "lg:col-span-8 flex flex-col gap-4" : "lg:col-span-12 flex flex-col gap-4";
             }
+            const captureSection = document.getElementById('capture-section');
+            if (captureSection) {
+                captureSection.style.display = s.showCapture ? 'block' : 'none';
+            }
+
+            lucide.createIcons();
         }
 
         function exportData() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
             const dlAnchorElem = document.createElement('a');
             dlAnchorElem.setAttribute("href", dataStr);
-            dlAnchorElem.setAttribute("download", "myhub_absolute_backup.json");
+            dlAnchorElem.setAttribute("download", "myhub_config.json");
             dlAnchorElem.click();
             showToast('Export réussi !');
-        }
-
-        function resetDefaultState() {
-            if (confirm("Réinitialiser tous les paramètres et données ?")) {
-                localStorage.removeItem('myhub_absolute_state');
-                state = JSON.parse(JSON.stringify(defaultState));
-                applySettings();
-                saveState();
-                showToast('Réinitialisé avec succès');
-            }
         }
 
         const smartInput = document.getElementById('smart-input');
@@ -540,7 +531,7 @@
 
         function renderAll() {
             renderLinks(); renderTasks(); renderNotes(); renderWorkspaces();
-            lucide.createIcons();
+            applySettings();
         }
 
         function openLink(id, url) {
