@@ -40,6 +40,14 @@
         }
         .accent-text { color: var(--accent-color); }
         .accent-bg { background-color: var(--accent-color); color: var(--bg-color); }
+        .dest-btn {
+            transition: all 0.15s ease;
+        }
+        .dest-btn.active {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            font-weight: 600;
+        }
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: var(--bg-color); }
         ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 2px; }
@@ -107,7 +115,7 @@
                             <input type="text" id="txt-notes" oninput="updateTextSetting('notesTitle', this.value)" class="bg-zinc-950 border border-zinc-800 rounded px-2.5 py-1.5 text-xs text-zinc-200">
                         </div>
                         <div class="flex flex-col gap-1 md:col-span-2">
-                            <label class="text-[11px] text-zinc-400">Texte d'indication de la barre de recherche :</label>
+                            <label class="text-[11px] text-zinc-400">Texte d'indication de la barre de saisie :</label>
                             <input type="text" id="txt-placeholder" oninput="updateTextSetting('searchPlaceholder', this.value)" class="bg-zinc-950 border border-zinc-800 rounded px-2.5 py-1.5 text-xs text-zinc-200">
                         </div>
                     </div>
@@ -159,7 +167,7 @@
                         <i data-lucide="layout" class="w-3.5 h-3.5"></i> Disposition & Widgets
                     </h4>
                     <label class="flex items-center justify-between text-xs text-zinc-300 cursor-pointer">
-                        <span>Afficher Barre de Recherche</span>
+                        <span>Afficher Barre de Saisie</span>
                         <input type="checkbox" id="toggle-capture" checked onchange="updateToggleSetting('showCapture', this.checked)" class="rounded bg-zinc-900 border-zinc-700">
                     </label>
                     <label class="flex items-center justify-between text-xs text-zinc-300 cursor-pointer">
@@ -175,21 +183,34 @@
     <!-- Main Content -->
     <main class="flex-1 max-w-7xl w-full mx-auto px-6 py-8 flex flex-col gap-8">
 
-        <!-- Smart Capture Bar -->
+        <!-- Smart Capture Bar avec Sélecteur Manuel de Destination -->
         <section id="capture-section" class="max-w-3xl w-full mx-auto">
-            <div class="relative group">
-                <div class="relative flex items-center surface-card border px-4 py-3 shadow-lg">
+            <div class="relative flex flex-col sm:flex-row sm:items-center gap-2 surface-card border px-3.5 py-2.5 shadow-lg">
+                <div class="flex items-center flex-1">
                     <i data-lucide="terminal" class="w-4 h-4 text-zinc-500 mr-3 shrink-0"></i>
                     <input 
                         type="text" 
                         id="smart-input" 
-                        placeholder="Coller un lien, ajouter une tâche ('Finir...') ou écrire une note..." 
+                        placeholder="Écris ton texte ou colle ton lien, puis choisis où l'envoyer..." 
                         class="w-full bg-transparent text-zinc-100 placeholder-zinc-500 focus:outline-none text-sm"
                         autocomplete="off"
                     >
-                    <div id="input-type-badge" class="hidden sm:flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] mono font-medium bg-zinc-900 text-zinc-400 border border-zinc-800 shrink-0 ml-2">
-                        Prêt
-                    </div>
+                </div>
+
+                <!-- Choix de destination -->
+                <div class="flex items-center gap-1 bg-zinc-950/90 p-1 rounded border border-zinc-800/90 shrink-0 self-end sm:self-auto">
+                    <button type="button" onclick="setTargetDestination('link')" id="btn-dest-link" class="dest-btn text-[11px] px-2.5 py-1 rounded text-zinc-400 hover:text-zinc-200 flex items-center gap-1">
+                        <i data-lucide="link" class="w-3 h-3"></i> Lien
+                    </button>
+                    <button type="button" onclick="setTargetDestination('task')" id="btn-dest-task" class="dest-btn active text-[11px] px-2.5 py-1 rounded text-zinc-400 hover:text-zinc-200 flex items-center gap-1">
+                        <i data-lucide="check-square" class="w-3 h-3"></i> Tâche
+                    </button>
+                    <button type="button" onclick="setTargetDestination('note')" id="btn-dest-note" class="dest-btn text-[11px] px-2.5 py-1 rounded text-zinc-400 hover:text-zinc-200 flex items-center gap-1">
+                        <i data-lucide="file-text" class="w-3 h-3"></i> Note
+                    </button>
+                    <button type="button" onclick="submitSmartInput()" title="Ajouter (Entrée)" class="ml-1 px-2.5 py-1 rounded accent-bg text-[11px] font-semibold hover:opacity-90 flex items-center gap-1">
+                        <i data-lucide="corner-down-left" class="w-3 h-3"></i>
+                    </button>
                 </div>
             </div>
         </section>
@@ -295,7 +316,7 @@
                 linksTitle: 'Accès rapides',
                 tasksTitle: 'À faire',
                 notesTitle: 'Notes rapides',
-                searchPlaceholder: "Coller un lien, ajouter une tâche ('Finir...') ou écrire une note...",
+                searchPlaceholder: "Écris ton texte ou colle ton lien, puis choisis où l'envoyer...",
                 bgColor: '#09090b',
                 cardBg: '#111113',
                 borderColor: '#27272a',
@@ -307,6 +328,7 @@
         };
 
         let state = JSON.parse(localStorage.getItem('myhub_ultimate_state')) || defaultState;
+        let selectedDestination = 'task'; // 'link', 'task' ou 'note'
         
         const urlParams = new URLSearchParams(window.location.search);
         let isAdmin = false;
@@ -370,14 +392,12 @@
             const root = document.documentElement;
             const s = state.settings;
 
-            // Couleurs et Formes CSS
             if (s.bgColor) root.style.setProperty('--bg-color', s.bgColor);
             if (s.cardBg) root.style.setProperty('--card-bg', s.cardBg);
             if (s.borderColor) root.style.setProperty('--border-color', s.borderColor);
             if (s.accentColor) root.style.setProperty('--accent-color', s.accentColor);
             if (s.cardRadius) root.style.setProperty('--card-radius', s.cardRadius);
 
-            // Textes dynamiques
             if(document.getElementById('header-brand-name')) document.getElementById('header-brand-name').textContent = s.brandName || 'MyHub';
             if(document.getElementById('page-title')) document.getElementById('page-title').textContent = (s.brandName || 'MyHub') + ' — Dashboard';
             if(document.getElementById('title-links-heading')) document.getElementById('title-links-heading').innerHTML = `<i data-lucide="layout-grid" class="w-3.5 h-3.5 text-zinc-400"></i> ${s.linksTitle || 'Accès rapides'}`;
@@ -385,7 +405,6 @@
             if(document.getElementById('title-notes-heading')) document.getElementById('title-notes-heading').innerHTML = `<i data-lucide="file-text" class="w-3.5 h-3.5 text-zinc-400"></i> ${s.notesTitle || 'Notes rapides'}`;
             if(document.getElementById('smart-input')) document.getElementById('smart-input').placeholder = s.searchPlaceholder || '';
 
-            // Synchronisation des champs du panneau admin
             if(document.getElementById('txt-brand')) document.getElementById('txt-brand').value = s.brandName || '';
             if(document.getElementById('txt-links')) document.getElementById('txt-links').value = s.linksTitle || '';
             if(document.getElementById('txt-tasks')) document.getElementById('txt-tasks').value = s.tasksTitle || '';
@@ -400,7 +419,6 @@
             if(document.getElementById('toggle-notes')) document.getElementById('toggle-notes').checked = s.showNotes;
             if(document.getElementById('toggle-capture')) document.getElementById('toggle-capture').checked = s.showCapture;
 
-            // Widgets
             const notesWidget = document.getElementById('notes-widget-container');
             const mainSection = document.getElementById('main-links-section');
             if (notesWidget) {
@@ -424,40 +442,62 @@
             showToast('Export réussi !');
         }
 
+        // --- Choix manuel de destination ---
         const smartInput = document.getElementById('smart-input');
-        const typeBadge = document.getElementById('input-type-badge');
-        const actionVerbs = ['finir', 'faire', 'acheter', 'appeler', 'envoyer', 'réviser', 'préparer', 'lire', 'écrire', 'tester', 'créer'];
 
-        function detectInputType(val) {
-            const trimmed = val.trim();
-            if (!trimmed) return { type: 'empty', label: 'Prêt' };
-            if (/^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w- ./?%&=]*)?$/i.test(trimmed) && !trimmed.includes(' ')) return { type: 'link', label: 'Lien URL' };
-            if (actionVerbs.includes(trimmed.split(' ')[0].toLowerCase().replace(/[^a-zà-ÿ]/g, ''))) return { type: 'task', label: 'Tâche' };
-            return { type: 'note', label: 'Note' };
+        function setTargetDestination(dest) {
+            selectedDestination = dest;
+            ['link', 'task', 'note'].forEach(d => {
+                const btn = document.getElementById('btn-dest-' + d);
+                if (btn) {
+                    if (d === dest) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                }
+            });
+            // Si du texte est déjà écrit dans la barre, cliquer sur la destination l'envoie directement !
+            if (smartInput && smartInput.value.trim() !== '') {
+                submitSmartInput();
+            } else if (smartInput) {
+                smartInput.focus();
+            }
         }
 
-        if(smartInput) {
-            smartInput.addEventListener('input', (e) => typeBadge.textContent = detectInputType(e.target.value).label);
+        function submitSmartInput() {
+            if (!smartInput) return;
+            const raw = smartInput.value.trim();
+            if (!raw) return;
+
+            if (selectedDestination === 'link') {
+                let url = raw.startsWith('http://') || raw.startsWith('https://') ? raw : 'https://' + raw;
+                let title = raw;
+                try {
+                    const parsed = new URL(url);
+                    title = parsed.hostname.replace('www.', '').split('.')[0];
+                    title = title.charAt(0).toUpperCase() + title.slice(1);
+                } catch (e) {
+                    title = raw;
+                }
+                state.links.unshift({ id: 'l_' + Date.now(), title, url, clicks: 1, attached: [] });
+                showToast('Ajouté aux liens');
+            } else if (selectedDestination === 'task') {
+                state.tasks.unshift({ id: 't_' + Date.now(), text: raw, done: false });
+                showToast('Ajouté aux tâches');
+            } else {
+                state.notes.unshift({ id: 'n_' + Date.now(), text: raw });
+                showToast('Ajouté aux notes');
+            }
+
+            smartInput.value = '';
+            saveState();
+        }
+
+        if (smartInput) {
             smartInput.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' && smartInput.value.trim() !== '') {
-                    const raw = smartInput.value.trim();
-                    const detection = detectInputType(raw);
-                    if (detection.type === 'link') {
-                        let url = raw.startsWith('http') ? raw : 'https://' + raw;
-                        let title = new URL(url).hostname.replace('www.', '').split('.')[0];
-                        title = title.charAt(0).toUpperCase() + title.slice(1);
-                        state.links.unshift({ id: 'l_' + Date.now(), title, url, clicks: 1, attached: [] });
-                        showToast('Lien ajouté');
-                    } else if (detection.type === 'task') {
-                        state.tasks.unshift({ id: 't_' + Date.now(), text: raw, done: false });
-                        showToast('Tâche ajoutée');
-                    } else {
-                        state.notes.unshift({ id: 'n_' + Date.now(), text: raw });
-                        showToast('Note ajoutée');
-                    }
-                    smartInput.value = '';
-                    typeBadge.textContent = 'Prêt';
-                    saveState();
+                    submitSmartInput();
                 }
             });
         }
@@ -468,7 +508,8 @@
             const sortedLinks = [...state.links].sort((a, b) => b.clicks - a.clicks);
 
             grid.innerHTML = sortedLinks.map((link) => {
-                const domain = new URL(link.url).hostname;
+                let domain = link.url;
+                try { domain = new URL(link.url).hostname; } catch (e) {}
                 const favicon = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
                 const attachedCount = link.attached ? link.attached.length : 0;
                 return `
@@ -574,7 +615,9 @@
             currentModalLinkId = linkId;
             const link = state.links.find(l => l.id === linkId);
             if (!link) return;
-            document.getElementById('modal-favicon').src = `https://www.google.com/s2/favicons?domain=${new URL(link.url).hostname}&sz=64`;
+            let domain = link.url;
+            try { domain = new URL(link.url).hostname; } catch (e) {}
+            document.getElementById('modal-favicon').src = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
             document.getElementById('modal-title').textContent = link.title;
             const urlEl = document.getElementById('modal-url'); urlEl.textContent = link.url; urlEl.href = link.url;
             renderModalAttached(link);
