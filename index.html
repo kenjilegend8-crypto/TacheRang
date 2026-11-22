@@ -65,36 +65,50 @@
             <span id="mode-badge" class="text-[11px] mono px-1.5 py-0.5 rounded bg-zinc-900 text-zinc-500 border border-zinc-800">Espace Privé</span>
             
             <!-- Compteur de personnes en ligne en temps réel -->
-            <div id="online-counter-badge" class="flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-950/40 border border-emerald-800/60 text-emerald-400 text-[11px] mono" title="Nombre d'utilisateurs actuellement connectés sur le site">
+            <div id="online-counter-badge" class="flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-950/40 border border-emerald-800/60 text-emerald-400 text-[11px] mono">
                 <span class="relative flex h-2 w-2">
                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                     <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                 </span>
-                <span id="online-count">1</span> en ligne
+                <span id="online-count">1</span> <span id="lbl-online">en ligne</span>
             </div>
         </div>
 
         <div class="flex items-center gap-2 flex-wrap" id="workspaces-container">
-            <span class="text-xs text-zinc-500 mr-1 hidden sm:inline">Espaces :</span>
+            <span id="lbl-workspaces" class="text-xs text-zinc-500 mr-1 hidden sm:inline">Espaces :</span>
         </div>
 
         <div class="flex items-center gap-2">
+            <!-- Bouton Commentaires Publics -->
+            <button onclick="openCommentsModal()" class="text-xs px-3 py-1.5 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-800 transition flex items-center gap-1.5">
+                <i data-lucide="message-square" class="w-3.5 h-3.5 text-sky-400"></i>
+                <span id="lbl-comments-btn">Commentaires</span>
+                <span id="comments-badge-count" class="ml-0.5 px-1.5 py-0.2 rounded-full bg-zinc-800 text-[10px] mono text-zinc-300">0</span>
+            </button>
+
+            <!-- Sélecteur de Langue -->
+            <button onclick="toggleLanguage()" id="lang-toggle-btn" title="Switch Language / Changer de langue" class="text-xs px-2.5 py-1.5 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 transition mono flex items-center gap-1">
+                <i data-lucide="globe" class="w-3.5 h-3.5 text-zinc-400"></i>
+                <span id="current-lang-label">FR</span>
+            </button>
+
+            <!-- Bouton Studio Admin (visible uniquement en mode admin) -->
             <button onclick="toggleAdminPanel()" id="admin-trigger-btn" class="hidden text-xs px-3 py-1.5 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 transition items-center gap-1.5">
-                <i data-lucide="sliders" class="w-3.5 h-3.5 text-emerald-400"></i> Studio Admin 100%
+                <i data-lucide="sliders" class="w-3.5 h-3.5 text-emerald-400"></i> Studio Admin
             </button>
         </div>
     </header>
 
-    <!-- Studio de Contrôle Total & Textes (Admin Panel) -->
+    <!-- Studio de Contrôle Total & Statistiques Admin (Uniquement via ?admin=monpasssecure) -->
     <section id="admin-panel" class="hidden bg-[#0c0c0e] border-b border-zinc-800 px-6 py-6 transition-all shadow-2xl">
         <div class="max-w-7xl mx-auto flex flex-col gap-6">
-            <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+            <div class="flex flex-wrap items-center justify-between gap-4 border-b border-zinc-800 pb-3">
                 <span class="text-xs font-semibold text-emerald-400 uppercase tracking-wider flex items-center gap-2">
-                    <i data-lucide="sliders" class="w-4 h-4"></i> Studio de Personnalisation Absolue (Textes, Couleurs, Formes)
+                    <i data-lucide="sliders" class="w-4 h-4"></i> Studio Admin & Statistiques Privées
                 </span>
-                <div class="flex items-center gap-4">
+                <div class="flex items-center gap-3 flex-wrap">
                     <button onclick="resetToDefaults()" class="text-xs px-2.5 py-1 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-700 transition flex items-center gap-1">
-                        <i data-lucide="rotate-ccw" class="w-3 h-3"></i> Restaurer Espaces par défaut
+                        <i data-lucide="rotate-ccw" class="w-3 h-3"></i> Restaurer défauts
                     </button>
                     <button onclick="lockAdminSession()" class="text-xs px-2.5 py-1 rounded bg-red-950/60 hover:bg-red-900/60 text-red-300 border border-red-900/50 transition flex items-center gap-1">
                         <i data-lucide="lock" class="w-3 h-3"></i> Verrouiller (Mode Visiteur)
@@ -103,11 +117,33 @@
                 </div>
             </div>
 
+            <!-- Bloc Statistiques Exclusif Admin (Visiteurs Uniques par Appareil) -->
+            <div class="surface-card p-4 border-emerald-900/40 bg-emerald-950/10 flex flex-wrap items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                        <i data-lucide="users" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-semibold uppercase tracking-wider text-emerald-400">Statistiques Visiteurs Uniques (Admin Uniquement)</h4>
+                        <p class="text-xs text-zinc-400 mt-0.5">Chaque appareil est identifié de manière unique (un même appareil n'est compté qu'une seule fois).</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-6">
+                    <div class="text-right">
+                        <div class="text-2xl font-bold mono text-white" id="admin-unique-visitors-count">1</div>
+                        <div class="text-[11px] text-zinc-400">Appareils uniques détectés</div>
+                    </div>
+                    <button onclick="syncVisitorStats()" class="text-xs px-3 py-1.5 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-700 transition flex items-center gap-1.5">
+                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Actualiser
+                    </button>
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <!-- 1. Personnalisation des Textes -->
                 <div class="surface-card p-4 flex flex-col gap-3 md:col-span-3">
                     <h4 class="text-xs font-semibold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
-                        <i data-lucide="type" class="w-3.5 h-3.5"></i> Personnalisation de tous les Textes du Site
+                        <i data-lucide="type" class="w-3.5 h-3.5"></i> Personnalisation des Textes
                     </h4>
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                         <div class="flex flex-col gap-1">
@@ -216,15 +252,15 @@
                 <!-- Choix de destination -->
                 <div class="flex items-center gap-1 bg-zinc-950/90 p-1 rounded border border-zinc-800/90 shrink-0 self-end sm:self-auto">
                     <button type="button" onclick="setTargetDestination('link')" id="btn-dest-link" class="dest-btn text-[11px] px-2.5 py-1 rounded text-zinc-400 hover:text-zinc-200 flex items-center gap-1">
-                        <i data-lucide="link" class="w-3 h-3"></i> Lien
+                        <i data-lucide="link" class="w-3 h-3"></i> <span id="lbl-dest-link">Lien</span>
                     </button>
                     <button type="button" onclick="setTargetDestination('task')" id="btn-dest-task" class="dest-btn active text-[11px] px-2.5 py-1 rounded text-zinc-400 hover:text-zinc-200 flex items-center gap-1">
-                        <i data-lucide="check-square" class="w-3 h-3"></i> Tâche
+                        <i data-lucide="check-square" class="w-3 h-3"></i> <span id="lbl-dest-task">Tâche</span>
                     </button>
                     <button type="button" onclick="setTargetDestination('note')" id="btn-dest-note" class="dest-btn text-[11px] px-2.5 py-1 rounded text-zinc-400 hover:text-zinc-200 flex items-center gap-1">
-                        <i data-lucide="file-text" class="w-3 h-3"></i> Note
+                        <i data-lucide="file-text" class="w-3 h-3"></i> <span id="lbl-dest-note">Note</span>
                     </button>
-                    <button type="button" onclick="submitSmartInput()" title="Ajouter (Entrée)" class="ml-1 px-2.5 py-1 rounded accent-bg text-[11px] font-semibold hover:opacity-90 flex items-center gap-1">
+                    <button type="button" onclick="submitSmartInput()" class="ml-1 px-2.5 py-1 rounded accent-bg text-[11px] font-semibold hover:opacity-90 flex items-center gap-1">
                         <i data-lucide="corner-down-left" class="w-3 h-3"></i>
                     </button>
                 </div>
@@ -244,7 +280,7 @@
                     <div class="flex items-center gap-3">
                         <span class="text-xs text-zinc-500" id="links-count">0 liens</span>
                         <button onclick="openWorkspaceModal()" class="text-xs px-2.5 py-1 rounded surface-card hover:bg-zinc-800 text-zinc-300 transition flex items-center gap-1">
-                            <i data-lucide="plus" class="w-3 h-3"></i> Espace groupé
+                            <i data-lucide="plus" class="w-3 h-3"></i> <span id="lbl-add-ws">Espace groupé</span>
                         </button>
                     </div>
                 </div>
@@ -281,7 +317,34 @@
         </div>
     </main>
 
-    <!-- Modals -->
+    <!-- Modale Commentaires Publics (Accessible uniquement via le bouton du header) -->
+    <div id="comments-modal" class="fixed inset-0 bg-black/80 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+        <div class="surface-card rounded-lg max-w-xl w-full p-6 flex flex-col gap-4 shadow-2xl max-h-[85vh]">
+            <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="message-square" class="w-4 h-4 text-sky-400"></i>
+                    <h3 id="lbl-comments-modal-title" class="font-semibold text-base text-zinc-100">Espace Commentaires & Retours</h3>
+                </div>
+                <button onclick="closeCommentsModal()" class="text-zinc-500 hover:text-zinc-200 p-1"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+
+            <p id="lbl-comments-subtitle" class="text-xs text-zinc-400">Laisse un avis, une idée ou signale un bug — visible par tous les visiteurs.</p>
+
+            <!-- Liste des commentaires -->
+            <div id="public-comments-list" class="flex-1 overflow-y-auto flex flex-col gap-2.5 pr-1 min-h-[180px] max-h-[340px]"></div>
+
+            <!-- Formulaire d'ajout de commentaire -->
+            <form onsubmit="submitPublicComment(event)" class="flex flex-col gap-2.5 pt-3 border-t border-zinc-800">
+                <div class="flex gap-2">
+                    <input type="text" id="comment-author-input" maxlength="25" placeholder="Ton pseudo (optionnel)" class="w-1/3 bg-zinc-950 border border-zinc-800 rounded px-3 py-2 text-xs text-zinc-100 focus:outline-none focus:border-zinc-600">
+                    <input type="text" id="comment-text-input" maxlength="300" required placeholder="Écris ton commentaire ici..." class="flex-1 bg-zinc-950 border border-zinc-800 rounded px-3 py-2 text-xs text-zinc-100 focus:outline-none focus:border-zinc-600">
+                    <button type="submit" id="lbl-comment-send" class="accent-bg px-4 py-2 rounded text-xs font-semibold hover:opacity-90 shrink-0">Envoyer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modale Contexte Lien -->
     <div id="context-modal" class="fixed inset-0 bg-black/75 z-50 hidden items-center justify-center p-4">
         <div class="surface-card rounded-lg max-w-lg w-full p-6 flex flex-col gap-5 shadow-2xl">
             <div class="flex items-start justify-between gap-4 border-b border-zinc-800 pb-4">
@@ -297,20 +360,21 @@
             <div id="modal-attached-items" class="flex flex-col gap-2 max-h-48 overflow-y-auto"></div>
             <div class="flex gap-2 pt-2 border-t border-zinc-800">
                 <input type="text" id="modal-quick-add" placeholder="Ajouter une note liée..." class="flex-1 bg-zinc-950 border border-zinc-800 rounded px-3 py-2 text-sm text-zinc-100 focus:outline-none">
-                <button onclick="addContextItemFromModal()" class="accent-bg px-4 py-2 rounded text-sm font-medium">Ajouter</button>
+                <button onclick="addContextItemFromModal()" id="lbl-modal-add" class="accent-bg px-4 py-2 rounded text-sm font-medium">Ajouter</button>
             </div>
         </div>
     </div>
 
+    <!-- Modale Nouvel Espace -->
     <div id="workspace-modal" class="fixed inset-0 bg-black/75 z-50 hidden items-center justify-center p-4">
         <div class="surface-card rounded-lg max-w-md w-full p-6 flex flex-col gap-4 shadow-2xl">
             <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
-                <h3 class="font-semibold text-base text-zinc-100">Nouvel espace groupé</h3>
+                <h3 id="lbl-ws-modal-title" class="font-semibold text-base text-zinc-100">Nouvel espace groupé</h3>
                 <button onclick="closeWorkspaceModal()" class="text-zinc-500"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
-            <input type="text" id="ws-name" placeholder="Nom de l'espace (ex: Cours, Musique...)" class="bg-zinc-950 border border-zinc-800 rounded px-3 py-2 text-sm text-zinc-100 focus:outline-none">
+            <input type="text" id="ws-name" placeholder="Nom de l'espace (ex: Gaming, Cours...)" class="bg-zinc-950 border border-zinc-800 rounded px-3 py-2 text-sm text-zinc-100 focus:outline-none">
             <div id="ws-links-selection" class="flex flex-col gap-1.5 max-h-40 overflow-y-auto bg-zinc-950 p-2.5 rounded border border-zinc-800"></div>
-            <button onclick="saveWorkspace()" class="w-full accent-bg py-2 rounded text-sm font-medium">Enregistrer</button>
+            <button onclick="saveWorkspace()" id="lbl-ws-save" class="w-full accent-bg py-2 rounded text-sm font-medium">Enregistrer</button>
         </div>
     </div>
 
@@ -319,42 +383,109 @@
     </div>
 
     <script>
-        // État initial riche avec espaces thématiques par défaut (supprimables)
-        const defaultState = {
-            links: [
-                // Bureautique
-                { id: 'l_docs', title: 'Google Docs', url: 'https://docs.google.com', clicks: 8, attached: [] },
-                { id: 'l_drive', title: 'Google Drive', url: 'https://drive.google.com', clicks: 7, attached: [] },
-                { id: 'l_notion', title: 'Notion', url: 'https://www.notion.so', clicks: 6, attached: [] },
-                // Jeux Vidéo
-                { id: 'l_steam', title: 'Steam', url: 'https://store.steampowered.com', clicks: 9, attached: [] },
-                { id: 'l_discord', title: 'Discord', url: 'https://discord.com/app', clicks: 10, attached: [] },
-                { id: 'l_twitch', title: 'Twitch', url: 'https://www.twitch.tv', clicks: 5, attached: [] },
-                // Médias & Détente
-                { id: 'l_yt', title: 'YouTube', url: 'https://www.youtube.com', clicks: 8, attached: [] },
-                { id: 'l_spotify', title: 'Spotify', url: 'https://open.spotify.com', clicks: 6, attached: [] },
-                // Dev & Outils
-                { id: 'l_gh', title: 'GitHub', url: 'https://github.com', clicks: 7, attached: [] },
-                { id: 'l_vercel', title: 'Vercel', url: 'https://vercel.com', clicks: 4, attached: [] }
-            ],
-            tasks: [
-                { id: 't1', text: 'Tester mes espaces thématiques dans le menu du haut', done: false }
-            ],
-            notes: [
-                { id: 'n1', text: 'Clique sur un espace en haut (ex: Jeux Vidéo) pour ouvrir tous ses onglets d’un coup, ou sur la croix × pour le supprimer.' }
-            ],
-            workspaces: [
-                { id: 'ws_office', name: '💼 Bureautique', linkIds: ['l_docs', 'l_drive', 'l_notion'] },
-                { id: 'ws_gaming', name: '🎮 Jeux Vidéo', linkIds: ['l_steam', 'l_discord', 'l_twitch'] },
-                { id: 'ws_media', name: '🎧 Détente', linkIds: ['l_yt', 'l_spotify'] },
-                { id: 'ws_dev', name: '💻 Dev & Code', linkIds: ['l_gh', 'l_vercel'] }
-            ],
-            settings: {
-                brandName: 'MyHub',
+        // --- Dictionnaire de traduction FR / EN ---
+        const i18n = {
+            fr: {
+                modeBadge: 'Espace Privé',
+                online: 'en ligne',
+                workspaces: 'Espaces :',
+                commentsBtn: 'Commentaires',
                 linksTitle: 'Accès rapides',
                 tasksTitle: 'À faire',
                 notesTitle: 'Notes rapides',
                 searchPlaceholder: "Écris ton texte ou colle ton lien, puis choisis où l'envoyer...",
+                destLink: 'Lien',
+                destTask: 'Tâche',
+                destNote: 'Note',
+                addWs: 'Espace groupé',
+                linkUnit: 'lien',
+                linksUnit: 'liens',
+                noTasks: 'Aucune tâche.',
+                noNotes: 'Aucune note.',
+                commentsModalTitle: 'Espace Commentaires & Retours',
+                commentsSubtitle: 'Laisse un avis, une idée ou signale un bug — visible par tous les visiteurs.',
+                commentAuthorPlaceholder: 'Ton pseudo (optionnel)',
+                commentTextPlaceholder: 'Écris ton commentaire ici...',
+                commentSend: 'Envoyer',
+                noComments: 'Aucun commentaire pour le moment. Sois le premier à écrire !',
+                wsModalTitle: 'Nouvel espace groupé',
+                wsNamePlaceholder: "Nom de l'espace (ex: Gaming, Cours...)",
+                wsSave: 'Enregistrer',
+                modalQuickAdd: 'Ajouter une note liée...',
+                modalAdd: 'Ajouter',
+                toastLinkAdded: 'Ajouté aux liens',
+                toastTaskAdded: 'Ajouté aux tâches',
+                toastNoteAdded: 'Ajouté aux notes',
+                toastCommentAdded: 'Commentaire publié !',
+                toastLangChanged: 'Langue : Français'
+            },
+            en: {
+                modeBadge: 'Private Space',
+                online: 'online',
+                workspaces: 'Workspaces:',
+                commentsBtn: 'Comments',
+                linksTitle: 'Quick Access',
+                tasksTitle: 'To-Do',
+                notesTitle: 'Quick Notes',
+                searchPlaceholder: 'Type text or paste a URL, then pick where to send it...',
+                destLink: 'Link',
+                destTask: 'Task',
+                destNote: 'Note',
+                addWs: 'New Group',
+                linkUnit: 'link',
+                linksUnit: 'links',
+                noTasks: 'No tasks yet.',
+                noNotes: 'No notes yet.',
+                commentsModalTitle: 'Community Comments & Feedback',
+                commentsSubtitle: 'Leave feedback, share an idea, or report a bug — visible to all visitors.',
+                commentAuthorPlaceholder: 'Your nickname (optional)',
+                commentTextPlaceholder: 'Write your comment here...',
+                commentSend: 'Post',
+                noComments: 'No comments yet. Be the first to post!',
+                wsModalTitle: 'New Link Group',
+                wsNamePlaceholder: 'Group name (e.g. Gaming, Work...)',
+                wsSave: 'Save',
+                modalQuickAdd: 'Add an attached note...',
+                modalAdd: 'Add',
+                toastLinkAdded: 'Added to links',
+                toastTaskAdded: 'Added to tasks',
+                toastNoteAdded: 'Added to notes',
+                toastCommentAdded: 'Comment posted!',
+                toastLangChanged: 'Language: English'
+            }
+        };
+
+        const defaultState = {
+            lang: 'fr',
+            links: [
+                { id: 'l_docs', title: 'Google Docs', url: 'https://docs.google.com', clicks: 8, attached: [] },
+                { id: 'l_drive', title: 'Google Drive', url: 'https://drive.google.com', clicks: 7, attached: [] },
+                { id: 'l_notion', title: 'Notion', url: 'https://www.notion.so', clicks: 6, attached: [] },
+                { id: 'l_steam', title: 'SteamDB', url: 'https://steamdb.info', clicks: 9, attached: [] },
+                { id: 'l_gp', title: 'GamerPower', url: 'https://www.gamerpower.com', clicks: 8, attached: [] },
+                { id: 'l_discord', title: 'Discord', url: 'https://discord.com/app', clicks: 10, attached: [] },
+                { id: 'l_twitch', title: 'Twitch', url: 'https://www.twitch.tv', clicks: 5, attached: [] },
+                { id: 'l_yt', title: 'YouTube', url: 'https://www.youtube.com', clicks: 8, attached: [] },
+                { id: 'l_gh', title: 'GitHub', url: 'https://github.com', clicks: 7, attached: [] }
+            ],
+            tasks: [
+                { id: 't1', text: 'Tester les espaces thématiques en haut', done: false }
+            ],
+            notes: [
+                { id: 'n1', text: 'Clique sur un espace (ex: Gaming) pour ouvrir tous ses onglets d’un coup.' }
+            ],
+            workspaces: [
+                { id: 'ws_office', name: '💼 Office', linkIds: ['l_docs', 'l_drive', 'l_notion'] },
+                { id: 'ws_gaming', name: '🎮 Gaming', linkIds: ['l_steam', 'l_gp', 'l_discord', 'l_twitch'] },
+                { id: 'ws_media', name: '🎧 Chill', linkIds: ['l_yt'] },
+                { id: 'ws_dev', name: '💻 Dev', linkIds: ['l_gh'] }
+            ],
+            settings: {
+                brandName: 'MyHub',
+                linksTitle: '',
+                tasksTitle: '',
+                notesTitle: '',
+                searchPlaceholder: '',
                 bgColor: '#09090b',
                 cardBg: '#111113',
                 borderColor: '#27272a',
@@ -366,10 +497,11 @@
             }
         };
 
-        // Clé v2 pour charger automatiquement les nouveaux espaces thématiques par défaut
-        let state = JSON.parse(localStorage.getItem('myhub_v2_state')) || JSON.parse(JSON.stringify(defaultState));
+        let state = JSON.parse(localStorage.getItem('myhub_v3_state')) || JSON.parse(JSON.stringify(defaultState));
+        if (!state.lang) state.lang = 'fr';
         let selectedDestination = 'task';
         
+        // --- Gestion Admin & Identifiant Unique par Appareil ---
         const urlParams = new URLSearchParams(window.location.search);
         let isAdmin = false;
 
@@ -378,6 +510,23 @@
             localStorage.setItem('myhub_is_admin', 'true');
         } else if (localStorage.getItem('myhub_is_admin') === 'true') {
             isAdmin = true;
+        }
+
+        // Identifiant unique persistant pour cet appareil précis (ne compte jamais 2 fois le même appareil)
+        let deviceId = localStorage.getItem('myhub_unique_device_id');
+        if (!deviceId) {
+            deviceId = 'dev_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 10);
+            localStorage.setItem('myhub_unique_device_id', deviceId);
+        }
+
+        // Base locale des appareils uniques connus + synchronisation temps réel
+        let knownDevices = new Set(JSON.parse(localStorage.getItem('myhub_known_devices') || '[]'));
+        knownDevices.add(deviceId);
+        localStorage.setItem('myhub_known_devices', JSON.stringify([...knownDevices]));
+
+        function updateAdminVisitorDisplay() {
+            const el = document.getElementById('admin-unique-visitors-count');
+            if (el) el.textContent = knownDevices.size;
         }
 
         function lockAdminSession() {
@@ -389,19 +538,22 @@
         }
 
         function resetToDefaults() {
-            if (confirm("Restaurer les espaces thématiques (Bureautique, Jeux Vidéo...) et les liens par défaut ?")) {
+            if (confirm("Restaurer les espaces et liens par défaut ?")) {
+                const currentLang = state.lang;
                 state = JSON.parse(JSON.stringify(defaultState));
+                state.lang = currentLang;
                 saveState();
-                showToast('Espaces par défaut restaurés');
+                showToast('Restauré');
             }
         }
 
         if (isAdmin) {
             document.getElementById('admin-trigger-btn').classList.remove('hidden');
+            updateAdminVisitorDisplay();
         }
 
         function saveState() {
-            localStorage.setItem('myhub_v2_state', JSON.stringify(state));
+            localStorage.setItem('myhub_v3_state', JSON.stringify(state));
             renderAll();
         }
 
@@ -412,33 +564,32 @@
             setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 2500);
         }
 
+        function toggleLanguage() {
+            state.lang = state.lang === 'fr' ? 'en' : 'fr';
+            saveState();
+            showToast(i18n[state.lang].toastLangChanged);
+        }
+
         function toggleAdminPanel() {
             if (!isAdmin) return;
             const panel = document.getElementById('admin-panel');
             panel.classList.toggle('hidden');
+            updateAdminVisitorDisplay();
         }
 
-        function updateStyleSetting(key, value) {
-            state.settings[key] = value;
-            applySettings();
-            saveState();
-        }
-
-        function updateTextSetting(key, value) {
-            state.settings[key] = value;
-            applySettings();
-            saveState();
-        }
-
-        function updateToggleSetting(key, value) {
-            state.settings[key] = value;
-            applySettings();
-            saveState();
-        }
+        function updateStyleSetting(key, value) { state.settings[key] = value; applySettings(); saveState(); }
+        function updateTextSetting(key, value) { state.settings[key] = value; applySettings(); saveState(); }
+        function updateToggleSetting(key, value) { state.settings[key] = value; applySettings(); saveState(); }
 
         function applySettings() {
             const root = document.documentElement;
             const s = state.settings;
+            const t = i18n[state.lang] || i18n.fr;
+
+            document.documentElement.lang = state.lang;
+            if (document.getElementById('current-lang-label')) {
+                document.getElementById('current-lang-label').textContent = state.lang.toUpperCase();
+            }
 
             if (s.bgColor) root.style.setProperty('--bg-color', s.bgColor);
             if (s.cardBg) root.style.setProperty('--card-bg', s.cardBg);
@@ -448,10 +599,35 @@
 
             if(document.getElementById('header-brand-name')) document.getElementById('header-brand-name').textContent = s.brandName || 'MyHub';
             if(document.getElementById('page-title')) document.getElementById('page-title').textContent = (s.brandName || 'MyHub') + ' — Dashboard';
-            if(document.getElementById('title-links-heading')) document.getElementById('title-links-heading').innerHTML = `<i data-lucide="layout-grid" class="w-3.5 h-3.5 text-zinc-400"></i> ${s.linksTitle || 'Accès rapides'}`;
-            if(document.getElementById('title-tasks-heading')) document.getElementById('title-tasks-heading').innerHTML = `<i data-lucide="check-square" class="w-3.5 h-3.5 text-zinc-400"></i> ${s.tasksTitle || 'À faire'}`;
-            if(document.getElementById('title-notes-heading')) document.getElementById('title-notes-heading').innerHTML = `<i data-lucide="file-text" class="w-3.5 h-3.5 text-zinc-400"></i> ${s.notesTitle || 'Notes rapides'}`;
-            if(document.getElementById('smart-input')) document.getElementById('smart-input').placeholder = s.searchPlaceholder || '';
+            if(document.getElementById('mode-badge')) document.getElementById('mode-badge').textContent = t.modeBadge;
+            if(document.getElementById('lbl-online')) document.getElementById('lbl-online').textContent = t.online;
+            if(document.getElementById('lbl-comments-btn')) document.getElementById('lbl-comments-btn').textContent = t.commentsBtn;
+            if(document.getElementById('lbl-dest-link')) document.getElementById('lbl-dest-link').textContent = t.destLink;
+            if(document.getElementById('lbl-dest-task')) document.getElementById('lbl-dest-task').textContent = t.destTask;
+            if(document.getElementById('lbl-dest-note')) document.getElementById('lbl-dest-note').textContent = t.destNote;
+            if(document.getElementById('lbl-add-ws')) document.getElementById('lbl-add-ws').textContent = t.addWs;
+
+            // Modales traductions
+            if(document.getElementById('lbl-comments-modal-title')) document.getElementById('lbl-comments-modal-title').textContent = t.commentsModalTitle;
+            if(document.getElementById('lbl-comments-subtitle')) document.getElementById('lbl-comments-subtitle').textContent = t.commentsSubtitle;
+            if(document.getElementById('comment-author-input')) document.getElementById('comment-author-input').placeholder = t.commentAuthorPlaceholder;
+            if(document.getElementById('comment-text-input')) document.getElementById('comment-text-input').placeholder = t.commentTextPlaceholder;
+            if(document.getElementById('lbl-comment-send')) document.getElementById('lbl-comment-send').textContent = t.commentSend;
+            if(document.getElementById('lbl-ws-modal-title')) document.getElementById('lbl-ws-modal-title').textContent = t.wsModalTitle;
+            if(document.getElementById('ws-name')) document.getElementById('ws-name').placeholder = t.wsNamePlaceholder;
+            if(document.getElementById('lbl-ws-save')) document.getElementById('lbl-ws-save').textContent = t.wsSave;
+            if(document.getElementById('modal-quick-add')) document.getElementById('modal-quick-add').placeholder = t.modalQuickAdd;
+            if(document.getElementById('lbl-modal-add')) document.getElementById('lbl-modal-add').textContent = t.modalAdd;
+
+            const linksTitle = s.linksTitle || t.linksTitle;
+            const tasksTitle = s.tasksTitle || t.tasksTitle;
+            const notesTitle = s.notesTitle || t.notesTitle;
+            const placeholderText = s.searchPlaceholder || t.searchPlaceholder;
+
+            if(document.getElementById('title-links-heading')) document.getElementById('title-links-heading').innerHTML = `<i data-lucide="layout-grid" class="w-3.5 h-3.5 text-zinc-400"></i> ${linksTitle}`;
+            if(document.getElementById('title-tasks-heading')) document.getElementById('title-tasks-heading').innerHTML = `<i data-lucide="check-square" class="w-3.5 h-3.5 text-zinc-400"></i> ${tasksTitle}`;
+            if(document.getElementById('title-notes-heading')) document.getElementById('title-notes-heading').innerHTML = `<i data-lucide="file-text" class="w-3.5 h-3.5 text-zinc-400"></i> ${notesTitle}`;
+            if(document.getElementById('smart-input')) document.getElementById('smart-input').placeholder = placeholderText;
 
             if(document.getElementById('txt-brand')) document.getElementById('txt-brand').value = s.brandName || '';
             if(document.getElementById('txt-links')) document.getElementById('txt-links').value = s.linksTitle || '';
@@ -475,13 +651,9 @@
                 mainSection.className = s.showNotes ? "lg:col-span-8 flex flex-col gap-4" : "lg:col-span-12 flex flex-col gap-4";
             }
             const captureSection = document.getElementById('capture-section');
-            if (captureSection) {
-                captureSection.style.display = s.showCapture ? 'block' : 'none';
-            }
+            if (captureSection) captureSection.style.display = s.showCapture ? 'block' : 'none';
             const onlineBadge = document.getElementById('online-counter-badge');
-            if (onlineBadge) {
-                onlineBadge.style.display = (s.showOnline !== false) ? 'flex' : 'none';
-            }
+            if (onlineBadge) onlineBadge.style.display = (s.showOnline !== false) ? 'flex' : 'none';
 
             lucide.createIcons();
         }
@@ -492,78 +664,231 @@
             dlAnchorElem.setAttribute("href", dataStr);
             dlAnchorElem.setAttribute("download", "myhub_config.json");
             dlAnchorElem.click();
-            showToast('Export réussi !');
+            showToast('Export OK');
         }
 
-        // --- Compteur de personnes en ligne en temps réel ---
-        (function initRealtimePresence() {
-            const clientId = 'user_' + Math.random().toString(36).substring(2, 10);
-            const activePeers = new Map();
-            activePeers.set(clientId, Date.now());
+        // --- Système Temps Réel : Présence, Visiteurs Uniques & Commentaires Publics ---
+        let globalSocket = null;
+        let publicComments = JSON.parse(localStorage.getItem('myhub_public_comments') || '[]');
 
-            function updateCounterUI() {
+        function savePublicComments() {
+            localStorage.setItem('myhub_public_comments', JSON.stringify(publicComments));
+            renderCommentsList();
+        }
+
+        function escapeHTML(str) {
+            return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
+        }
+
+        function renderCommentsList() {
+            const container = document.getElementById('public-comments-list');
+            const badge = document.getElementById('comments-badge-count');
+            const t = i18n[state.lang] || i18n.fr;
+            if (badge) badge.textContent = publicComments.length;
+            if (!container) return;
+
+            if (publicComments.length === 0) {
+                container.innerHTML = `<div class="text-center py-8 text-xs text-zinc-500">${t.noComments}</div>`;
+                return;
+            }
+
+            const sorted = [...publicComments].sort((a, b) => b.timestamp - a.timestamp);
+            container.innerHTML = sorted.map(c => {
+                const dateStr = new Date(c.timestamp).toLocaleDateString(state.lang === 'fr' ? 'fr-FR' : 'en-US', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+                const deleteBtn = isAdmin ? `<button onclick="deletePublicComment('${c.id}')" title="Supprimer (Admin)" class="text-zinc-600 hover:text-red-400"><i data-lucide="trash-2" class="w-3 h-3"></i></button>` : '';
+                return `
+                    <div class="p-3 rounded bg-zinc-950/80 border border-zinc-800/90 flex flex-col gap-1">
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="text-xs font-semibold text-sky-400">${escapeHTML(c.author || 'Anonyme')}</span>
+                            <div class="flex items-center gap-2">
+                                <span class="text-[10px] mono text-zinc-500">${dateStr}</span>
+                                ${deleteBtn}
+                            </div>
+                        </div>
+                        <p class="text-xs text-zinc-200 leading-relaxed break-words">${escapeHTML(c.text)}</p>
+                    </div>
+                `;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        function openCommentsModal() {
+            renderCommentsList();
+            const m = document.getElementById('comments-modal');
+            m.classList.remove('hidden');
+            m.classList.add('flex');
+            // Demander aux pairs en ligne de partager d'éventuels nouveaux commentaires
+            if (globalSocket && globalSocket.readyState === WebSocket.OPEN) {
+                globalSocket.send(JSON.stringify({ type: 'sync_comments_req', deviceId }));
+            }
+        }
+
+        function closeCommentsModal() {
+            const m = document.getElementById('comments-modal');
+            m.classList.add('hidden');
+            m.classList.remove('flex');
+        }
+
+        function submitPublicComment(e) {
+            e.preventDefault();
+            const authorEl = document.getElementById('comment-author-input');
+            const textEl = document.getElementById('comment-text-input');
+            const text = textEl.value.trim();
+            if (!text) return;
+
+            const author = authorEl.value.trim() || (state.lang === 'fr' ? 'Visiteur' : 'Visitor');
+            const commentObj = {
+                id: 'cmt_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+                author,
+                text,
+                timestamp: Date.now()
+            };
+
+            publicComments.push(commentObj);
+            savePublicComments();
+            textEl.value = '';
+            showToast(i18n[state.lang].toastCommentAdded);
+
+            if (globalSocket && globalSocket.readyState === WebSocket.OPEN) {
+                globalSocket.send(JSON.stringify({ type: 'new_comment', comment: commentObj }));
+            }
+        }
+
+        function deletePublicComment(id) {
+            if (!isAdmin) return;
+            publicComments = publicComments.filter(c => c.id !== id);
+            savePublicComments();
+            if (globalSocket && globalSocket.readyState === WebSocket.OPEN) {
+                globalSocket.send(JSON.stringify({ type: 'delete_comment', id }));
+            }
+        }
+
+        function syncVisitorStats() {
+            if (globalSocket && globalSocket.readyState === WebSocket.OPEN) {
+                globalSocket.send(JSON.stringify({ type: 'ping', deviceId, knownDevices: [...knownDevices] }));
+            }
+            updateAdminVisitorDisplay();
+            showToast('Statistiques actualisées');
+        }
+
+        (function initRealtimeNetwork() {
+            const activeDevices = new Map();
+            activeDevices.set(deviceId, Date.now());
+
+            function updateOnlineUI() {
                 const now = Date.now();
-                for (const [id, lastSeen] of activePeers.entries()) {
-                    if (id !== clientId && now - lastSeen > 12000) {
-                        activePeers.delete(id);
+                for (const [id, lastSeen] of activeDevices.entries()) {
+                    if (id !== deviceId && now - lastSeen > 12000) {
+                        activeDevices.delete(id);
                     }
                 }
                 const el = document.getElementById('online-count');
-                if (el) el.textContent = activePeers.size;
+                if (el) el.textContent = activeDevices.size;
             }
 
-            // 1. Synchronisation instantanée entre les onglets d'un même navigateur
             if ('BroadcastChannel' in window) {
                 const bc = new BroadcastChannel('myhub_presence_local');
                 bc.onmessage = (e) => {
-                    if (e.data && e.data.id) {
-                        if (e.data.type === 'bye') activePeers.delete(e.data.id);
-                        else activePeers.set(e.data.id, Date.now());
-                        updateCounterUI();
+                    if (e.data && e.data.deviceId) {
+                        if (e.data.type === 'bye') activeDevices.delete(e.data.deviceId);
+                        else activeDevices.set(e.data.deviceId, Date.now());
+                        updateOnlineUI();
                     }
                 };
-                setInterval(() => bc.postMessage({ type: 'ping', id: clientId }), 3000);
-                window.addEventListener('beforeunload', () => bc.postMessage({ type: 'bye', id: clientId }));
+                setInterval(() => bc.postMessage({ type: 'ping', deviceId }), 3000);
+                window.addEventListener('beforeunload', () => bc.postMessage({ type: 'bye', deviceId }));
             }
 
-            // 2. Synchronisation mondiale via WebSocket public sans serveur requis
             function connectGlobalSocket() {
                 try {
-                    const ws = new WebSocket('wss://free.blr2.piesocket.com/v3/myhubv1_presence_room?api_key=VCXCEuvhGcBDP7XhiJJUDvR1e1D3eiVjgZ9VRiaV&notify_self=0');
+                    const ws = new WebSocket('wss://free.blr2.piesocket.com/v3/myhubv1_global_hub_v3?api_key=VCXCEuvhGcBDP7XhiJJUDvR1e1D3eiVjgZ9VRiaV&notify_self=0');
+                    globalSocket = ws;
+
                     ws.onopen = () => {
-                        ws.send(JSON.stringify({ type: 'ping', id: clientId }));
+                        ws.send(JSON.stringify({
+                            type: 'hello',
+                            deviceId,
+                            knownDevices: [...knownDevices],
+                            comments: publicComments
+                        }));
                         const pingInterval = setInterval(() => {
                             if (ws.readyState === WebSocket.OPEN) {
-                                ws.send(JSON.stringify({ type: 'ping', id: clientId }));
+                                ws.send(JSON.stringify({ type: 'ping', deviceId }));
                             } else {
                                 clearInterval(pingInterval);
                             }
-                        }, 4000);
+                        }, 4500);
                         window.addEventListener('beforeunload', () => {
                             if (ws.readyState === WebSocket.OPEN) {
-                                ws.send(JSON.stringify({ type: 'bye', id: clientId }));
+                                ws.send(JSON.stringify({ type: 'bye', deviceId }));
                             }
                         });
                     };
+
                     ws.onmessage = (event) => {
                         try {
                             const data = JSON.parse(event.data);
-                            if (data && data.id && data.id !== clientId) {
+                            if (!data) return;
+
+                            // Présence & appareils uniques
+                            if (data.deviceId) {
                                 if (data.type === 'bye') {
-                                    activePeers.delete(data.id);
+                                    activeDevices.delete(data.deviceId);
                                 } else {
-                                    activePeers.set(data.id, Date.now());
+                                    activeDevices.set(data.deviceId, Date.now());
+                                    if (!knownDevices.has(data.deviceId)) {
+                                        knownDevices.add(data.deviceId);
+                                        localStorage.setItem('myhub_known_devices', JSON.stringify([...knownDevices]));
+                                        updateAdminVisitorDisplay();
+                                    }
                                 }
-                                updateCounterUI();
+                                updateOnlineUI();
+                            }
+
+                            if (Array.isArray(data.knownDevices)) {
+                                let changed = false;
+                                data.knownDevices.forEach(d => {
+                                    if (!knownDevices.has(d)) {
+                                        knownDevices.add(d);
+                                        changed = true;
+                                    }
+                                });
+                                if (changed) {
+                                    localStorage.setItem('myhub_known_devices', JSON.stringify([...knownDevices]));
+                                    updateAdminVisitorDisplay();
+                                }
+                            }
+
+                            // Synchronisation des commentaires publics
+                            if (data.type === 'new_comment' && data.comment) {
+                                if (!publicComments.some(c => c.id === data.comment.id)) {
+                                    publicComments.push(data.comment);
+                                    savePublicComments();
+                                }
+                            } else if (data.type === 'delete_comment' && data.id) {
+                                publicComments = publicComments.filter(c => c.id !== data.id);
+                                savePublicComments();
+                            } else if ((data.type === 'hello' || data.type === 'sync_comments_res') && Array.isArray(data.comments)) {
+                                let merged = false;
+                                data.comments.forEach(remoteC => {
+                                    if (!publicComments.some(localC => localC.id === remoteC.id)) {
+                                        publicComments.push(remoteC);
+                                        merged = true;
+                                    }
+                                });
+                                if (merged) savePublicComments();
+                            } else if (data.type === 'sync_comments_req' && publicComments.length > 0) {
+                                ws.send(JSON.stringify({ type: 'sync_comments_res', comments: publicComments }));
                             }
                         } catch (err) {}
                     };
+
                     ws.onclose = () => setTimeout(connectGlobalSocket, 5000);
                 } catch (e) {}
             }
 
             connectGlobalSocket();
-            setInterval(updateCounterUI, 3000);
+            setInterval(updateOnlineUI, 3000);
         })();
 
         // --- Choix manuel de destination ---
@@ -589,6 +914,7 @@
             if (!smartInput) return;
             const raw = smartInput.value.trim();
             if (!raw) return;
+            const t = i18n[state.lang] || i18n.fr;
 
             if (selectedDestination === 'link') {
                 let url = raw.startsWith('http://') || raw.startsWith('https://') ? raw : 'https://' + raw;
@@ -597,17 +923,15 @@
                     const parsed = new URL(url);
                     title = parsed.hostname.replace('www.', '').split('.')[0];
                     title = title.charAt(0).toUpperCase() + title.slice(1);
-                } catch (e) {
-                    title = raw;
-                }
+                } catch (e) { title = raw; }
                 state.links.unshift({ id: 'l_' + Date.now(), title, url, clicks: 1, attached: [] });
-                showToast('Ajouté aux liens');
+                showToast(t.toastLinkAdded);
             } else if (selectedDestination === 'task') {
                 state.tasks.unshift({ id: 't_' + Date.now(), text: raw, done: false });
-                showToast('Ajouté aux tâches');
+                showToast(t.toastTaskAdded);
             } else {
                 state.notes.unshift({ id: 'n_' + Date.now(), text: raw });
-                showToast('Ajouté aux notes');
+                showToast(t.toastNoteAdded);
             }
 
             smartInput.value = '';
@@ -616,15 +940,14 @@
 
         if (smartInput) {
             smartInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' && smartInput.value.trim() !== '') {
-                    submitSmartInput();
-                }
+                if (e.key === 'Enter' && smartInput.value.trim() !== '') submitSmartInput();
             });
         }
 
         function renderLinks() {
             const grid = document.getElementById('links-grid');
-            document.getElementById('links-count').textContent = `${state.links.length} lien${state.links.length > 1 ? 's' : ''}`;
+            const t = i18n[state.lang] || i18n.fr;
+            document.getElementById('links-count').textContent = `${state.links.length} ${state.links.length > 1 ? t.linksUnit : t.linkUnit}`;
             const sortedLinks = [...state.links].sort((a, b) => b.clicks - a.clicks);
 
             grid.innerHTML = sortedLinks.map((link) => {
@@ -645,8 +968,8 @@
                                 </div>
                             </div>
                             <div class="flex items-center gap-1" onclick="event.stopPropagation()">
-                                <button onclick="openContextModal('${link.id}')" title="Contenu" class="p-1.5 rounded hover:bg-zinc-800 text-zinc-400"><i data-lucide="layers" class="w-3.5 h-3.5"></i></button>
-                                <button onclick="deleteLink('${link.id}')" title="Supprimer" class="p-1.5 rounded hover:bg-zinc-800 text-zinc-500 hover:text-red-400"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                                <button onclick="openContextModal('${link.id}')" class="p-1.5 rounded hover:bg-zinc-800 text-zinc-400"><i data-lucide="layers" class="w-3.5 h-3.5"></i></button>
+                                <button onclick="deleteLink('${link.id}')" class="p-1.5 rounded hover:bg-zinc-800 text-zinc-500 hover:text-red-400"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
                             </div>
                         </div>
                         <div class="flex items-center justify-between text-[11px] pt-2 border-t" style="border-color: var(--border-color);">
@@ -659,7 +982,8 @@
 
         function renderTasks() {
             const list = document.getElementById('tasks-list');
-            if (state.tasks.length === 0) { list.innerHTML = `<li class="text-xs text-zinc-600 py-2">Aucune tâche.</li>`; return; }
+            const t = i18n[state.lang] || i18n.fr;
+            if (state.tasks.length === 0) { list.innerHTML = `<li class="text-xs text-zinc-600 py-2">${t.noTasks}</li>`; return; }
             list.innerHTML = state.tasks.map(task => `
                 <li draggable="true" ondragstart="handleDragStart(event, 'task', '${task.id}')" class="flex items-center justify-between gap-2 p-2 rounded bg-zinc-950/60 border border-zinc-800/80 cursor-grab group">
                     <div class="flex items-center gap-2.5 overflow-hidden">
@@ -672,8 +996,9 @@
 
         function renderNotes() {
             const list = document.getElementById('notes-list');
+            const t = i18n[state.lang] || i18n.fr;
             if (!list) return;
-            if (state.notes.length === 0) { list.innerHTML = `<p class="text-xs text-zinc-600 py-2">Aucune note.</p>`; return; }
+            if (state.notes.length === 0) { list.innerHTML = `<p class="text-xs text-zinc-600 py-2">${t.noNotes}</p>`; return; }
             list.innerHTML = state.notes.map(note => `
                 <div draggable="true" ondragstart="handleDragStart(event, 'note', '${note.id}')" class="p-2.5 rounded bg-zinc-950/60 border border-zinc-800/80 text-xs text-zinc-300 flex justify-between items-start gap-2 cursor-grab group">
                     <p class="leading-relaxed">${note.text}</p>
@@ -683,19 +1008,20 @@
 
         function renderWorkspaces() {
             const container = document.getElementById('workspaces-container');
-            container.innerHTML = `<span class="text-xs text-zinc-500 mr-1 hidden sm:inline">Espaces :</span>` + state.workspaces.map(ws => `
+            const t = i18n[state.lang] || i18n.fr;
+            container.innerHTML = `<span id="lbl-workspaces" class="text-xs text-zinc-500 mr-1 hidden sm:inline">${t.workspaces}</span>` + state.workspaces.map(ws => `
                 <div class="inline-flex items-center rounded bg-zinc-900 border border-zinc-800 overflow-hidden">
-                    <button onclick="launchWorkspace('${ws.id}')" title="Ouvrir tous les liens de cet espace" class="px-2.5 py-1 text-xs font-medium text-zinc-200 hover:text-white hover:bg-zinc-800/70 transition flex items-center gap-1.5">
+                    <button onclick="launchWorkspace('${ws.id}')" class="px-2.5 py-1 text-xs font-medium text-zinc-200 hover:text-white hover:bg-zinc-800/70 transition flex items-center gap-1.5">
                         <i data-lucide="play" class="w-2.5 h-2.5 text-emerald-400"></i> ${ws.name}
                     </button>
-                    <button onclick="deleteWorkspace('${ws.id}')" title="Supprimer cet espace" class="px-1.5 py-1 text-zinc-600 hover:text-red-400 hover:bg-zinc-800/70 border-l border-zinc-800 transition">
+                    <button onclick="deleteWorkspace('${ws.id}')" class="px-1.5 py-1 text-zinc-600 hover:text-red-400 hover:bg-zinc-800/70 border-l border-zinc-800 transition">
                         <i data-lucide="x" class="w-2.5 h-2.5"></i>
                     </button>
                 </div>`).join('');
         }
 
         function renderAll() {
-            renderLinks(); renderTasks(); renderNotes(); renderWorkspaces();
+            renderLinks(); renderTasks(); renderNotes(); renderWorkspaces(); renderCommentsList();
             applySettings();
         }
 
@@ -707,12 +1033,8 @@
 
         function deleteLink(id) {
             state.links = state.links.filter(l => l.id !== id);
-            // Nettoyer aussi le lien supprimé dans les espaces
-            state.workspaces.forEach(ws => {
-                ws.linkIds = ws.linkIds.filter(lid => lid !== id);
-            });
+            state.workspaces.forEach(ws => { ws.linkIds = ws.linkIds.filter(lid => lid !== id); });
             saveState();
-            showToast('Lien supprimé');
         }
         function toggleTask(id) { const t = state.tasks.find(t => t.id === id); if (t) { t.done = !t.done; saveState(); } }
         function deleteTask(id) { state.tasks = state.tasks.filter(t => t.id !== id); saveState(); }
@@ -721,19 +1043,10 @@
             const ws = state.workspaces.find(w => w.id === wsId);
             if (ws) {
                 const urls = ws.linkIds.map(id => state.links.find(l => l.id === id)?.url).filter(Boolean);
-                if (urls.length === 0) {
-                    showToast('Aucun lien dans cet espace');
-                    return;
-                }
                 urls.forEach(url => window.open(url, '_blank'));
-                showToast(`Espace "${ws.name}" lancé (${urls.length} onglets)`);
             }
         }
-        function deleteWorkspace(wsId) {
-            state.workspaces = state.workspaces.filter(w => w.id !== wsId);
-            saveState();
-            showToast('Espace supprimé');
-        }
+        function deleteWorkspace(wsId) { state.workspaces = state.workspaces.filter(w => w.id !== wsId); saveState(); }
 
         let draggedItem = null;
         function handleDragStart(e, type, id) { draggedItem = { type, id }; }
@@ -751,7 +1064,7 @@
                 const idx = state.notes.findIndex(n => n.id === draggedItem.id);
                 if (idx > -1) { const [n] = state.notes.splice(idx, 1); target.attached.push({ id: 'att_'+Date.now(), type: 'note', text: n.text }); }
             }
-            draggedItem = null; saveState(); showToast('Fusionné !');
+            draggedItem = null; saveState();
         }
 
         let currentModalLinkId = null;
@@ -771,7 +1084,7 @@
 
         function renderModalAttached(link) {
             const container = document.getElementById('modal-attached-items');
-            if (!link.attached || link.attached.length === 0) { container.innerHTML = `<p class="text-xs text-zinc-500">Aucun élément associé.</p>`; return; }
+            if (!link.attached || link.attached.length === 0) { container.innerHTML = `<p class="text-xs text-zinc-500">—</p>`; return; }
             container.innerHTML = link.attached.map(item => `
                 <div class="flex items-center justify-between gap-2 p-2 rounded bg-zinc-950 border border-zinc-800 text-xs">
                     <span class="text-zinc-200">${item.text}</span>
@@ -811,7 +1124,7 @@
             const checked = Array.from(document.querySelectorAll('.ws-link-cb:checked')).map(cb => cb.value);
             if (!name || checked.length === 0) return;
             state.workspaces.push({ id: 'w_' + Date.now(), name, linkIds: checked });
-            document.getElementById('ws-name').value = ''; closeWorkspaceModal(); saveState(); showToast('Espace créé');
+            document.getElementById('ws-name').value = ''; closeWorkspaceModal(); saveState();
         }
 
         applySettings();
