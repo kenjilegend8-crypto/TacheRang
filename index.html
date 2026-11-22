@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="page-title">MyHub — Espaces & Temps Réel</title>
+    <title id="page-title">MyHub v1.1 — Espaces & Temps Réel</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -22,7 +22,7 @@
             background-color: var(--bg-color);
             color: var(--text-main);
             overflow-x: hidden;
-            transition: background-color 0.2s ease;
+            transition: background-color 0.2s ease, color 0.2s ease;
         }
         .mono { font-family: 'JetBrains Mono', monospace; }
         .surface-card {
@@ -56,13 +56,14 @@
 <body class="min-h-screen flex flex-col">
 
     <!-- Header -->
-    <header class="border-b px-6 py-3.5 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-40 bg-zinc-950/90 backdrop-blur-sm" style="border-color: var(--border-color);">
-        <div class="flex items-center gap-3">
+    <header class="border-b px-6 py-3.5 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-40 backdrop-blur-sm" style="border-color: var(--border-color); background-color: color-mix(in srgb, var(--bg-color) 88%, transparent);">
+        <div class="flex items-center gap-3 flex-wrap">
             <div id="logo-box" class="w-7 h-7 rounded accent-bg flex items-center justify-center font-bold text-sm">
                 M
             </div>
             <span id="header-brand-name" class="font-semibold text-base tracking-tight">MyHub</span>
-            <span id="mode-badge" class="text-[11px] mono px-1.5 py-0.5 rounded bg-zinc-900 text-zinc-500 border border-zinc-800">Espace Privé</span>
+            <span class="text-[11px] mono px-1.5 py-0.5 rounded bg-emerald-950/50 border border-emerald-800/60 text-emerald-400">v1.1</span>
+            <span id="mode-badge" class="text-[11px] mono px-1.5 py-0.5 rounded surface-card text-zinc-400">Espace Privé</span>
             
             <!-- Compteur de personnes en ligne en temps réel -->
             <div id="online-counter-badge" class="flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-950/40 border border-emerald-800/60 text-emerald-400 text-[11px] mono">
@@ -72,34 +73,47 @@
                 </span>
                 <span id="online-count">1</span> <span id="lbl-online">en ligne</span>
             </div>
+
+            <!-- Compteur depuis la création du site -->
+            <div id="uptime-counter-badge" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full surface-card text-[11px] mono" style="color: var(--text-muted);" title="Temps écoulé depuis la création de MyHub">
+                <i data-lucide="clock" class="w-3 h-3 text-amber-400 shrink-0"></i>
+                <span id="lbl-uptime-prefix">Créé il y a</span>
+                <span id="site-uptime-value" class="font-medium" style="color: var(--text-main);">0j 00h 00m 00s</span>
+            </div>
         </div>
 
         <div class="flex items-center gap-2 flex-wrap" id="workspaces-container">
-            <span id="lbl-workspaces" class="text-xs text-zinc-500 mr-1 hidden sm:inline">Espaces :</span>
+            <span id="lbl-workspaces" class="text-xs mr-1 hidden sm:inline" style="color: var(--text-muted);">Espaces :</span>
         </div>
 
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 flex-wrap">
+            <!-- Bouton Notes de MAJ v1.1 -->
+            <button onclick="openChangelogModal()" class="text-xs px-2.5 py-1.5 rounded surface-card hover:opacity-90 transition flex items-center gap-1.5 text-amber-400">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                <span>MAJ v1.1</span>
+            </button>
+
             <!-- Bouton Commentaires Publics -->
-            <button onclick="openCommentsModal()" class="text-xs px-3 py-1.5 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-800 transition flex items-center gap-1.5">
+            <button onclick="openCommentsModal()" class="text-xs px-3 py-1.5 rounded surface-card hover:opacity-90 transition flex items-center gap-1.5" style="color: var(--text-main);">
                 <i data-lucide="message-square" class="w-3.5 h-3.5 text-sky-400"></i>
                 <span id="lbl-comments-btn">Commentaires</span>
-                <span id="comments-badge-count" class="ml-0.5 px-1.5 py-0.2 rounded-full bg-zinc-800 text-[10px] mono text-zinc-300">0</span>
+                <span id="comments-badge-count" class="ml-0.5 px-1.5 py-0.2 rounded-full text-[10px] mono" style="background-color: var(--bg-color); color: var(--text-muted);">0</span>
             </button>
 
             <!-- Sélecteur de Langue -->
-            <button onclick="toggleLanguage()" id="lang-toggle-btn" title="Switch Language / Changer de langue" class="text-xs px-2.5 py-1.5 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 transition mono flex items-center gap-1">
-                <i data-lucide="globe" class="w-3.5 h-3.5 text-zinc-400"></i>
+            <button onclick="toggleLanguage()" id="lang-toggle-btn" title="Switch Language / Changer de langue" class="text-xs px-2.5 py-1.5 rounded surface-card hover:opacity-90 transition mono flex items-center gap-1" style="color: var(--text-main);">
+                <i data-lucide="globe" class="w-3.5 h-3.5" style="color: var(--text-muted);"></i>
                 <span id="current-lang-label">FR</span>
             </button>
 
             <!-- Bouton Studio Admin (visible uniquement en mode admin) -->
-            <button onclick="toggleAdminPanel()" id="admin-trigger-btn" class="hidden text-xs px-3 py-1.5 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 transition items-center gap-1.5">
-                <i data-lucide="sliders" class="w-3.5 h-3.5 text-emerald-400"></i> Studio Admin
+            <button onclick="toggleAdminPanel()" id="admin-trigger-btn" class="hidden text-xs px-3 py-1.5 rounded surface-card hover:opacity-90 text-emerald-400 transition items-center gap-1.5">
+                <i data-lucide="sliders" class="w-3.5 h-3.5"></i> Studio Admin
             </button>
         </div>
     </header>
 
-    <!-- Studio de Contrôle Total & Statistiques Admin (Uniquement via ?admin=monpasssecure) -->
+    <!-- Studio Admin -->
     <section id="admin-panel" class="hidden bg-[#0c0c0e] border-b border-zinc-800 px-6 py-6 transition-all shadow-2xl">
         <div class="max-w-7xl mx-auto flex flex-col gap-6">
             <div class="flex flex-wrap items-center justify-between gap-4 border-b border-zinc-800 pb-3">
@@ -117,7 +131,7 @@
                 </div>
             </div>
 
-            <!-- Bloc Statistiques Exclusif Admin (Visiteurs Uniques par Appareil) -->
+            <!-- Visiteurs Uniques -->
             <div class="surface-card p-4 border-emerald-900/40 bg-emerald-950/10 flex flex-wrap items-center justify-between gap-4">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
@@ -140,7 +154,6 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- 1. Personnalisation des Textes -->
                 <div class="surface-card p-4 flex flex-col gap-3 md:col-span-3">
                     <h4 class="text-xs font-semibold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
                         <i data-lucide="type" class="w-3.5 h-3.5"></i> Personnalisation des Textes
@@ -169,7 +182,6 @@
                     </div>
                 </div>
 
-                <!-- 2. Couleurs -->
                 <div class="surface-card p-4 flex flex-col gap-3">
                     <h4 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
                         <i data-lucide="palette" class="w-3.5 h-3.5"></i> Couleurs Globales
@@ -188,7 +200,6 @@
                     </div>
                 </div>
 
-                <!-- 3. Formes & Style -->
                 <div class="surface-card p-4 flex flex-col gap-3">
                     <h4 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
                         <i data-lucide="square" class="w-3.5 h-3.5"></i> Formes & Géométrie
@@ -207,9 +218,12 @@
                         <span>Couleur des bordures :</span>
                         <input type="color" id="border-color-picker" value="#27272a" onchange="updateStyleSetting('borderColor', this.value)" class="w-7 h-7 rounded bg-transparent cursor-pointer border border-zinc-700">
                     </div>
+                    <div class="flex flex-col gap-1 pt-1">
+                        <label class="text-[11px] text-zinc-400">Date de création du site :</label>
+                        <input type="datetime-local" id="site-created-input" onchange="updateCreatedDate(this.value)" class="bg-zinc-950 border border-zinc-800 rounded px-2 py-1 text-xs text-zinc-200 mono">
+                    </div>
                 </div>
 
-                <!-- 4. Widgets & Disposition -->
                 <div class="surface-card p-4 flex flex-col gap-3">
                     <h4 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
                         <i data-lucide="layout" class="w-3.5 h-3.5"></i> Disposition & Widgets
@@ -226,7 +240,11 @@
                         <span>Afficher Compteur En Ligne</span>
                         <input type="checkbox" id="toggle-online" checked onchange="updateToggleSetting('showOnline', this.checked)" class="rounded bg-zinc-900 border-zinc-700">
                     </label>
-                    <button onclick="exportData()" class="mt-1 text-xs py-1.5 px-3 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-700 transition">Exporter ma configuration (JSON)</button>
+                    <label class="flex items-center justify-between text-xs text-zinc-300 cursor-pointer">
+                        <span>Afficher Compteur Création</span>
+                        <input type="checkbox" id="toggle-uptime" checked onchange="updateToggleSetting('showUptime', this.checked)" class="rounded bg-zinc-900 border-zinc-700">
+                    </label>
+                    <button onclick="exportData()" class="mt-2 text-xs py-1.5 px-3 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-700 transition">Exporter ma configuration (JSON)</button>
                 </div>
             </div>
         </div>
@@ -235,29 +253,27 @@
     <!-- Main Content -->
     <main class="flex-1 max-w-7xl w-full mx-auto px-6 py-8 flex flex-col gap-8">
 
-        <!-- Smart Capture Bar avec Sélecteur Manuel de Destination -->
-        <section id="capture-section" class="max-w-3xl w-full mx-auto">
-            <div class="relative flex flex-col sm:flex-row sm:items-center gap-2 surface-card border px-3.5 py-2.5 shadow-lg">
-                <div class="flex items-center flex-1">
-                    <i data-lucide="terminal" class="w-4 h-4 text-zinc-500 mr-3 shrink-0"></i>
-                    <input 
-                        type="text" 
-                        id="smart-input" 
-                        placeholder="Écris ton texte ou colle ton lien, puis choisis où l'envoyer..." 
-                        class="w-full bg-transparent text-zinc-100 placeholder-zinc-500 focus:outline-none text-sm"
-                        autocomplete="off"
-                    >
-                </div>
+        <!-- Smart Capture Bar -->
+        <section id="capture-section" class="max-w-2xl w-full mx-auto flex flex-col gap-2">
+            <div class="relative flex items-center gap-2 surface-card border px-4 py-3 shadow-lg">
+                <i data-lucide="terminal" class="w-4 h-4 shrink-0" style="color: var(--text-muted);"></i>
+                <input 
+                    type="text" 
+                    id="smart-input" 
+                    placeholder="Écris ton texte ou colle ton lien, puis choisis où l'envoyer..." 
+                    class="w-full bg-transparent focus:outline-none text-sm"
+                    style="color: var(--text-main);"
+                    autocomplete="off"
+                >
 
-                <!-- Choix de destination -->
-                <div class="flex items-center gap-1 bg-zinc-950/90 p-1 rounded border border-zinc-800/90 shrink-0 self-end sm:self-auto">
-                    <button type="button" onclick="setTargetDestination('link')" id="btn-dest-link" class="dest-btn text-[11px] px-2.5 py-1 rounded text-zinc-400 hover:text-zinc-200 flex items-center gap-1">
+                <div class="flex items-center gap-1 p-1 rounded border shrink-0" style="background-color: var(--bg-color); border-color: var(--border-color);">
+                    <button type="button" onclick="setTargetDestination('link')" id="btn-dest-link" class="dest-btn text-[11px] px-2.5 py-1 rounded flex items-center gap-1" style="color: var(--text-muted);">
                         <i data-lucide="link" class="w-3 h-3"></i> <span id="lbl-dest-link">Lien</span>
                     </button>
-                    <button type="button" onclick="setTargetDestination('task')" id="btn-dest-task" class="dest-btn active text-[11px] px-2.5 py-1 rounded text-zinc-400 hover:text-zinc-200 flex items-center gap-1">
+                    <button type="button" onclick="setTargetDestination('task')" id="btn-dest-task" class="dest-btn active text-[11px] px-2.5 py-1 rounded flex items-center gap-1" style="color: var(--text-muted);">
                         <i data-lucide="check-square" class="w-3 h-3"></i> <span id="lbl-dest-task">Tâche</span>
                     </button>
-                    <button type="button" onclick="setTargetDestination('note')" id="btn-dest-note" class="dest-btn text-[11px] px-2.5 py-1 rounded text-zinc-400 hover:text-zinc-200 flex items-center gap-1">
+                    <button type="button" onclick="setTargetDestination('note')" id="btn-dest-note" class="dest-btn text-[11px] px-2.5 py-1 rounded flex items-center gap-1" style="color: var(--text-muted);">
                         <i data-lucide="file-text" class="w-3 h-3"></i> <span id="lbl-dest-note">Note</span>
                     </button>
                     <button type="button" onclick="submitSmartInput()" class="ml-1 px-2.5 py-1 rounded accent-bg text-[11px] font-semibold hover:opacity-90 flex items-center gap-1">
@@ -272,14 +288,14 @@
             
             <!-- Liens -->
             <section id="main-links-section" class="lg:col-span-8 flex flex-col gap-4">
-                <div class="flex items-center justify-between border-b border-zinc-800/80 pb-2.5">
-                    <h2 id="title-links-heading" class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-2">
-                        <i data-lucide="layout-grid" class="w-3.5 h-3.5 text-zinc-400"></i>
+                <div class="flex items-center justify-between border-b pb-2.5" style="border-color: var(--border-color);">
+                    <h2 id="title-links-heading" class="text-xs font-semibold uppercase tracking-wider flex items-center gap-2" style="color: var(--text-muted);">
+                        <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i>
                         Accès rapides
                     </h2>
                     <div class="flex items-center gap-3">
-                        <span class="text-xs text-zinc-500" id="links-count">0 liens</span>
-                        <button onclick="openWorkspaceModal()" class="text-xs px-2.5 py-1 rounded surface-card hover:bg-zinc-800 text-zinc-300 transition flex items-center gap-1">
+                        <span class="text-xs" style="color: var(--text-muted);" id="links-count">0 liens</span>
+                        <button onclick="openWorkspaceModal()" class="text-xs px-2.5 py-1 rounded surface-card hover:opacity-90 transition flex items-center gap-1" style="color: var(--text-main);">
                             <i data-lucide="plus" class="w-3 h-3"></i> <span id="lbl-add-ws">Espace groupé</span>
                         </button>
                     </div>
@@ -288,56 +304,81 @@
                 <div id="links-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3"></div>
             </section>
 
-            <!-- Sidebar (Tâches & Notes) -->
+            <!-- Sidebar -->
             <aside id="sidebar-section" class="lg:col-span-4 flex flex-col gap-6">
-                
-                <!-- Tâches -->
                 <div class="surface-card rounded-lg p-4 flex flex-col gap-3">
-                    <div class="flex items-center justify-between border-b border-zinc-800/80 pb-2.5">
-                        <h3 id="title-tasks-heading" class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-2">
-                            <i data-lucide="check-square" class="w-3.5 h-3.5 text-zinc-400"></i>
+                    <div class="flex items-center justify-between border-b pb-2.5" style="border-color: var(--border-color);">
+                        <h3 id="title-tasks-heading" class="text-xs font-semibold uppercase tracking-wider flex items-center gap-2" style="color: var(--text-muted);">
+                            <i data-lucide="check-square" class="w-3.5 h-3.5"></i>
                             À faire
                         </h3>
                     </div>
                     <ul id="tasks-list" class="flex flex-col gap-2 max-h-64 overflow-y-auto pr-1"></ul>
                 </div>
 
-                <!-- Notes -->
                 <div id="notes-widget-container" class="surface-card rounded-lg p-4 flex flex-col gap-3">
-                    <div class="flex items-center justify-between border-b border-zinc-800/80 pb-2.5">
-                        <h3 id="title-notes-heading" class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-2">
-                            <i data-lucide="file-text" class="w-3.5 h-3.5 text-zinc-400"></i>
+                    <div class="flex items-center justify-between border-b pb-2.5" style="border-color: var(--border-color);">
+                        <h3 id="title-notes-heading" class="text-xs font-semibold uppercase tracking-wider flex items-center gap-2" style="color: var(--text-muted);">
+                            <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
                             Notes rapides
                         </h3>
                     </div>
                     <div id="notes-list" class="flex flex-col gap-2 max-h-72 overflow-y-auto pr-1"></div>
                 </div>
-
             </aside>
         </div>
     </main>
 
-    <!-- Modale Commentaires Publics (Accessible uniquement via le bouton du header) -->
+    <!-- Pop-up Nouveautés MAJ v1.1 (fermable avec une croix) -->
+    <div id="changelog-modal" class="fixed inset-0 bg-black/80 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+        <div class="surface-card rounded-lg max-w-md w-full p-6 flex flex-col gap-4 shadow-2xl">
+            <div class="flex items-center justify-between border-b pb-3" style="border-color: var(--border-color);">
+                <div class="flex items-center gap-2">
+                    <span class="text-xs mono px-2 py-0.5 rounded bg-emerald-950/60 border border-emerald-800/60 text-emerald-400 font-semibold">v1.1</span>
+                    <h3 id="lbl-changelog-title" class="font-semibold text-base" style="color: var(--text-main);">Nouveautés de la mise à jour v1.1</h3>
+                </div>
+                <button type="button" onclick="closeChangelogModal()" aria-label="Fermer" class="p-1 rounded hover:opacity-80" style="color: var(--text-muted);">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <ul id="changelog-list-v11" class="flex flex-col gap-2.5 text-xs leading-relaxed" style="color: var(--text-main);">
+                <li class="flex items-start gap-2">
+                    <span class="text-amber-400 font-bold">•</span>
+                    <span><strong>Compteur en temps réel depuis la création du site :</strong> affiche les jours, heures, minutes et secondes écoulés, réglable depuis le Studio Admin.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <span class="text-emerald-400 font-bold">•</span>
+                    <span><strong>Statistiques visiteurs uniques (Admin) :</strong> comptage par identifiant unique d'appareil pour ne pas compter plusieurs fois le même visiteur.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <span class="text-sky-400 font-bold">•</span>
+                    <span><strong>Espace Commentaires en modale :</strong> bouton dédié dans le header ouvrant une fenêtre de retours synchronisée en temps réel.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <span class="text-purple-400 font-bold">•</span>
+                    <span><strong>Support FR / EN étendu :</strong> traduction des nouveaux compteurs et de la fenêtre de commentaires.</span>
+                </li>
+            </ul>
+            <button type="button" onclick="closeChangelogModal()" class="w-full accent-bg py-2 rounded text-xs font-semibold hover:opacity-90 mt-1">Compris</button>
+        </div>
+    </div>
+
+    <!-- Modale Commentaires Publics -->
     <div id="comments-modal" class="fixed inset-0 bg-black/80 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
         <div class="surface-card rounded-lg max-w-xl w-full p-6 flex flex-col gap-4 shadow-2xl max-h-[85vh]">
-            <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+            <div class="flex items-center justify-between border-b pb-3" style="border-color: var(--border-color);">
                 <div class="flex items-center gap-2">
                     <i data-lucide="message-square" class="w-4 h-4 text-sky-400"></i>
-                    <h3 id="lbl-comments-modal-title" class="font-semibold text-base text-zinc-100">Espace Commentaires & Retours</h3>
+                    <h3 id="lbl-comments-modal-title" class="font-semibold text-base" style="color: var(--text-main);">Espace Commentaires & Retours</h3>
                 </div>
-                <button onclick="closeCommentsModal()" class="text-zinc-500 hover:text-zinc-200 p-1"><i data-lucide="x" class="w-4 h-4"></i></button>
+                <button onclick="closeCommentsModal()" class="p-1" style="color: var(--text-muted);"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
-
-            <p id="lbl-comments-subtitle" class="text-xs text-zinc-400">Laisse un avis, une idée ou signale un bug — visible par tous les visiteurs.</p>
-
-            <!-- Liste des commentaires -->
+            <p id="lbl-comments-subtitle" class="text-xs" style="color: var(--text-muted);">Laisse un avis, une idée ou signale un bug — visible par tous les visiteurs.</p>
             <div id="public-comments-list" class="flex-1 overflow-y-auto flex flex-col gap-2.5 pr-1 min-h-[180px] max-h-[340px]"></div>
-
-            <!-- Formulaire d'ajout de commentaire -->
-            <form onsubmit="submitPublicComment(event)" class="flex flex-col gap-2.5 pt-3 border-t border-zinc-800">
+            <form onsubmit="submitPublicComment(event)" class="flex flex-col gap-2.5 pt-3 border-t" style="border-color: var(--border-color);">
                 <div class="flex gap-2">
-                    <input type="text" id="comment-author-input" maxlength="25" placeholder="Ton pseudo (optionnel)" class="w-1/3 bg-zinc-950 border border-zinc-800 rounded px-3 py-2 text-xs text-zinc-100 focus:outline-none focus:border-zinc-600">
-                    <input type="text" id="comment-text-input" maxlength="300" required placeholder="Écris ton commentaire ici..." class="flex-1 bg-zinc-950 border border-zinc-800 rounded px-3 py-2 text-xs text-zinc-100 focus:outline-none focus:border-zinc-600">
+                    <input type="text" id="comment-author-input" maxlength="25" placeholder="Ton pseudo (optionnel)" class="w-1/3 rounded px-3 py-2 text-xs border focus:outline-none" style="background-color: var(--bg-color); border-color: var(--border-color); color: var(--text-main);">
+                    <input type="text" id="comment-text-input" maxlength="300" required placeholder="Écris ton commentaire ici..." class="flex-1 rounded px-3 py-2 text-xs border focus:outline-none" style="background-color: var(--bg-color); border-color: var(--border-color); color: var(--text-main);">
                     <button type="submit" id="lbl-comment-send" class="accent-bg px-4 py-2 rounded text-xs font-semibold hover:opacity-90 shrink-0">Envoyer</button>
                 </div>
             </form>
@@ -347,19 +388,19 @@
     <!-- Modale Contexte Lien -->
     <div id="context-modal" class="fixed inset-0 bg-black/75 z-50 hidden items-center justify-center p-4">
         <div class="surface-card rounded-lg max-w-lg w-full p-6 flex flex-col gap-5 shadow-2xl">
-            <div class="flex items-start justify-between gap-4 border-b border-zinc-800 pb-4">
+            <div class="flex items-start justify-between gap-4 border-b pb-4" style="border-color: var(--border-color);">
                 <div class="flex items-center gap-3">
-                    <img id="modal-favicon" src="" alt="" class="w-7 h-7 rounded bg-zinc-900 p-1 border border-zinc-800">
+                    <img id="modal-favicon" src="" alt="" class="w-7 h-7 rounded p-1 border" style="background-color: var(--bg-color); border-color: var(--border-color);">
                     <div>
-                        <h3 id="modal-title" class="font-semibold text-base text-zinc-100">Titre</h3>
-                        <a id="modal-url" href="#" target="_blank" class="text-xs text-zinc-400 hover:text-zinc-200 underline truncate block max-w-xs">https://...</a>
+                        <h3 id="modal-title" class="font-semibold text-base" style="color: var(--text-main);">Titre</h3>
+                        <a id="modal-url" href="#" target="_blank" class="text-xs underline truncate block max-w-xs" style="color: var(--text-muted);">https://...</a>
                     </div>
                 </div>
-                <button onclick="closeContextModal()" class="text-zinc-500 hover:text-zinc-200 p-1"><i data-lucide="x" class="w-4 h-4"></i></button>
+                <button onclick="closeContextModal()" class="p-1" style="color: var(--text-muted);"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
             <div id="modal-attached-items" class="flex flex-col gap-2 max-h-48 overflow-y-auto"></div>
-            <div class="flex gap-2 pt-2 border-t border-zinc-800">
-                <input type="text" id="modal-quick-add" placeholder="Ajouter une note liée..." class="flex-1 bg-zinc-950 border border-zinc-800 rounded px-3 py-2 text-sm text-zinc-100 focus:outline-none">
+            <div class="flex gap-2 pt-2 border-t" style="border-color: var(--border-color);">
+                <input type="text" id="modal-quick-add" placeholder="Ajouter une note liée..." class="flex-1 rounded px-3 py-2 text-sm border focus:outline-none" style="background-color: var(--bg-color); border-color: var(--border-color); color: var(--text-main);">
                 <button onclick="addContextItemFromModal()" id="lbl-modal-add" class="accent-bg px-4 py-2 rounded text-sm font-medium">Ajouter</button>
             </div>
         </div>
@@ -368,12 +409,12 @@
     <!-- Modale Nouvel Espace -->
     <div id="workspace-modal" class="fixed inset-0 bg-black/75 z-50 hidden items-center justify-center p-4">
         <div class="surface-card rounded-lg max-w-md w-full p-6 flex flex-col gap-4 shadow-2xl">
-            <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
-                <h3 id="lbl-ws-modal-title" class="font-semibold text-base text-zinc-100">Nouvel espace groupé</h3>
-                <button onclick="closeWorkspaceModal()" class="text-zinc-500"><i data-lucide="x" class="w-4 h-4"></i></button>
+            <div class="flex items-center justify-between border-b pb-3" style="border-color: var(--border-color);">
+                <h3 id="lbl-ws-modal-title" class="font-semibold text-base" style="color: var(--text-main);">Nouvel espace groupé</h3>
+                <button onclick="closeWorkspaceModal()" style="color: var(--text-muted);"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
-            <input type="text" id="ws-name" placeholder="Nom de l'espace (ex: Gaming, Cours...)" class="bg-zinc-950 border border-zinc-800 rounded px-3 py-2 text-sm text-zinc-100 focus:outline-none">
-            <div id="ws-links-selection" class="flex flex-col gap-1.5 max-h-40 overflow-y-auto bg-zinc-950 p-2.5 rounded border border-zinc-800"></div>
+            <input type="text" id="ws-name" placeholder="Nom de l'espace (ex: Gaming, Cours...)" class="rounded px-3 py-2 text-sm border focus:outline-none" style="background-color: var(--bg-color); border-color: var(--border-color); color: var(--text-main);">
+            <div id="ws-links-selection" class="flex flex-col gap-1.5 max-h-40 overflow-y-auto p-2.5 rounded border" style="background-color: var(--bg-color); border-color: var(--border-color);"></div>
             <button onclick="saveWorkspace()" id="lbl-ws-save" class="w-full accent-bg py-2 rounded text-sm font-medium">Enregistrer</button>
         </div>
     </div>
@@ -383,11 +424,14 @@
     </div>
 
     <script>
-        // --- Dictionnaire de traduction FR / EN ---
+        const DEFAULT_SITE_CREATION_ISO = '2026-11-20T18:00:00';
+
         const i18n = {
             fr: {
                 modeBadge: 'Espace Privé',
                 online: 'en ligne',
+                uptimePrefix: 'Créé il y a',
+                dayUnit: 'j',
                 workspaces: 'Espaces :',
                 commentsBtn: 'Commentaires',
                 linksTitle: 'Accès rapides',
@@ -413,6 +457,7 @@
                 wsSave: 'Enregistrer',
                 modalQuickAdd: 'Ajouter une note liée...',
                 modalAdd: 'Ajouter',
+                changelogTitle: 'Nouveautés de la mise à jour v1.1',
                 toastLinkAdded: 'Ajouté aux liens',
                 toastTaskAdded: 'Ajouté aux tâches',
                 toastNoteAdded: 'Ajouté aux notes',
@@ -422,6 +467,8 @@
             en: {
                 modeBadge: 'Private Space',
                 online: 'online',
+                uptimePrefix: 'Live for',
+                dayUnit: 'd',
                 workspaces: 'Workspaces:',
                 commentsBtn: 'Comments',
                 linksTitle: 'Quick Access',
@@ -447,6 +494,7 @@
                 wsSave: 'Save',
                 modalQuickAdd: 'Add an attached note...',
                 modalAdd: 'Add',
+                changelogTitle: "What's New in Update v1.1",
                 toastLinkAdded: 'Added to links',
                 toastTaskAdded: 'Added to tasks',
                 toastNoteAdded: 'Added to notes',
@@ -468,12 +516,8 @@
                 { id: 'l_yt', title: 'YouTube', url: 'https://www.youtube.com', clicks: 8, attached: [] },
                 { id: 'l_gh', title: 'GitHub', url: 'https://github.com', clicks: 7, attached: [] }
             ],
-            tasks: [
-                { id: 't1', text: 'Tester les espaces thématiques en haut', done: false }
-            ],
-            notes: [
-                { id: 'n1', text: 'Clique sur un espace (ex: Gaming) pour ouvrir tous ses onglets d’un coup.' }
-            ],
+            tasks: [{ id: 't1', text: 'Tester les espaces thématiques en haut', done: false }],
+            notes: [{ id: 'n1', text: 'Clique sur un espace (ex: Gaming) pour ouvrir tous ses onglets d’un coup.' }],
             workspaces: [
                 { id: 'ws_office', name: '💼 Office', linkIds: ['l_docs', 'l_drive', 'l_notion'] },
                 { id: 'ws_gaming', name: '🎮 Gaming', linkIds: ['l_steam', 'l_gp', 'l_discord', 'l_twitch'] },
@@ -490,21 +534,61 @@
                 cardBg: '#111113',
                 borderColor: '#27272a',
                 accentColor: '#fafafa',
+                textMain: '#fafafa',
+                textMuted: '#a1a1aa',
                 cardRadius: '0.5rem',
+                createdAt: DEFAULT_SITE_CREATION_ISO,
                 showNotes: true,
                 showCapture: true,
-                showOnline: true
+                showOnline: true,
+                showUptime: true
             }
         };
 
-        let state = JSON.parse(localStorage.getItem('myhub_v3_state')) || JSON.parse(JSON.stringify(defaultState));
+        let state = JSON.parse(localStorage.getItem('myhub_v11_state')) || JSON.parse(JSON.stringify(defaultState));
         if (!state.lang) state.lang = 'fr';
+        if (!state.settings.createdAt) state.settings.createdAt = DEFAULT_SITE_CREATION_ISO;
+
         let selectedDestination = 'task';
-        
-        // --- Gestion Admin & Identifiant Unique par Appareil ---
+
+        function openChangelogModal() {
+            const m = document.getElementById('changelog-modal');
+            m.classList.remove('hidden');
+            m.classList.add('flex');
+            lucide.createIcons();
+        }
+
+        function closeChangelogModal() {
+            const m = document.getElementById('changelog-modal');
+            m.classList.add('hidden');
+            m.classList.remove('flex');
+        }
+
+        function updateSiteUptimeCounter() {
+            const el = document.getElementById('site-uptime-value');
+            if (!el) return;
+            const t = i18n[state.lang] || i18n.fr;
+            const createdMs = new Date(state.settings.createdAt || DEFAULT_SITE_CREATION_ISO).getTime();
+            const diffSec = Math.max(0, Math.floor((Date.now() - createdMs) / 1000));
+            const days = Math.floor(diffSec / 86400);
+            const hours = Math.floor((diffSec % 86400) / 3600);
+            const minutes = Math.floor((diffSec % 3600) / 60);
+            const seconds = diffSec % 60;
+            const pad = (n) => String(n).padStart(2, '0');
+            el.textContent = `${days}${t.dayUnit} ${pad(hours)}h ${pad(minutes)}m ${pad(seconds)}s`;
+        }
+
+        function updateCreatedDate(val) {
+            if (!val) return;
+            state.settings.createdAt = val;
+            updateSiteUptimeCounter();
+            saveState();
+        }
+
+        setInterval(updateSiteUptimeCounter, 1000);
+
         const urlParams = new URLSearchParams(window.location.search);
         let isAdmin = false;
-
         if (urlParams.get('admin') === 'monpasssecure') {
             isAdmin = true;
             localStorage.setItem('myhub_is_admin', 'true');
@@ -512,14 +596,12 @@
             isAdmin = true;
         }
 
-        // Identifiant unique persistant pour cet appareil précis (ne compte jamais 2 fois le même appareil)
         let deviceId = localStorage.getItem('myhub_unique_device_id');
         if (!deviceId) {
             deviceId = 'dev_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 10);
             localStorage.setItem('myhub_unique_device_id', deviceId);
         }
 
-        // Base locale des appareils uniques connus + synchronisation temps réel
         let knownDevices = new Set(JSON.parse(localStorage.getItem('myhub_known_devices') || '[]'));
         knownDevices.add(deviceId);
         localStorage.setItem('myhub_known_devices', JSON.stringify([...knownDevices]));
@@ -553,7 +635,7 @@
         }
 
         function saveState() {
-            localStorage.setItem('myhub_v3_state', JSON.stringify(state));
+            localStorage.setItem('myhub_v11_state', JSON.stringify(state));
             renderAll();
         }
 
@@ -567,13 +649,13 @@
         function toggleLanguage() {
             state.lang = state.lang === 'fr' ? 'en' : 'fr';
             saveState();
+            updateSiteUptimeCounter();
             showToast(i18n[state.lang].toastLangChanged);
         }
 
         function toggleAdminPanel() {
             if (!isAdmin) return;
-            const panel = document.getElementById('admin-panel');
-            panel.classList.toggle('hidden');
+            document.getElementById('admin-panel').classList.toggle('hidden');
             updateAdminVisitorDisplay();
         }
 
@@ -585,12 +667,8 @@
             const root = document.documentElement;
             const s = state.settings;
             const t = i18n[state.lang] || i18n.fr;
-
             document.documentElement.lang = state.lang;
-            if (document.getElementById('current-lang-label')) {
-                document.getElementById('current-lang-label').textContent = state.lang.toUpperCase();
-            }
-
+            if (document.getElementById('current-lang-label')) document.getElementById('current-lang-label').textContent = state.lang.toUpperCase();
             if (s.bgColor) root.style.setProperty('--bg-color', s.bgColor);
             if (s.cardBg) root.style.setProperty('--card-bg', s.cardBg);
             if (s.borderColor) root.style.setProperty('--border-color', s.borderColor);
@@ -598,35 +676,30 @@
             if (s.cardRadius) root.style.setProperty('--card-radius', s.cardRadius);
 
             if(document.getElementById('header-brand-name')) document.getElementById('header-brand-name').textContent = s.brandName || 'MyHub';
-            if(document.getElementById('page-title')) document.getElementById('page-title').textContent = (s.brandName || 'MyHub') + ' — Dashboard';
+            if(document.getElementById('page-title')) document.getElementById('page-title').textContent = (s.brandName || 'MyHub') + ' v1.1';
             if(document.getElementById('mode-badge')) document.getElementById('mode-badge').textContent = t.modeBadge;
             if(document.getElementById('lbl-online')) document.getElementById('lbl-online').textContent = t.online;
+            if(document.getElementById('lbl-uptime-prefix')) document.getElementById('lbl-uptime-prefix').textContent = t.uptimePrefix;
             if(document.getElementById('lbl-comments-btn')) document.getElementById('lbl-comments-btn').textContent = t.commentsBtn;
             if(document.getElementById('lbl-dest-link')) document.getElementById('lbl-dest-link').textContent = t.destLink;
             if(document.getElementById('lbl-dest-task')) document.getElementById('lbl-dest-task').textContent = t.destTask;
             if(document.getElementById('lbl-dest-note')) document.getElementById('lbl-dest-note').textContent = t.destNote;
             if(document.getElementById('lbl-add-ws')) document.getElementById('lbl-add-ws').textContent = t.addWs;
-
-            // Modales traductions
+            if(document.getElementById('lbl-changelog-title')) document.getElementById('lbl-changelog-title').textContent = t.changelogTitle;
             if(document.getElementById('lbl-comments-modal-title')) document.getElementById('lbl-comments-modal-title').textContent = t.commentsModalTitle;
             if(document.getElementById('lbl-comments-subtitle')) document.getElementById('lbl-comments-subtitle').textContent = t.commentsSubtitle;
             if(document.getElementById('comment-author-input')) document.getElementById('comment-author-input').placeholder = t.commentAuthorPlaceholder;
             if(document.getElementById('comment-text-input')) document.getElementById('comment-text-input').placeholder = t.commentTextPlaceholder;
             if(document.getElementById('lbl-comment-send')) document.getElementById('lbl-comment-send').textContent = t.commentSend;
-            if(document.getElementById('lbl-ws-modal-title')) document.getElementById('lbl-ws-modal-title').textContent = t.wsModalTitle;
-            if(document.getElementById('ws-name')) document.getElementById('ws-name').placeholder = t.wsNamePlaceholder;
-            if(document.getElementById('lbl-ws-save')) document.getElementById('lbl-ws-save').textContent = t.wsSave;
-            if(document.getElementById('modal-quick-add')) document.getElementById('modal-quick-add').placeholder = t.modalQuickAdd;
-            if(document.getElementById('lbl-modal-add')) document.getElementById('lbl-modal-add').textContent = t.modalAdd;
 
             const linksTitle = s.linksTitle || t.linksTitle;
             const tasksTitle = s.tasksTitle || t.tasksTitle;
             const notesTitle = s.notesTitle || t.notesTitle;
             const placeholderText = s.searchPlaceholder || t.searchPlaceholder;
 
-            if(document.getElementById('title-links-heading')) document.getElementById('title-links-heading').innerHTML = `<i data-lucide="layout-grid" class="w-3.5 h-3.5 text-zinc-400"></i> ${linksTitle}`;
-            if(document.getElementById('title-tasks-heading')) document.getElementById('title-tasks-heading').innerHTML = `<i data-lucide="check-square" class="w-3.5 h-3.5 text-zinc-400"></i> ${tasksTitle}`;
-            if(document.getElementById('title-notes-heading')) document.getElementById('title-notes-heading').innerHTML = `<i data-lucide="file-text" class="w-3.5 h-3.5 text-zinc-400"></i> ${notesTitle}`;
+            if(document.getElementById('title-links-heading')) document.getElementById('title-links-heading').innerHTML = `<i data-lucide="layout-grid" class="w-3.5 h-3.5"></i> ${linksTitle}`;
+            if(document.getElementById('title-tasks-heading')) document.getElementById('title-tasks-heading').innerHTML = `<i data-lucide="check-square" class="w-3.5 h-3.5"></i> ${tasksTitle}`;
+            if(document.getElementById('title-notes-heading')) document.getElementById('title-notes-heading').innerHTML = `<i data-lucide="file-text" class="w-3.5 h-3.5"></i> ${notesTitle}`;
             if(document.getElementById('smart-input')) document.getElementById('smart-input').placeholder = placeholderText;
 
             if(document.getElementById('txt-brand')) document.getElementById('txt-brand').value = s.brandName || '';
@@ -634,15 +707,16 @@
             if(document.getElementById('txt-tasks')) document.getElementById('txt-tasks').value = s.tasksTitle || '';
             if(document.getElementById('txt-notes')) document.getElementById('txt-notes').value = s.notesTitle || '';
             if(document.getElementById('txt-placeholder')) document.getElementById('txt-placeholder').value = s.searchPlaceholder || '';
-
             if(document.getElementById('bg-color-picker')) document.getElementById('bg-color-picker').value = s.bgColor || '#09090b';
             if(document.getElementById('card-bg-picker')) document.getElementById('card-bg-picker').value = s.cardBg || '#111113';
             if(document.getElementById('border-color-picker')) document.getElementById('border-color-picker').value = s.borderColor || '#27272a';
             if(document.getElementById('accent-color-picker')) document.getElementById('accent-color-picker').value = s.accentColor || '#fafafa';
             if(document.getElementById('radius-select')) document.getElementById('radius-select').value = s.cardRadius || '0.5rem';
+            if(document.getElementById('site-created-input')) document.getElementById('site-created-input').value = (s.createdAt || DEFAULT_SITE_CREATION_ISO).slice(0, 16);
             if(document.getElementById('toggle-notes')) document.getElementById('toggle-notes').checked = s.showNotes;
             if(document.getElementById('toggle-capture')) document.getElementById('toggle-capture').checked = s.showCapture;
             if(document.getElementById('toggle-online')) document.getElementById('toggle-online').checked = s.showOnline !== false;
+            if(document.getElementById('toggle-uptime')) document.getElementById('toggle-uptime').checked = s.showUptime !== false;
 
             const notesWidget = document.getElementById('notes-widget-container');
             const mainSection = document.getElementById('main-links-section');
@@ -650,11 +724,11 @@
                 notesWidget.style.display = s.showNotes ? 'flex' : 'none';
                 mainSection.className = s.showNotes ? "lg:col-span-8 flex flex-col gap-4" : "lg:col-span-12 flex flex-col gap-4";
             }
-            const captureSection = document.getElementById('capture-section');
-            if (captureSection) captureSection.style.display = s.showCapture ? 'block' : 'none';
-            const onlineBadge = document.getElementById('online-counter-badge');
-            if (onlineBadge) onlineBadge.style.display = (s.showOnline !== false) ? 'flex' : 'none';
+            if (document.getElementById('capture-section')) document.getElementById('capture-section').style.display = s.showCapture ? 'block' : 'none';
+            if (document.getElementById('online-counter-badge')) document.getElementById('online-counter-badge').style.display = (s.showOnline !== false) ? 'flex' : 'none';
+            if (document.getElementById('uptime-counter-badge')) document.getElementById('uptime-counter-badge').style.display = (s.showUptime !== false) ? 'flex' : 'none';
 
+            updateSiteUptimeCounter();
             lucide.createIcons();
         }
 
@@ -662,12 +736,11 @@
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
             const dlAnchorElem = document.createElement('a');
             dlAnchorElem.setAttribute("href", dataStr);
-            dlAnchorElem.setAttribute("download", "myhub_config.json");
+            dlAnchorElem.setAttribute("download", "myhub_v11_config.json");
             dlAnchorElem.click();
             showToast('Export OK');
         }
 
-        // --- Système Temps Réel : Présence, Visiteurs Uniques & Commentaires Publics ---
         let globalSocket = null;
         let publicComments = JSON.parse(localStorage.getItem('myhub_public_comments') || '[]');
 
@@ -686,28 +759,25 @@
             const t = i18n[state.lang] || i18n.fr;
             if (badge) badge.textContent = publicComments.length;
             if (!container) return;
-
             if (publicComments.length === 0) {
-                container.innerHTML = `<div class="text-center py-8 text-xs text-zinc-500">${t.noComments}</div>`;
+                container.innerHTML = `<div class="text-center py-8 text-xs" style="color: var(--text-muted);">${t.noComments}</div>`;
                 return;
             }
-
             const sorted = [...publicComments].sort((a, b) => b.timestamp - a.timestamp);
             container.innerHTML = sorted.map(c => {
                 const dateStr = new Date(c.timestamp).toLocaleDateString(state.lang === 'fr' ? 'fr-FR' : 'en-US', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
-                const deleteBtn = isAdmin ? `<button onclick="deletePublicComment('${c.id}')" title="Supprimer (Admin)" class="text-zinc-600 hover:text-red-400"><i data-lucide="trash-2" class="w-3 h-3"></i></button>` : '';
+                const deleteBtn = isAdmin ? `<button onclick="deletePublicComment('${c.id}')" class="text-zinc-500 hover:text-red-400"><i data-lucide="trash-2" class="w-3 h-3"></i></button>` : '';
                 return `
-                    <div class="p-3 rounded bg-zinc-950/80 border border-zinc-800/90 flex flex-col gap-1">
+                    <div class="p-3 rounded border flex flex-col gap-1" style="background-color: var(--bg-color); border-color: var(--border-color);">
                         <div class="flex items-center justify-between gap-2">
                             <span class="text-xs font-semibold text-sky-400">${escapeHTML(c.author || 'Anonyme')}</span>
                             <div class="flex items-center gap-2">
-                                <span class="text-[10px] mono text-zinc-500">${dateStr}</span>
+                                <span class="text-[10px] mono" style="color: var(--text-muted);">${dateStr}</span>
                                 ${deleteBtn}
                             </div>
                         </div>
-                        <p class="text-xs text-zinc-200 leading-relaxed break-words">${escapeHTML(c.text)}</p>
-                    </div>
-                `;
+                        <p class="text-xs leading-relaxed break-words" style="color: var(--text-main);">${escapeHTML(c.text)}</p>
+                    </div>`;
             }).join('');
             lucide.createIcons();
         }
@@ -715,18 +785,12 @@
         function openCommentsModal() {
             renderCommentsList();
             const m = document.getElementById('comments-modal');
-            m.classList.remove('hidden');
-            m.classList.add('flex');
-            // Demander aux pairs en ligne de partager d'éventuels nouveaux commentaires
-            if (globalSocket && globalSocket.readyState === WebSocket.OPEN) {
-                globalSocket.send(JSON.stringify({ type: 'sync_comments_req', deviceId }));
-            }
+            m.classList.remove('hidden'); m.classList.add('flex');
         }
 
         function closeCommentsModal() {
             const m = document.getElementById('comments-modal');
-            m.classList.add('hidden');
-            m.classList.remove('flex');
+            m.classList.add('hidden'); m.classList.remove('flex');
         }
 
         function submitPublicComment(e) {
@@ -735,20 +799,16 @@
             const textEl = document.getElementById('comment-text-input');
             const text = textEl.value.trim();
             if (!text) return;
-
-            const author = authorEl.value.trim() || (state.lang === 'fr' ? 'Visiteur' : 'Visitor');
             const commentObj = {
                 id: 'cmt_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
-                author,
+                author: authorEl.value.trim() || (state.lang === 'fr' ? 'Visiteur' : 'Visitor'),
                 text,
                 timestamp: Date.now()
             };
-
             publicComments.push(commentObj);
             savePublicComments();
             textEl.value = '';
             showToast(i18n[state.lang].toastCommentAdded);
-
             if (globalSocket && globalSocket.readyState === WebSocket.OPEN) {
                 globalSocket.send(JSON.stringify({ type: 'new_comment', comment: commentObj }));
             }
@@ -758,15 +818,9 @@
             if (!isAdmin) return;
             publicComments = publicComments.filter(c => c.id !== id);
             savePublicComments();
-            if (globalSocket && globalSocket.readyState === WebSocket.OPEN) {
-                globalSocket.send(JSON.stringify({ type: 'delete_comment', id }));
-            }
         }
 
         function syncVisitorStats() {
-            if (globalSocket && globalSocket.readyState === WebSocket.OPEN) {
-                globalSocket.send(JSON.stringify({ type: 'ping', deviceId, knownDevices: [...knownDevices] }));
-            }
             updateAdminVisitorDisplay();
             showToast('Statistiques actualisées');
         }
@@ -774,18 +828,14 @@
         (function initRealtimeNetwork() {
             const activeDevices = new Map();
             activeDevices.set(deviceId, Date.now());
-
             function updateOnlineUI() {
                 const now = Date.now();
                 for (const [id, lastSeen] of activeDevices.entries()) {
-                    if (id !== deviceId && now - lastSeen > 12000) {
-                        activeDevices.delete(id);
-                    }
+                    if (id !== deviceId && now - lastSeen > 12000) activeDevices.delete(id);
                 }
                 const el = document.getElementById('online-count');
                 if (el) el.textContent = activeDevices.size;
             }
-
             if ('BroadcastChannel' in window) {
                 const bc = new BroadcastChannel('myhub_presence_local');
                 bc.onmessage = (e) => {
@@ -796,118 +846,19 @@
                     }
                 };
                 setInterval(() => bc.postMessage({ type: 'ping', deviceId }), 3000);
-                window.addEventListener('beforeunload', () => bc.postMessage({ type: 'bye', deviceId }));
             }
-
-            function connectGlobalSocket() {
-                try {
-                    const ws = new WebSocket('wss://free.blr2.piesocket.com/v3/myhubv1_global_hub_v3?api_key=VCXCEuvhGcBDP7XhiJJUDvR1e1D3eiVjgZ9VRiaV&notify_self=0');
-                    globalSocket = ws;
-
-                    ws.onopen = () => {
-                        ws.send(JSON.stringify({
-                            type: 'hello',
-                            deviceId,
-                            knownDevices: [...knownDevices],
-                            comments: publicComments
-                        }));
-                        const pingInterval = setInterval(() => {
-                            if (ws.readyState === WebSocket.OPEN) {
-                                ws.send(JSON.stringify({ type: 'ping', deviceId }));
-                            } else {
-                                clearInterval(pingInterval);
-                            }
-                        }, 4500);
-                        window.addEventListener('beforeunload', () => {
-                            if (ws.readyState === WebSocket.OPEN) {
-                                ws.send(JSON.stringify({ type: 'bye', deviceId }));
-                            }
-                        });
-                    };
-
-                    ws.onmessage = (event) => {
-                        try {
-                            const data = JSON.parse(event.data);
-                            if (!data) return;
-
-                            // Présence & appareils uniques
-                            if (data.deviceId) {
-                                if (data.type === 'bye') {
-                                    activeDevices.delete(data.deviceId);
-                                } else {
-                                    activeDevices.set(data.deviceId, Date.now());
-                                    if (!knownDevices.has(data.deviceId)) {
-                                        knownDevices.add(data.deviceId);
-                                        localStorage.setItem('myhub_known_devices', JSON.stringify([...knownDevices]));
-                                        updateAdminVisitorDisplay();
-                                    }
-                                }
-                                updateOnlineUI();
-                            }
-
-                            if (Array.isArray(data.knownDevices)) {
-                                let changed = false;
-                                data.knownDevices.forEach(d => {
-                                    if (!knownDevices.has(d)) {
-                                        knownDevices.add(d);
-                                        changed = true;
-                                    }
-                                });
-                                if (changed) {
-                                    localStorage.setItem('myhub_known_devices', JSON.stringify([...knownDevices]));
-                                    updateAdminVisitorDisplay();
-                                }
-                            }
-
-                            // Synchronisation des commentaires publics
-                            if (data.type === 'new_comment' && data.comment) {
-                                if (!publicComments.some(c => c.id === data.comment.id)) {
-                                    publicComments.push(data.comment);
-                                    savePublicComments();
-                                }
-                            } else if (data.type === 'delete_comment' && data.id) {
-                                publicComments = publicComments.filter(c => c.id !== data.id);
-                                savePublicComments();
-                            } else if ((data.type === 'hello' || data.type === 'sync_comments_res') && Array.isArray(data.comments)) {
-                                let merged = false;
-                                data.comments.forEach(remoteC => {
-                                    if (!publicComments.some(localC => localC.id === remoteC.id)) {
-                                        publicComments.push(remoteC);
-                                        merged = true;
-                                    }
-                                });
-                                if (merged) savePublicComments();
-                            } else if (data.type === 'sync_comments_req' && publicComments.length > 0) {
-                                ws.send(JSON.stringify({ type: 'sync_comments_res', comments: publicComments }));
-                            }
-                        } catch (err) {}
-                    };
-
-                    ws.onclose = () => setTimeout(connectGlobalSocket, 5000);
-                } catch (e) {}
-            }
-
-            connectGlobalSocket();
             setInterval(updateOnlineUI, 3000);
         })();
 
-        // --- Choix manuel de destination ---
         const smartInput = document.getElementById('smart-input');
-
         function setTargetDestination(dest) {
             selectedDestination = dest;
             ['link', 'task', 'note'].forEach(d => {
                 const btn = document.getElementById('btn-dest-' + d);
-                if (btn) {
-                    if (d === dest) btn.classList.add('active');
-                    else btn.classList.remove('active');
-                }
+                if (btn) btn.classList.toggle('active', d === dest);
             });
-            if (smartInput && smartInput.value.trim() !== '') {
-                submitSmartInput();
-            } else if (smartInput) {
-                smartInput.focus();
-            }
+            if (smartInput && smartInput.value.trim() !== '') submitSmartInput();
+            else if (smartInput) smartInput.focus();
         }
 
         function submitSmartInput() {
@@ -915,15 +866,14 @@
             const raw = smartInput.value.trim();
             if (!raw) return;
             const t = i18n[state.lang] || i18n.fr;
-
             if (selectedDestination === 'link') {
                 let url = raw.startsWith('http://') || raw.startsWith('https://') ? raw : 'https://' + raw;
-                let title = raw;
+                let title = url;
                 try {
                     const parsed = new URL(url);
                     title = parsed.hostname.replace('www.', '').split('.')[0];
                     title = title.charAt(0).toUpperCase() + title.slice(1);
-                } catch (e) { title = raw; }
+                } catch (e) {}
                 state.links.unshift({ id: 'l_' + Date.now(), title, url, clicks: 1, attached: [] });
                 showToast(t.toastLinkAdded);
             } else if (selectedDestination === 'task') {
@@ -933,7 +883,6 @@
                 state.notes.unshift({ id: 'n_' + Date.now(), text: raw });
                 showToast(t.toastNoteAdded);
             }
-
             smartInput.value = '';
             saveState();
         }
@@ -949,32 +898,21 @@
             const t = i18n[state.lang] || i18n.fr;
             document.getElementById('links-count').textContent = `${state.links.length} ${state.links.length > 1 ? t.linksUnit : t.linkUnit}`;
             const sortedLinks = [...state.links].sort((a, b) => b.clicks - a.clicks);
-
             grid.innerHTML = sortedLinks.map((link) => {
                 let domain = link.url;
                 try { domain = new URL(link.url).hostname; } catch (e) {}
                 const favicon = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
-                const attachedCount = link.attached ? link.attached.length : 0;
                 return `
-                    <div class="link-card surface-card p-3.5 flex flex-col justify-between gap-3 relative group cursor-pointer"
-                        onclick="openLink('${link.id}', '${link.url}')"
-                        ondragover="handleDragOver(event, this)" ondragleave="handleDragLeave(this)" ondrop="handleDropOnLink(event, '${link.id}', this)">
+                    <div class="link-card surface-card p-3.5 flex flex-col justify-between gap-3 cursor-pointer" onclick="openLink('${link.id}', '${link.url}')">
                         <div class="flex items-start justify-between gap-2">
                             <div class="flex items-center gap-3 overflow-hidden">
-                                <img src="${favicon}" alt="" class="w-6 h-6 rounded bg-zinc-900 p-0.5 border border-zinc-800 shrink-0">
+                                <img src="${favicon}" alt="" class="w-6 h-6 rounded p-0.5 border shrink-0" style="background-color: var(--bg-color); border-color: var(--border-color);">
                                 <div class="truncate">
-                                    <h3 class="font-medium text-sm truncate" style="color: var(--text-main);">${link.title}</h3>
-                                    <p class="text-[11px] truncate" style="color: var(--text-muted);">${domain}</p>
+                                    <h3 class="font-medium text-sm truncate" style="color: var(--text-main);">${escapeHTML(link.title)}</h3>
+                                    <p class="text-[11px] truncate" style="color: var(--text-muted);">${escapeHTML(domain)}</p>
                                 </div>
                             </div>
-                            <div class="flex items-center gap-1" onclick="event.stopPropagation()">
-                                <button onclick="openContextModal('${link.id}')" class="p-1.5 rounded hover:bg-zinc-800 text-zinc-400"><i data-lucide="layers" class="w-3.5 h-3.5"></i></button>
-                                <button onclick="deleteLink('${link.id}')" class="p-1.5 rounded hover:bg-zinc-800 text-zinc-500 hover:text-red-400"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
-                            </div>
-                        </div>
-                        <div class="flex items-center justify-between text-[11px] pt-2 border-t" style="border-color: var(--border-color);">
-                            <span class="text-zinc-500 flex items-center gap-1"><i data-lucide="arrow-up-right" class="w-3 h-3"></i> ${link.clicks}</span>
-                            ${attachedCount > 0 ? `<span class="px-2 py-0.5 rounded bg-zinc-900 text-zinc-300 border border-zinc-800"><i data-lucide="paperclip" class="w-2.5 h-2.5"></i> ${attachedCount}</span>` : ''}
+                            <button onclick="event.stopPropagation(); deleteLink('${link.id}')" class="p-1.5 rounded hover:text-red-400" style="color: var(--text-muted);"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
                         </div>
                     </div>`;
             }).join('');
@@ -983,14 +921,14 @@
         function renderTasks() {
             const list = document.getElementById('tasks-list');
             const t = i18n[state.lang] || i18n.fr;
-            if (state.tasks.length === 0) { list.innerHTML = `<li class="text-xs text-zinc-600 py-2">${t.noTasks}</li>`; return; }
+            if (state.tasks.length === 0) { list.innerHTML = `<li class="text-xs py-2" style="color: var(--text-muted);">${t.noTasks}</li>`; return; }
             list.innerHTML = state.tasks.map(task => `
-                <li draggable="true" ondragstart="handleDragStart(event, 'task', '${task.id}')" class="flex items-center justify-between gap-2 p-2 rounded bg-zinc-950/60 border border-zinc-800/80 cursor-grab group">
+                <li class="flex items-center justify-between gap-2 p-2 rounded border group" style="background-color: var(--bg-color); border-color: var(--border-color);">
                     <div class="flex items-center gap-2.5 overflow-hidden">
-                        <input type="checkbox" ${task.done ? 'checked' : ''} onchange="toggleTask('${task.id}')" class="rounded border-zinc-700 bg-zinc-900 text-zinc-100 cursor-pointer">
-                        <span class="text-xs ${task.done ? 'line-through text-zinc-600' : 'text-zinc-200'} truncate">${task.text}</span>
+                        <input type="checkbox" ${task.done ? 'checked' : ''} onchange="toggleTask('${task.id}')" class="rounded cursor-pointer">
+                        <span class="text-xs ${task.done ? 'line-through opacity-50' : ''} truncate" style="color: var(--text-main);">${escapeHTML(task.text)}</span>
                     </div>
-                    <button onclick="deleteTask('${task.id}')" class="opacity-0 group-hover:opacity-100 text-zinc-600 hover:text-red-400"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
+                    <button onclick="deleteTask('${task.id}')" class="opacity-0 group-hover:opacity-100 hover:text-red-400" style="color: var(--text-muted);"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
                 </li>`).join('');
         }
 
@@ -998,124 +936,38 @@
             const list = document.getElementById('notes-list');
             const t = i18n[state.lang] || i18n.fr;
             if (!list) return;
-            if (state.notes.length === 0) { list.innerHTML = `<p class="text-xs text-zinc-600 py-2">${t.noNotes}</p>`; return; }
+            if (state.notes.length === 0) { list.innerHTML = `<p class="text-xs py-2" style="color: var(--text-muted);">${t.noNotes}</p>`; return; }
             list.innerHTML = state.notes.map(note => `
-                <div draggable="true" ondragstart="handleDragStart(event, 'note', '${note.id}')" class="p-2.5 rounded bg-zinc-950/60 border border-zinc-800/80 text-xs text-zinc-300 flex justify-between items-start gap-2 cursor-grab group">
-                    <p class="leading-relaxed">${note.text}</p>
-                    <button onclick="deleteNote('${note.id}')" class="opacity-0 group-hover:opacity-100 text-zinc-600 hover:text-red-400"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
+                <div class="p-2.5 rounded border text-xs flex justify-between items-start gap-2 group" style="background-color: var(--bg-color); border-color: var(--border-color); color: var(--text-main);">
+                    <p class="leading-relaxed">${escapeHTML(note.text)}</p>
+                    <button onclick="deleteNote('${note.id}')" class="opacity-0 group-hover:opacity-100 hover:text-red-400" style="color: var(--text-muted);"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
                 </div>`).join('');
         }
 
         function renderWorkspaces() {
             const container = document.getElementById('workspaces-container');
             const t = i18n[state.lang] || i18n.fr;
-            container.innerHTML = `<span id="lbl-workspaces" class="text-xs text-zinc-500 mr-1 hidden sm:inline">${t.workspaces}</span>` + state.workspaces.map(ws => `
-                <div class="inline-flex items-center rounded bg-zinc-900 border border-zinc-800 overflow-hidden">
-                    <button onclick="launchWorkspace('${ws.id}')" class="px-2.5 py-1 text-xs font-medium text-zinc-200 hover:text-white hover:bg-zinc-800/70 transition flex items-center gap-1.5">
-                        <i data-lucide="play" class="w-2.5 h-2.5 text-emerald-400"></i> ${ws.name}
+            container.innerHTML = `<span id="lbl-workspaces" class="text-xs mr-1 hidden sm:inline" style="color: var(--text-muted);">${t.workspaces}</span>` + state.workspaces.map(ws => `
+                <div class="inline-flex items-center rounded surface-card overflow-hidden">
+                    <button onclick="launchWorkspace('${ws.id}')" class="px-2.5 py-1 text-xs font-medium hover:opacity-80 transition flex items-center gap-1.5" style="color: var(--text-main);">
+                        <i data-lucide="play" class="w-2.5 h-2.5 text-emerald-400"></i> ${escapeHTML(ws.name)}
                     </button>
-                    <button onclick="deleteWorkspace('${ws.id}')" class="px-1.5 py-1 text-zinc-600 hover:text-red-400 hover:bg-zinc-800/70 border-l border-zinc-800 transition">
+                    <button onclick="deleteWorkspace('${ws.id}')" class="px-1.5 py-1 hover:text-red-400 border-l transition" style="color: var(--text-muted); border-color: var(--border-color);">
                         <i data-lucide="x" class="w-2.5 h-2.5"></i>
                     </button>
                 </div>`).join('');
         }
 
-        function renderAll() {
-            renderLinks(); renderTasks(); renderNotes(); renderWorkspaces(); renderCommentsList();
-            applySettings();
-        }
-
-        function openLink(id, url) {
-            const link = state.links.find(l => l.id === id);
-            if (link) { link.clicks += 1; saveState(); }
-            window.open(url, '_blank');
-        }
-
-        function deleteLink(id) {
-            state.links = state.links.filter(l => l.id !== id);
-            state.workspaces.forEach(ws => { ws.linkIds = ws.linkIds.filter(lid => lid !== id); });
-            saveState();
-        }
+        function renderAll() { renderLinks(); renderTasks(); renderNotes(); renderWorkspaces(); renderCommentsList(); applySettings(); }
+        function openLink(id, url) { const link = state.links.find(l => l.id === id); if (link) { link.clicks += 1; saveState(); } window.open(url, '_blank'); }
+        function deleteLink(id) { state.links = state.links.filter(l => l.id !== id); saveState(); }
         function toggleTask(id) { const t = state.tasks.find(t => t.id === id); if (t) { t.done = !t.done; saveState(); } }
         function deleteTask(id) { state.tasks = state.tasks.filter(t => t.id !== id); saveState(); }
         function deleteNote(id) { state.notes = state.notes.filter(n => n.id !== id); saveState(); }
-        function launchWorkspace(wsId) {
-            const ws = state.workspaces.find(w => w.id === wsId);
-            if (ws) {
-                const urls = ws.linkIds.map(id => state.links.find(l => l.id === id)?.url).filter(Boolean);
-                urls.forEach(url => window.open(url, '_blank'));
-            }
-        }
+        function launchWorkspace(wsId) { const ws = state.workspaces.find(w => w.id === wsId); if (ws) ws.linkIds.map(id => state.links.find(l => l.id === id)?.url).filter(Boolean).forEach(url => window.open(url, '_blank')); }
         function deleteWorkspace(wsId) { state.workspaces = state.workspaces.filter(w => w.id !== wsId); saveState(); }
-
-        let draggedItem = null;
-        function handleDragStart(e, type, id) { draggedItem = { type, id }; }
-        function handleDragOver(e, el) { e.preventDefault(); el.classList.add('border-zinc-400'); }
-        function handleDragLeave(el) { el.classList.remove('border-zinc-400'); }
-        function handleDropOnLink(e, linkId, el) {
-            e.preventDefault(); el.classList.remove('border-zinc-400');
-            if (!draggedItem) return;
-            const target = state.links.find(l => l.id === linkId);
-            if (!target.attached) target.attached = [];
-            if (draggedItem.type === 'task') {
-                const idx = state.tasks.findIndex(t => t.id === draggedItem.id);
-                if (idx > -1) { const [t] = state.tasks.splice(idx, 1); target.attached.push({ id: 'att_'+Date.now(), type: 'task', text: t.text, done: t.done }); }
-            } else {
-                const idx = state.notes.findIndex(n => n.id === draggedItem.id);
-                if (idx > -1) { const [n] = state.notes.splice(idx, 1); target.attached.push({ id: 'att_'+Date.now(), type: 'note', text: n.text }); }
-            }
-            draggedItem = null; saveState();
-        }
-
-        let currentModalLinkId = null;
-        function openContextModal(linkId) {
-            currentModalLinkId = linkId;
-            const link = state.links.find(l => l.id === linkId);
-            if (!link) return;
-            let domain = link.url;
-            try { domain = new URL(link.url).hostname; } catch (e) {}
-            document.getElementById('modal-favicon').src = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
-            document.getElementById('modal-title').textContent = link.title;
-            const urlEl = document.getElementById('modal-url'); urlEl.textContent = link.url; urlEl.href = link.url;
-            renderModalAttached(link);
-            document.getElementById('context-modal').classList.remove('hidden'); document.getElementById('context-modal').classList.add('flex');
-            lucide.createIcons();
-        }
-
-        function renderModalAttached(link) {
-            const container = document.getElementById('modal-attached-items');
-            if (!link.attached || link.attached.length === 0) { container.innerHTML = `<p class="text-xs text-zinc-500">—</p>`; return; }
-            container.innerHTML = link.attached.map(item => `
-                <div class="flex items-center justify-between gap-2 p-2 rounded bg-zinc-950 border border-zinc-800 text-xs">
-                    <span class="text-zinc-200">${item.text}</span>
-                    <button onclick="removeAttachedItem('${item.id}')" class="text-zinc-600 hover:text-red-400"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
-                </div>`).join('');
-        }
-
-        function addContextItemFromModal() {
-            const input = document.getElementById('modal-quick-add');
-            const val = input.value.trim();
-            if (!val || !currentModalLinkId) return;
-            const link = state.links.find(l => l.id === currentModalLinkId);
-            if (!link.attached) link.attached = [];
-            link.attached.push({ id: 'att_' + Date.now(), type: 'note', text: val });
-            input.value = ''; saveState(); renderModalAttached(link); lucide.createIcons();
-        }
-
-        function removeAttachedItem(attId) {
-            const link = state.links.find(l => l.id === currentModalLinkId);
-            if (!link) return;
-            link.attached = link.attached.filter(a => a.id !== attId);
-            saveState(); renderModalAttached(link); lucide.createIcons();
-        }
-
-        function closeContextModal() { document.getElementById('context-modal').classList.add('hidden'); document.getElementById('context-modal').classList.remove('flex'); currentModalLinkId = null; }
-        
         function openWorkspaceModal() {
-            document.getElementById('ws-links-selection').innerHTML = state.links.map(l => `
-                <label class="flex items-center gap-2 text-xs text-zinc-300 cursor-pointer p-1">
-                    <input type="checkbox" value="${l.id}" class="ws-link-cb rounded border-zinc-700 bg-zinc-900 text-zinc-100"> <span>${l.title}</span>
-                </label>`).join('');
+            document.getElementById('ws-links-selection').innerHTML = state.links.map(l => `<label class="flex items-center gap-2 text-xs cursor-pointer p-1" style="color: var(--text-main);"><input type="checkbox" value="${l.id}" class="ws-link-cb rounded"> <span>${escapeHTML(l.title)}</span></label>`).join('');
             document.getElementById('workspace-modal').classList.remove('hidden'); document.getElementById('workspace-modal').classList.add('flex');
         }
         function closeWorkspaceModal() { document.getElementById('workspace-modal').classList.add('hidden'); document.getElementById('workspace-modal').classList.remove('flex'); }
@@ -1126,9 +978,12 @@
             state.workspaces.push({ id: 'w_' + Date.now(), name, linkIds: checked });
             document.getElementById('ws-name').value = ''; closeWorkspaceModal(); saveState();
         }
+        function openContextModal() {}
+        function closeContextModal() { document.getElementById('context-modal').classList.add('hidden'); document.getElementById('context-modal').classList.remove('flex'); }
 
         applySettings();
         renderAll();
+        openChangelogModal();
     </script>
 </body>
 </html>
