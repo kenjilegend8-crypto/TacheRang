@@ -3,987 +3,278 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="page-title">MyHub v1.1 — Espaces & Temps Réel</title>
+    <title>MyHub v1.1.2</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-color: #09090b;
             --card-bg: #111113;
             --border-color: #27272a;
-            --accent-color: #fafafa;
-            --card-radius: 0.5rem;
-            --text-main: #fafafa;
-            --text-muted: #a1a1aa;
+            --accent-color: #34d399;
         }
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            overflow-x: hidden;
-            transition: background-color 0.2s ease, color 0.2s ease;
-        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: #fafafa; overflow-x: hidden; }
         .mono { font-family: 'JetBrains Mono', monospace; }
-        .surface-card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: var(--card-radius);
-            transition: background-color 0.2s ease, border-color 0.2s ease, border-radius 0.2s ease;
-        }
-        .link-card {
-            transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.15s ease;
-        }
-        .link-card:hover {
-            border-color: var(--accent-color);
-            transform: translateY(-1px);
-        }
-        .accent-text { color: var(--accent-color); }
-        .accent-bg { background-color: var(--accent-color); color: var(--bg-color); }
-        .dest-btn {
-            transition: all 0.15s ease;
-        }
-        .dest-btn.active {
-            background-color: var(--accent-color);
-            color: var(--bg-color);
-            font-weight: 600;
-        }
-        ::-webkit-scrollbar { width: 5px; height: 5px; }
-        ::-webkit-scrollbar-track { background: var(--bg-color); }
-        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 2px; }
+        .surface-card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 0.75rem; transition: all 0.2s ease; }
+        .link-card:hover { border-color: var(--accent-color); transform: translateY(-2px); }
+        .dest-btn { transition: all 0.15s ease; }
+        .dest-btn.active { background-color: var(--accent-color); color: #09090b; font-weight: 600; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
-
-    <!-- Header -->
-    <header class="border-b px-6 py-3.5 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-40 backdrop-blur-sm" style="border-color: var(--border-color); background-color: color-mix(in srgb, var(--bg-color) 88%, transparent);">
+    <header class="border-b border-zinc-800/80 px-6 py-3.5 flex flex-wrap items-center justify-between gap-4 bg-zinc-950/80 backdrop-blur-md sticky top-0 z-40">
         <div class="flex items-center gap-3 flex-wrap">
-            <div id="logo-box" class="w-7 h-7 rounded accent-bg flex items-center justify-center font-bold text-sm">
-                M
-            </div>
-            <span id="header-brand-name" class="font-semibold text-base tracking-tight">MyHub</span>
-            <span class="text-[11px] mono px-1.5 py-0.5 rounded bg-emerald-950/50 border border-emerald-800/60 text-emerald-400">v1.1</span>
-            <span id="mode-badge" class="text-[11px] mono px-1.5 py-0.5 rounded surface-card text-zinc-400">Espace Privé</span>
-            
-            <!-- Compteur de personnes en ligne en temps réel -->
-            <div id="online-counter-badge" class="flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-950/40 border border-emerald-800/60 text-emerald-400 text-[11px] mono">
+            <div class="w-7 h-7 rounded-md bg-emerald-400 text-zinc-950 flex items-center justify-center font-bold text-sm">M</div>
+            <span class="font-semibold text-base tracking-tight">MyHub</span>
+            <span class="text-xs mono px-2 py-0.5 rounded bg-emerald-950/70 text-emerald-400 border border-emerald-800/60">v1.1.2</span>
+
+            <div class="flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-950/40 border border-emerald-800/60 text-emerald-400 text-[11px] mono">
                 <span class="relative flex h-2 w-2">
                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                     <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                 </span>
-                <span id="online-count">1</span> <span id="lbl-online">en ligne</span>
+                <span>1 en ligne</span>
             </div>
 
-            <!-- Compteur depuis la création du site -->
-            <div id="uptime-counter-badge" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full surface-card text-[11px] mono" style="color: var(--text-muted);" title="Temps écoulé depuis la création de MyHub">
-                <i data-lucide="clock" class="w-3 h-3 text-amber-400 shrink-0"></i>
-                <span id="lbl-uptime-prefix">Créé il y a</span>
-                <span id="site-uptime-value" class="font-medium" style="color: var(--text-main);">0j 00h 00m 00s</span>
+            <!-- Timer Pomodoro v1.1.2 -->
+            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-300 text-[11px] mono">
+                <button type="button" onclick="togglePomodoroMode()" class="text-emerald-400 hover:underline font-semibold" title="Basculer Focus / Pause">
+                    🍅 <span id="pomo-mode">Focus</span>
+                </button>
+                <span id="pomo-display" class="text-white font-semibold">25:00</span>
+                <button type="button" onclick="togglePomodoroTimer()" class="p-0.5 hover:text-white"><i data-lucide="play" id="pomo-icon" class="w-3 h-3"></i></button>
+                <button type="button" onclick="resetPomodoro()" class="p-0.5 hover:text-white text-zinc-500"><i data-lucide="rotate-ccw" class="w-3 h-3"></i></button>
             </div>
         </div>
 
-        <div class="flex items-center gap-2 flex-wrap" id="workspaces-container">
-            <span id="lbl-workspaces" class="text-xs mr-1 hidden sm:inline" style="color: var(--text-muted);">Espaces :</span>
-        </div>
+        <div class="flex items-center gap-2 flex-wrap" id="workspaces-container"></div>
 
-        <div class="flex items-center gap-2 flex-wrap">
-            <!-- Bouton Notes de MAJ v1.1 -->
-            <button onclick="openChangelogModal()" class="text-xs px-2.5 py-1.5 rounded surface-card hover:opacity-90 transition flex items-center gap-1.5 text-amber-400">
-                <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
-                <span>MAJ v1.1</span>
+        <div class="flex items-center gap-2">
+            <button type="button" onclick="openChangelog()" class="text-xs px-2.5 py-1.5 rounded-lg bg-emerald-950/60 hover:bg-emerald-900/60 text-emerald-300 border border-emerald-800/60 flex items-center gap-1.5">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> MAJ v1.1.2
             </button>
-
-            <!-- Bouton Commentaires Publics -->
-            <button onclick="openCommentsModal()" class="text-xs px-3 py-1.5 rounded surface-card hover:opacity-90 transition flex items-center gap-1.5" style="color: var(--text-main);">
-                <i data-lucide="message-square" class="w-3.5 h-3.5 text-sky-400"></i>
-                <span id="lbl-comments-btn">Commentaires</span>
-                <span id="comments-badge-count" class="ml-0.5 px-1.5 py-0.2 rounded-full text-[10px] mono" style="background-color: var(--bg-color); color: var(--text-muted);">0</span>
-            </button>
-
-            <!-- Sélecteur de Langue -->
-            <button onclick="toggleLanguage()" id="lang-toggle-btn" title="Switch Language / Changer de langue" class="text-xs px-2.5 py-1.5 rounded surface-card hover:opacity-90 transition mono flex items-center gap-1" style="color: var(--text-main);">
-                <i data-lucide="globe" class="w-3.5 h-3.5" style="color: var(--text-muted);"></i>
-                <span id="current-lang-label">FR</span>
-            </button>
-
-            <!-- Bouton Studio Admin (visible uniquement en mode admin) -->
-            <button onclick="toggleAdminPanel()" id="admin-trigger-btn" class="hidden text-xs px-3 py-1.5 rounded surface-card hover:opacity-90 text-emerald-400 transition items-center gap-1.5">
-                <i data-lucide="sliders" class="w-3.5 h-3.5"></i> Studio Admin
+            <button type="button" onclick="openShortcuts()" class="text-xs px-2.5 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 flex items-center gap-1.5">
+                <i data-lucide="keyboard" class="w-3.5 h-3.5"></i> <kbd class="mono text-[10px]">?</kbd>
             </button>
         </div>
     </header>
 
-    <!-- Studio Admin -->
-    <section id="admin-panel" class="hidden bg-[#0c0c0e] border-b border-zinc-800 px-6 py-6 transition-all shadow-2xl">
-        <div class="max-w-7xl mx-auto flex flex-col gap-6">
-            <div class="flex flex-wrap items-center justify-between gap-4 border-b border-zinc-800 pb-3">
-                <span class="text-xs font-semibold text-emerald-400 uppercase tracking-wider flex items-center gap-2">
-                    <i data-lucide="sliders" class="w-4 h-4"></i> Studio Admin & Statistiques Privées
-                </span>
-                <div class="flex items-center gap-3 flex-wrap">
-                    <button onclick="resetToDefaults()" class="text-xs px-2.5 py-1 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-700 transition flex items-center gap-1">
-                        <i data-lucide="rotate-ccw" class="w-3 h-3"></i> Restaurer défauts
-                    </button>
-                    <button onclick="lockAdminSession()" class="text-xs px-2.5 py-1 rounded bg-red-950/60 hover:bg-red-900/60 text-red-300 border border-red-900/50 transition flex items-center gap-1">
-                        <i data-lucide="lock" class="w-3 h-3"></i> Verrouiller (Mode Visiteur)
-                    </button>
-                    <button onclick="toggleAdminPanel()" class="text-xs text-zinc-400 hover:text-white underline">Fermer</button>
+    <main class="flex-1 max-w-7xl w-full mx-auto px-6 py-8 flex flex-col gap-6">
+        <!-- Barre intelligente v1.1.2 (Lien + Nom perso / Tâche / Note / Web) -->
+        <section class="max-w-3xl w-full mx-auto">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-2 bg-zinc-900/90 border border-zinc-800 focus-within:border-emerald-500/60 rounded-xl px-4 py-3 shadow-lg">
+                <div class="flex items-center flex-1 gap-2">
+                    <i data-lucide="terminal" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+                    <input type="text" id="smart-input" placeholder="Écris ton texte, colle une URL (ou nom | url), ou tape ? recherche..." class="w-full bg-transparent text-zinc-100 placeholder-zinc-500 focus:outline-none text-sm" autocomplete="off">
+                    <input type="text" id="custom-link-name" placeholder="Nom (ex: didi)" class="hidden w-32 bg-zinc-950 border border-zinc-700 rounded-md px-2 py-1 text-xs text-zinc-200 focus:outline-none" autocomplete="off">
                 </div>
-            </div>
-
-            <!-- Visiteurs Uniques -->
-            <div class="surface-card p-4 border-emerald-900/40 bg-emerald-950/10 flex flex-wrap items-center justify-between gap-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
-                        <i data-lucide="users" class="w-5 h-5"></i>
-                    </div>
-                    <div>
-                        <h4 class="text-xs font-semibold uppercase tracking-wider text-emerald-400">Statistiques Visiteurs Uniques (Admin Uniquement)</h4>
-                        <p class="text-xs text-zinc-400 mt-0.5">Chaque appareil est identifié de manière unique (un même appareil n'est compté qu'une seule fois).</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-6">
-                    <div class="text-right">
-                        <div class="text-2xl font-bold mono text-white" id="admin-unique-visitors-count">1</div>
-                        <div class="text-[11px] text-zinc-400">Appareils uniques détectés</div>
-                    </div>
-                    <button onclick="syncVisitorStats()" class="text-xs px-3 py-1.5 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-700 transition flex items-center gap-1.5">
-                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Actualiser
-                    </button>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="surface-card p-4 flex flex-col gap-3 md:col-span-3">
-                    <h4 class="text-xs font-semibold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
-                        <i data-lucide="type" class="w-3.5 h-3.5"></i> Personnalisation des Textes
-                    </h4>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                        <div class="flex flex-col gap-1">
-                            <label class="text-[11px] text-zinc-400">Nom du site (Header) :</label>
-                            <input type="text" id="txt-brand" oninput="updateTextSetting('brandName', this.value)" class="bg-zinc-950 border border-zinc-800 rounded px-2.5 py-1.5 text-xs text-zinc-200">
-                        </div>
-                        <div class="flex flex-col gap-1">
-                            <label class="text-[11px] text-zinc-400">Titre Bloc Liens :</label>
-                            <input type="text" id="txt-links" oninput="updateTextSetting('linksTitle', this.value)" class="bg-zinc-950 border border-zinc-800 rounded px-2.5 py-1.5 text-xs text-zinc-200">
-                        </div>
-                        <div class="flex flex-col gap-1">
-                            <label class="text-[11px] text-zinc-400">Titre Bloc Tâches :</label>
-                            <input type="text" id="txt-tasks" oninput="updateTextSetting('tasksTitle', this.value)" class="bg-zinc-950 border border-zinc-800 rounded px-2.5 py-1.5 text-xs text-zinc-200">
-                        </div>
-                        <div class="flex flex-col gap-1">
-                            <label class="text-[11px] text-zinc-400">Titre Bloc Notes :</label>
-                            <input type="text" id="txt-notes" oninput="updateTextSetting('notesTitle', this.value)" class="bg-zinc-950 border border-zinc-800 rounded px-2.5 py-1.5 text-xs text-zinc-200">
-                        </div>
-                        <div class="flex flex-col gap-1 md:col-span-2">
-                            <label class="text-[11px] text-zinc-400">Texte d'indication de la barre de saisie :</label>
-                            <input type="text" id="txt-placeholder" oninput="updateTextSetting('searchPlaceholder', this.value)" class="bg-zinc-950 border border-zinc-800 rounded px-2.5 py-1.5 text-xs text-zinc-200">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="surface-card p-4 flex flex-col gap-3">
-                    <h4 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
-                        <i data-lucide="palette" class="w-3.5 h-3.5"></i> Couleurs Globales
-                    </h4>
-                    <div class="flex items-center justify-between text-xs text-zinc-300">
-                        <span>Fond de page :</span>
-                        <input type="color" id="bg-color-picker" value="#09090b" onchange="updateStyleSetting('bgColor', this.value)" class="w-7 h-7 rounded bg-transparent cursor-pointer border border-zinc-700">
-                    </div>
-                    <div class="flex items-center justify-between text-xs text-zinc-300">
-                        <span>Fond des cartes :</span>
-                        <input type="color" id="card-bg-picker" value="#111113" onchange="updateStyleSetting('cardBg', this.value)" class="w-7 h-7 rounded bg-transparent cursor-pointer border border-zinc-700">
-                    </div>
-                    <div class="flex items-center justify-between text-xs text-zinc-300">
-                        <span>Couleur d'accent :</span>
-                        <input type="color" id="accent-color-picker" value="#fafafa" onchange="updateStyleSetting('accentColor', this.value)" class="w-7 h-7 rounded bg-transparent cursor-pointer border border-zinc-700">
-                    </div>
-                </div>
-
-                <div class="surface-card p-4 flex flex-col gap-3">
-                    <h4 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
-                        <i data-lucide="square" class="w-3.5 h-3.5"></i> Formes & Géométrie
-                    </h4>
-                    <div class="flex items-center justify-between text-xs text-zinc-300">
-                        <span>Arrondi des cartes :</span>
-                        <select id="radius-select" onchange="updateStyleSetting('cardRadius', this.value)" class="bg-zinc-900 border border-zinc-700 rounded px-2 py-1 text-xs text-zinc-200">
-                            <option value="0rem">Carré pur (0px)</option>
-                            <option value="0.375rem">Subtil (6px)</option>
-                            <option value="0.5rem" selected>Standard (8px)</option>
-                            <option value="1rem">Arrondi fort (16px)</option>
-                            <option value="1.5rem">Pilule / Maximum (24px)</option>
-                        </select>
-                    </div>
-                    <div class="flex items-center justify-between text-xs text-zinc-300">
-                        <span>Couleur des bordures :</span>
-                        <input type="color" id="border-color-picker" value="#27272a" onchange="updateStyleSetting('borderColor', this.value)" class="w-7 h-7 rounded bg-transparent cursor-pointer border border-zinc-700">
-                    </div>
-                    <div class="flex flex-col gap-1 pt-1">
-                        <label class="text-[11px] text-zinc-400">Date de création du site :</label>
-                        <input type="datetime-local" id="site-created-input" onchange="updateCreatedDate(this.value)" class="bg-zinc-950 border border-zinc-800 rounded px-2 py-1 text-xs text-zinc-200 mono">
-                    </div>
-                </div>
-
-                <div class="surface-card p-4 flex flex-col gap-3">
-                    <h4 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
-                        <i data-lucide="layout" class="w-3.5 h-3.5"></i> Disposition & Widgets
-                    </h4>
-                    <label class="flex items-center justify-between text-xs text-zinc-300 cursor-pointer">
-                        <span>Afficher Barre de Saisie</span>
-                        <input type="checkbox" id="toggle-capture" checked onchange="updateToggleSetting('showCapture', this.checked)" class="rounded bg-zinc-900 border-zinc-700">
-                    </label>
-                    <label class="flex items-center justify-between text-xs text-zinc-300 cursor-pointer">
-                        <span>Afficher Widget Notes</span>
-                        <input type="checkbox" id="toggle-notes" checked onchange="updateToggleSetting('showNotes', this.checked)" class="rounded bg-zinc-900 border-zinc-700">
-                    </label>
-                    <label class="flex items-center justify-between text-xs text-zinc-300 cursor-pointer">
-                        <span>Afficher Compteur En Ligne</span>
-                        <input type="checkbox" id="toggle-online" checked onchange="updateToggleSetting('showOnline', this.checked)" class="rounded bg-zinc-900 border-zinc-700">
-                    </label>
-                    <label class="flex items-center justify-between text-xs text-zinc-300 cursor-pointer">
-                        <span>Afficher Compteur Création</span>
-                        <input type="checkbox" id="toggle-uptime" checked onchange="updateToggleSetting('showUptime', this.checked)" class="rounded bg-zinc-900 border-zinc-700">
-                    </label>
-                    <button onclick="exportData()" class="mt-2 text-xs py-1.5 px-3 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-700 transition">Exporter ma configuration (JSON)</button>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Main Content -->
-    <main class="flex-1 max-w-7xl w-full mx-auto px-6 py-8 flex flex-col gap-8">
-
-        <!-- Smart Capture Bar -->
-        <section id="capture-section" class="max-w-2xl w-full mx-auto flex flex-col gap-2">
-            <div class="relative flex items-center gap-2 surface-card border px-4 py-3 shadow-lg">
-                <i data-lucide="terminal" class="w-4 h-4 shrink-0" style="color: var(--text-muted);"></i>
-                <input 
-                    type="text" 
-                    id="smart-input" 
-                    placeholder="Écris ton texte ou colle ton lien, puis choisis où l'envoyer..." 
-                    class="w-full bg-transparent focus:outline-none text-sm"
-                    style="color: var(--text-main);"
-                    autocomplete="off"
-                >
-
-                <div class="flex items-center gap-1 p-1 rounded border shrink-0" style="background-color: var(--bg-color); border-color: var(--border-color);">
-                    <button type="button" onclick="setTargetDestination('link')" id="btn-dest-link" class="dest-btn text-[11px] px-2.5 py-1 rounded flex items-center gap-1" style="color: var(--text-muted);">
-                        <i data-lucide="link" class="w-3 h-3"></i> <span id="lbl-dest-link">Lien</span>
-                    </button>
-                    <button type="button" onclick="setTargetDestination('task')" id="btn-dest-task" class="dest-btn active text-[11px] px-2.5 py-1 rounded flex items-center gap-1" style="color: var(--text-muted);">
-                        <i data-lucide="check-square" class="w-3 h-3"></i> <span id="lbl-dest-task">Tâche</span>
-                    </button>
-                    <button type="button" onclick="setTargetDestination('note')" id="btn-dest-note" class="dest-btn text-[11px] px-2.5 py-1 rounded flex items-center gap-1" style="color: var(--text-muted);">
-                        <i data-lucide="file-text" class="w-3 h-3"></i> <span id="lbl-dest-note">Note</span>
-                    </button>
-                    <button type="button" onclick="submitSmartInput()" class="ml-1 px-2.5 py-1 rounded accent-bg text-[11px] font-semibold hover:opacity-90 flex items-center gap-1">
-                        <i data-lucide="corner-down-left" class="w-3 h-3"></i>
-                    </button>
+                <div class="flex items-center gap-1 bg-zinc-950 p-1 rounded-lg border border-zinc-800 shrink-0 self-end sm:self-auto">
+                    <button type="button" onclick="setDest('link')" id="btn-link" class="dest-btn text-[11px] px-2.5 py-1 rounded-md text-zinc-400 flex items-center gap-1"><i data-lucide="link" class="w-3 h-3"></i> Lien</button>
+                    <button type="button" onclick="setDest('task')" id="btn-task" class="dest-btn active text-[11px] px-2.5 py-1 rounded-md text-zinc-400 flex items-center gap-1"><i data-lucide="check-square" class="w-3 h-3"></i> Tâche</button>
+                    <button type="button" onclick="setDest('note')" id="btn-note" class="dest-btn text-[11px] px-2.5 py-1 rounded-md text-zinc-400 flex items-center gap-1"><i data-lucide="file-text" class="w-3 h-3"></i> Note</button>
+                    <button type="button" onclick="setDest('web')" id="btn-web" class="dest-btn text-[11px] px-2.5 py-1 rounded-md text-zinc-400 flex items-center gap-1"><i data-lucide="search" class="w-3 h-3"></i> Web</button>
+                    <button type="button" onclick="submitInput()" class="ml-1 px-2.5 py-1 rounded-md bg-emerald-400 text-zinc-950 text-[11px] font-semibold hover:bg-emerald-300"><i data-lucide="corner-down-left" class="w-3 h-3"></i></button>
                 </div>
             </div>
         </section>
 
-        <!-- Layout Grille -->
-        <div id="main-grid-container" class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            
-            <!-- Liens -->
-            <section id="main-links-section" class="lg:col-span-8 flex flex-col gap-4">
-                <div class="flex items-center justify-between border-b pb-2.5" style="border-color: var(--border-color);">
-                    <h2 id="title-links-heading" class="text-xs font-semibold uppercase tracking-wider flex items-center gap-2" style="color: var(--text-muted);">
-                        <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i>
-                        Accès rapides
-                    </h2>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <section class="lg:col-span-8 flex flex-col gap-4">
+                <div class="flex items-center justify-between border-b border-zinc-800/80 pb-2.5">
+                    <h2 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-2"><i data-lucide="layout-grid" class="w-3.5 h-3.5"></i> Accès rapides</h2>
                     <div class="flex items-center gap-3">
-                        <span class="text-xs" style="color: var(--text-muted);" id="links-count">0 liens</span>
-                        <button onclick="openWorkspaceModal()" class="text-xs px-2.5 py-1 rounded surface-card hover:opacity-90 transition flex items-center gap-1" style="color: var(--text-main);">
-                            <i data-lucide="plus" class="w-3 h-3"></i> <span id="lbl-add-ws">Espace groupé</span>
-                        </button>
+                        <span class="text-xs text-zinc-500" id="links-count">0 liens</span>
+                        <button type="button" onclick="openWsModal()" class="text-xs px-2.5 py-1 rounded-md bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 flex items-center gap-1"><i data-lucide="plus" class="w-3 h-3"></i> Espace groupé</button>
                     </div>
                 </div>
-
                 <div id="links-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3"></div>
             </section>
 
-            <!-- Sidebar -->
-            <aside id="sidebar-section" class="lg:col-span-4 flex flex-col gap-6">
-                <div class="surface-card rounded-lg p-4 flex flex-col gap-3">
-                    <div class="flex items-center justify-between border-b pb-2.5" style="border-color: var(--border-color);">
-                        <h3 id="title-tasks-heading" class="text-xs font-semibold uppercase tracking-wider flex items-center gap-2" style="color: var(--text-muted);">
-                            <i data-lucide="check-square" class="w-3.5 h-3.5"></i>
-                            À faire
-                        </h3>
-                    </div>
+            <aside class="lg:col-span-4 flex flex-col gap-6">
+                <div class="surface-card p-4 flex flex-col gap-3">
+                    <h3 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 border-b border-zinc-800/80 pb-2.5 flex items-center gap-2"><i data-lucide="check-square" class="w-3.5 h-3.5"></i> À faire</h3>
                     <ul id="tasks-list" class="flex flex-col gap-2 max-h-64 overflow-y-auto pr-1"></ul>
                 </div>
-
-                <div id="notes-widget-container" class="surface-card rounded-lg p-4 flex flex-col gap-3">
-                    <div class="flex items-center justify-between border-b pb-2.5" style="border-color: var(--border-color);">
-                        <h3 id="title-notes-heading" class="text-xs font-semibold uppercase tracking-wider flex items-center gap-2" style="color: var(--text-muted);">
-                            <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
-                            Notes rapides
-                        </h3>
-                    </div>
+                <div class="surface-card p-4 flex flex-col gap-3">
+                    <h3 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 border-b border-zinc-800/80 pb-2.5 flex items-center gap-2"><i data-lucide="file-text" class="w-3.5 h-3.5"></i> Notes rapides</h3>
                     <div id="notes-list" class="flex flex-col gap-2 max-h-72 overflow-y-auto pr-1"></div>
                 </div>
             </aside>
         </div>
     </main>
 
-    <!-- Pop-up Nouveautés MAJ v1.1 (fermable avec une croix) -->
-    <div id="changelog-modal" class="fixed inset-0 bg-black/80 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
-        <div class="surface-card rounded-lg max-w-md w-full p-6 flex flex-col gap-4 shadow-2xl">
-            <div class="flex items-center justify-between border-b pb-3" style="border-color: var(--border-color);">
+    <!-- Modale MAJ v1.1.2 -->
+    <div id="changelog-modal" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4">
+        <div class="surface-card max-w-md w-full p-6 flex flex-col gap-4">
+            <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
                 <div class="flex items-center gap-2">
-                    <span class="text-xs mono px-2 py-0.5 rounded bg-emerald-950/60 border border-emerald-800/60 text-emerald-400 font-semibold">v1.1</span>
-                    <h3 id="lbl-changelog-title" class="font-semibold text-base" style="color: var(--text-main);">Nouveautés de la mise à jour v1.1</h3>
+                    <span class="text-xs mono px-2 py-0.5 rounded bg-emerald-400 text-zinc-950 font-semibold">v1.1.2</span>
+                    <h3 class="font-semibold text-base">Nouveautés de la mise à jour v1.1.2</h3>
                 </div>
-                <button type="button" onclick="closeChangelogModal()" aria-label="Fermer" class="p-1 rounded hover:opacity-80" style="color: var(--text-muted);">
-                    <i data-lucide="x" class="w-4 h-4"></i>
-                </button>
+                <button type="button" onclick="closeModal('changelog-modal')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
-            <ul id="changelog-list-v11" class="flex flex-col gap-2.5 text-xs leading-relaxed" style="color: var(--text-main);">
-                <li class="flex items-start gap-2">
-                    <span class="text-amber-400 font-bold">•</span>
-                    <span><strong>Compteur en temps réel depuis la création du site :</strong> affiche les jours, heures, minutes et secondes écoulés, réglable depuis le Studio Admin.</span>
-                </li>
-                <li class="flex items-start gap-2">
-                    <span class="text-emerald-400 font-bold">•</span>
-                    <span><strong>Statistiques visiteurs uniques (Admin) :</strong> comptage par identifiant unique d'appareil pour ne pas compter plusieurs fois le même visiteur.</span>
-                </li>
-                <li class="flex items-start gap-2">
-                    <span class="text-sky-400 font-bold">•</span>
-                    <span><strong>Espace Commentaires en modale :</strong> bouton dédié dans le header ouvrant une fenêtre de retours synchronisée en temps réel.</span>
-                </li>
-                <li class="flex items-start gap-2">
-                    <span class="text-purple-400 font-bold">•</span>
-                    <span><strong>Support FR / EN étendu :</strong> traduction des nouveaux compteurs et de la fenêtre de commentaires.</span>
-                </li>
+            <ul class="flex flex-col gap-2 text-xs text-zinc-300 leading-relaxed">
+                <li>• <strong class="text-emerald-400">Recherche web directe :</strong> utilise le mode <em>Web</em> ou tape <code>? ta recherche</code> / <code>g ta recherche</code>.</li>
+                <li>• <strong class="text-emerald-400">Noms de liens personnalisés :</strong> donne le nom que tu veux (ex. <code>didi</code> ou <code>didi | discord.com</code>) ou clique sur le crayon pour renommer.</li>
+                <li>• <strong class="text-emerald-400">Raccourcis clavier :</strong> <code>/</code> ou <code>Ctrl+K</code> pour écrire, <code>Alt+1..4</code> pour changer de mode, <code>?</code> pour l'aide.</li>
+                <li>• <strong class="text-emerald-400">Minuteur Pomodoro :</strong> sessions Focus (25 min) et Pause (5 min) dans la barre du haut.</li>
             </ul>
-            <button type="button" onclick="closeChangelogModal()" class="w-full accent-bg py-2 rounded text-xs font-semibold hover:opacity-90 mt-1">Compris</button>
+            <button type="button" onclick="closeModal('changelog-modal')" class="w-full bg-emerald-400 text-zinc-950 py-2 rounded-lg text-xs font-semibold">Compris</button>
         </div>
     </div>
 
-    <!-- Modale Commentaires Publics -->
-    <div id="comments-modal" class="fixed inset-0 bg-black/80 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
-        <div class="surface-card rounded-lg max-w-xl w-full p-6 flex flex-col gap-4 shadow-2xl max-h-[85vh]">
-            <div class="flex items-center justify-between border-b pb-3" style="border-color: var(--border-color);">
-                <div class="flex items-center gap-2">
-                    <i data-lucide="message-square" class="w-4 h-4 text-sky-400"></i>
-                    <h3 id="lbl-comments-modal-title" class="font-semibold text-base" style="color: var(--text-main);">Espace Commentaires & Retours</h3>
-                </div>
-                <button onclick="closeCommentsModal()" class="p-1" style="color: var(--text-muted);"><i data-lucide="x" class="w-4 h-4"></i></button>
+    <!-- Modale Raccourcis -->
+    <div id="shortcuts-modal" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4">
+        <div class="surface-card max-w-md w-full p-6 flex flex-col gap-3 text-xs">
+            <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+                <h3 class="font-semibold text-sm">Raccourcis clavier</h3>
+                <button type="button" onclick="closeModal('shortcuts-modal')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
-            <p id="lbl-comments-subtitle" class="text-xs" style="color: var(--text-muted);">Laisse un avis, une idée ou signale un bug — visible par tous les visiteurs.</p>
-            <div id="public-comments-list" class="flex-1 overflow-y-auto flex flex-col gap-2.5 pr-1 min-h-[180px] max-h-[340px]"></div>
-            <form onsubmit="submitPublicComment(event)" class="flex flex-col gap-2.5 pt-3 border-t" style="border-color: var(--border-color);">
-                <div class="flex gap-2">
-                    <input type="text" id="comment-author-input" maxlength="25" placeholder="Ton pseudo (optionnel)" class="w-1/3 rounded px-3 py-2 text-xs border focus:outline-none" style="background-color: var(--bg-color); border-color: var(--border-color); color: var(--text-main);">
-                    <input type="text" id="comment-text-input" maxlength="300" required placeholder="Écris ton commentaire ici..." class="flex-1 rounded px-3 py-2 text-xs border focus:outline-none" style="background-color: var(--bg-color); border-color: var(--border-color); color: var(--text-main);">
-                    <button type="submit" id="lbl-comment-send" class="accent-bg px-4 py-2 rounded text-xs font-semibold hover:opacity-90 shrink-0">Envoyer</button>
-                </div>
-            </form>
+            <div class="flex justify-between py-1"><span>Focus barre saisie</span><kbd class="mono bg-zinc-900 px-2 py-0.5 rounded">/ ou Ctrl+K</kbd></div>
+            <div class="flex justify-between py-1"><span>Modes Lien / Tâche / Note / Web</span><kbd class="mono bg-zinc-900 px-2 py-0.5 rounded">Alt + 1..4</kbd></div>
+            <div class="flex justify-between py-1"><span>Recherche Google directe</span><kbd class="mono bg-zinc-900 px-2 py-0.5 rounded">? mot-clé</kbd></div>
+            <div class="flex justify-between py-1"><span>Fermer modale</span><kbd class="mono bg-zinc-900 px-2 py-0.5 rounded">Échap</kbd></div>
         </div>
     </div>
 
-    <!-- Modale Contexte Lien -->
-    <div id="context-modal" class="fixed inset-0 bg-black/75 z-50 hidden items-center justify-center p-4">
-        <div class="surface-card rounded-lg max-w-lg w-full p-6 flex flex-col gap-5 shadow-2xl">
-            <div class="flex items-start justify-between gap-4 border-b pb-4" style="border-color: var(--border-color);">
-                <div class="flex items-center gap-3">
-                    <img id="modal-favicon" src="" alt="" class="w-7 h-7 rounded p-1 border" style="background-color: var(--bg-color); border-color: var(--border-color);">
-                    <div>
-                        <h3 id="modal-title" class="font-semibold text-base" style="color: var(--text-main);">Titre</h3>
-                        <a id="modal-url" href="#" target="_blank" class="text-xs underline truncate block max-w-xs" style="color: var(--text-muted);">https://...</a>
-                    </div>
-                </div>
-                <button onclick="closeContextModal()" class="p-1" style="color: var(--text-muted);"><i data-lucide="x" class="w-4 h-4"></i></button>
+    <!-- Modale Espace -->
+    <div id="ws-modal" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4">
+        <div class="surface-card max-w-md w-full p-6 flex flex-col gap-4">
+            <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+                <h3 class="font-semibold text-base">Nouvel espace groupé</h3>
+                <button type="button" onclick="closeModal('ws-modal')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
-            <div id="modal-attached-items" class="flex flex-col gap-2 max-h-48 overflow-y-auto"></div>
-            <div class="flex gap-2 pt-2 border-t" style="border-color: var(--border-color);">
-                <input type="text" id="modal-quick-add" placeholder="Ajouter une note liée..." class="flex-1 rounded px-3 py-2 text-sm border focus:outline-none" style="background-color: var(--bg-color); border-color: var(--border-color); color: var(--text-main);">
-                <button onclick="addContextItemFromModal()" id="lbl-modal-add" class="accent-bg px-4 py-2 rounded text-sm font-medium">Ajouter</button>
-            </div>
+            <input type="text" id="ws-name" placeholder="Nom (ex: Gaming, Cours...)" class="bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none">
+            <div id="ws-selection" class="flex flex-col gap-1.5 max-h-40 overflow-y-auto bg-zinc-950 p-2.5 rounded-lg border border-zinc-800"></div>
+            <button type="button" onclick="saveWs()" class="w-full bg-emerald-400 text-zinc-950 py-2 rounded-lg text-sm font-semibold">Enregistrer</button>
         </div>
     </div>
 
-    <!-- Modale Nouvel Espace -->
-    <div id="workspace-modal" class="fixed inset-0 bg-black/75 z-50 hidden items-center justify-center p-4">
-        <div class="surface-card rounded-lg max-w-md w-full p-6 flex flex-col gap-4 shadow-2xl">
-            <div class="flex items-center justify-between border-b pb-3" style="border-color: var(--border-color);">
-                <h3 id="lbl-ws-modal-title" class="font-semibold text-base" style="color: var(--text-main);">Nouvel espace groupé</h3>
-                <button onclick="closeWorkspaceModal()" style="color: var(--text-muted);"><i data-lucide="x" class="w-4 h-4"></i></button>
-            </div>
-            <input type="text" id="ws-name" placeholder="Nom de l'espace (ex: Gaming, Cours...)" class="rounded px-3 py-2 text-sm border focus:outline-none" style="background-color: var(--bg-color); border-color: var(--border-color); color: var(--text-main);">
-            <div id="ws-links-selection" class="flex flex-col gap-1.5 max-h-40 overflow-y-auto p-2.5 rounded border" style="background-color: var(--bg-color); border-color: var(--border-color);"></div>
-            <button onclick="saveWorkspace()" id="lbl-ws-save" class="w-full accent-bg py-2 rounded text-sm font-medium">Enregistrer</button>
-        </div>
-    </div>
-
-    <div id="toast" class="fixed bottom-5 right-5 accent-bg px-4 py-2.5 rounded shadow-xl text-xs font-medium transform translate-y-20 opacity-0 transition-all duration-200 z-50 flex items-center gap-2">
-        <i data-lucide="check" class="w-3.5 h-3.5"></i> <span id="toast-msg">Action effectuée</span>
-    </div>
+    <div id="toast" class="fixed bottom-5 right-5 bg-emerald-400 text-zinc-950 px-4 py-2 rounded-lg shadow-xl text-xs font-semibold transform translate-y-20 opacity-0 transition-all duration-200 z-50"></div>
 
     <script>
-        const DEFAULT_SITE_CREATION_ISO = '2026-11-20T18:00:00';
-
-        const i18n = {
-            fr: {
-                modeBadge: 'Espace Privé',
-                online: 'en ligne',
-                uptimePrefix: 'Créé il y a',
-                dayUnit: 'j',
-                workspaces: 'Espaces :',
-                commentsBtn: 'Commentaires',
-                linksTitle: 'Accès rapides',
-                tasksTitle: 'À faire',
-                notesTitle: 'Notes rapides',
-                searchPlaceholder: "Écris ton texte ou colle ton lien, puis choisis où l'envoyer...",
-                destLink: 'Lien',
-                destTask: 'Tâche',
-                destNote: 'Note',
-                addWs: 'Espace groupé',
-                linkUnit: 'lien',
-                linksUnit: 'liens',
-                noTasks: 'Aucune tâche.',
-                noNotes: 'Aucune note.',
-                commentsModalTitle: 'Espace Commentaires & Retours',
-                commentsSubtitle: 'Laisse un avis, une idée ou signale un bug — visible par tous les visiteurs.',
-                commentAuthorPlaceholder: 'Ton pseudo (optionnel)',
-                commentTextPlaceholder: 'Écris ton commentaire ici...',
-                commentSend: 'Envoyer',
-                noComments: 'Aucun commentaire pour le moment. Sois le premier à écrire !',
-                wsModalTitle: 'Nouvel espace groupé',
-                wsNamePlaceholder: "Nom de l'espace (ex: Gaming, Cours...)",
-                wsSave: 'Enregistrer',
-                modalQuickAdd: 'Ajouter une note liée...',
-                modalAdd: 'Ajouter',
-                changelogTitle: 'Nouveautés de la mise à jour v1.1',
-                toastLinkAdded: 'Ajouté aux liens',
-                toastTaskAdded: 'Ajouté aux tâches',
-                toastNoteAdded: 'Ajouté aux notes',
-                toastCommentAdded: 'Commentaire publié !',
-                toastLangChanged: 'Langue : Français'
-            },
-            en: {
-                modeBadge: 'Private Space',
-                online: 'online',
-                uptimePrefix: 'Live for',
-                dayUnit: 'd',
-                workspaces: 'Workspaces:',
-                commentsBtn: 'Comments',
-                linksTitle: 'Quick Access',
-                tasksTitle: 'To-Do',
-                notesTitle: 'Quick Notes',
-                searchPlaceholder: 'Type text or paste a URL, then pick where to send it...',
-                destLink: 'Link',
-                destTask: 'Task',
-                destNote: 'Note',
-                addWs: 'New Group',
-                linkUnit: 'link',
-                linksUnit: 'links',
-                noTasks: 'No tasks yet.',
-                noNotes: 'No notes yet.',
-                commentsModalTitle: 'Community Comments & Feedback',
-                commentsSubtitle: 'Leave feedback, share an idea, or report a bug — visible to all visitors.',
-                commentAuthorPlaceholder: 'Your nickname (optional)',
-                commentTextPlaceholder: 'Write your comment here...',
-                commentSend: 'Post',
-                noComments: 'No comments yet. Be the first to post!',
-                wsModalTitle: 'New Link Group',
-                wsNamePlaceholder: 'Group name (e.g. Gaming, Work...)',
-                wsSave: 'Save',
-                modalQuickAdd: 'Add an attached note...',
-                modalAdd: 'Add',
-                changelogTitle: "What's New in Update v1.1",
-                toastLinkAdded: 'Added to links',
-                toastTaskAdded: 'Added to tasks',
-                toastNoteAdded: 'Added to notes',
-                toastCommentAdded: 'Comment posted!',
-                toastLangChanged: 'Language: English'
-            }
-        };
-
-        const defaultState = {
-            lang: 'fr',
+        const defaultData = {
             links: [
-                { id: 'l_docs', title: 'Google Docs', url: 'https://docs.google.com', clicks: 8, attached: [] },
-                { id: 'l_drive', title: 'Google Drive', url: 'https://drive.google.com', clicks: 7, attached: [] },
-                { id: 'l_notion', title: 'Notion', url: 'https://www.notion.so', clicks: 6, attached: [] },
-                { id: 'l_steam', title: 'SteamDB', url: 'https://steamdb.info', clicks: 9, attached: [] },
-                { id: 'l_gp', title: 'GamerPower', url: 'https://www.gamerpower.com', clicks: 8, attached: [] },
-                { id: 'l_discord', title: 'Discord', url: 'https://discord.com/app', clicks: 10, attached: [] },
-                { id: 'l_twitch', title: 'Twitch', url: 'https://www.twitch.tv', clicks: 5, attached: [] },
-                { id: 'l_yt', title: 'YouTube', url: 'https://www.youtube.com', clicks: 8, attached: [] },
-                { id: 'l_gh', title: 'GitHub', url: 'https://github.com', clicks: 7, attached: [] }
+                { id: 'l1', title: 'Google Docs', url: 'https://docs.google.com', clicks: 8 },
+                { id: 'l2', title: 'Discord', url: 'https://discord.com/app', clicks: 10 },
+                { id: 'l3', title: 'SteamDB', url: 'https://steamdb.info', clicks: 9 },
+                { id: 'l4', title: 'YouTube', url: 'https://www.youtube.com', clicks: 8 },
+                { id: 'l5', title: 'GitHub', url: 'https://github.com', clicks: 7 }
             ],
-            tasks: [{ id: 't1', text: 'Tester les espaces thématiques en haut', done: false }],
-            notes: [{ id: 'n1', text: 'Clique sur un espace (ex: Gaming) pour ouvrir tous ses onglets d’un coup.' }],
-            workspaces: [
-                { id: 'ws_office', name: '💼 Office', linkIds: ['l_docs', 'l_drive', 'l_notion'] },
-                { id: 'ws_gaming', name: '🎮 Gaming', linkIds: ['l_steam', 'l_gp', 'l_discord', 'l_twitch'] },
-                { id: 'ws_media', name: '🎧 Chill', linkIds: ['l_yt'] },
-                { id: 'ws_dev', name: '💻 Dev', linkIds: ['l_gh'] }
-            ],
-            settings: {
-                brandName: 'MyHub',
-                linksTitle: '',
-                tasksTitle: '',
-                notesTitle: '',
-                searchPlaceholder: '',
-                bgColor: '#09090b',
-                cardBg: '#111113',
-                borderColor: '#27272a',
-                accentColor: '#fafafa',
-                textMain: '#fafafa',
-                textMuted: '#a1a1aa',
-                cardRadius: '0.5rem',
-                createdAt: DEFAULT_SITE_CREATION_ISO,
-                showNotes: true,
-                showCapture: true,
-                showOnline: true,
-                showUptime: true
-            }
+            tasks: [{ id: 't1', text: 'Tester la recherche web rapide (? mot-clé)', done: false }],
+            notes: [{ id: 'n1', text: 'Astuce : tape didi | discord.com pour nommer ton lien !' }],
+            workspaces: [{ id: 'w1', name: '🎮 Gaming', linkIds: ['l2', 'l3'] }]
         };
+        let state = JSON.parse(localStorage.getItem('myhub_v112')) || defaultData;
+        let dest = 'task';
+        const esc = s => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+        const save = () => { localStorage.setItem('myhub_v112', JSON.stringify(state)); render(); };
+        const toast = m => { const el = document.getElementById('toast'); el.textContent = m; el.classList.remove('translate-y-20','opacity-0'); setTimeout(()=>el.classList.add('translate-y-20','opacity-0'), 2200); };
 
-        let state = JSON.parse(localStorage.getItem('myhub_v11_state')) || JSON.parse(JSON.stringify(defaultState));
-        if (!state.lang) state.lang = 'fr';
-        if (!state.settings.createdAt) state.settings.createdAt = DEFAULT_SITE_CREATION_ISO;
-
-        let selectedDestination = 'task';
-
-        function openChangelogModal() {
-            const m = document.getElementById('changelog-modal');
-            m.classList.remove('hidden');
-            m.classList.add('flex');
-            lucide.createIcons();
+        // Pomodoro
+        let pMode = 'focus', pSec = 25 * 60, pInt = null;
+        function updatePomo() {
+            document.getElementById('pomo-display').textContent = `${String(Math.floor(pSec/60)).padStart(2,'0')}:${String(pSec%60).padStart(2,'0')}`;
+            document.getElementById('pomo-mode').textContent = pMode === 'focus' ? 'Focus' : 'Pause';
         }
-
-        function closeChangelogModal() {
-            const m = document.getElementById('changelog-modal');
-            m.classList.add('hidden');
-            m.classList.remove('flex');
-        }
-
-        function updateSiteUptimeCounter() {
-            const el = document.getElementById('site-uptime-value');
-            if (!el) return;
-            const t = i18n[state.lang] || i18n.fr;
-            const createdMs = new Date(state.settings.createdAt || DEFAULT_SITE_CREATION_ISO).getTime();
-            const diffSec = Math.max(0, Math.floor((Date.now() - createdMs) / 1000));
-            const days = Math.floor(diffSec / 86400);
-            const hours = Math.floor((diffSec % 86400) / 3600);
-            const minutes = Math.floor((diffSec % 3600) / 60);
-            const seconds = diffSec % 60;
-            const pad = (n) => String(n).padStart(2, '0');
-            el.textContent = `${days}${t.dayUnit} ${pad(hours)}h ${pad(minutes)}m ${pad(seconds)}s`;
-        }
-
-        function updateCreatedDate(val) {
-            if (!val) return;
-            state.settings.createdAt = val;
-            updateSiteUptimeCounter();
-            saveState();
-        }
-
-        setInterval(updateSiteUptimeCounter, 1000);
-
-        const urlParams = new URLSearchParams(window.location.search);
-        let isAdmin = false;
-        if (urlParams.get('admin') === 'monpasssecure') {
-            isAdmin = true;
-            localStorage.setItem('myhub_is_admin', 'true');
-        } else if (localStorage.getItem('myhub_is_admin') === 'true') {
-            isAdmin = true;
-        }
-
-        let deviceId = localStorage.getItem('myhub_unique_device_id');
-        if (!deviceId) {
-            deviceId = 'dev_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 10);
-            localStorage.setItem('myhub_unique_device_id', deviceId);
-        }
-
-        let knownDevices = new Set(JSON.parse(localStorage.getItem('myhub_known_devices') || '[]'));
-        knownDevices.add(deviceId);
-        localStorage.setItem('myhub_known_devices', JSON.stringify([...knownDevices]));
-
-        function updateAdminVisitorDisplay() {
-            const el = document.getElementById('admin-unique-visitors-count');
-            if (el) el.textContent = knownDevices.size;
-        }
-
-        function lockAdminSession() {
-            localStorage.removeItem('myhub_is_admin');
-            isAdmin = false;
-            document.getElementById('admin-panel').classList.add('hidden');
-            document.getElementById('admin-trigger-btn').classList.add('hidden');
-            showToast('Session verrouillée en mode visiteur');
-        }
-
-        function resetToDefaults() {
-            if (confirm("Restaurer les espaces et liens par défaut ?")) {
-                const currentLang = state.lang;
-                state = JSON.parse(JSON.stringify(defaultState));
-                state.lang = currentLang;
-                saveState();
-                showToast('Restauré');
+        function togglePomodoroTimer() {
+            const ic = document.getElementById('pomo-icon');
+            if (pInt) { clearInterval(pInt); pInt = null; ic.setAttribute('data-lucide','play'); lucide.createIcons(); }
+            else {
+                ic.setAttribute('data-lucide','pause'); lucide.createIcons();
+                pInt = setInterval(() => {
+                    if (pSec > 0) { pSec--; updatePomo(); }
+                    else { clearInterval(pInt); pInt = null; togglePomodoroMode(); toast('Session terminée !'); }
+                }, 1000);
             }
         }
+        function resetPomodoro() { clearInterval(pInt); pInt = null; document.getElementById('pomo-icon').setAttribute('data-lucide','play'); pSec = pMode === 'focus' ? 25*60 : 5*60; updatePomo(); lucide.createIcons(); }
+        function togglePomodoroMode() { pMode = pMode === 'focus' ? 'break' : 'focus'; resetPomodoro(); }
 
-        if (isAdmin) {
-            document.getElementById('admin-trigger-btn').classList.remove('hidden');
-            updateAdminVisitorDisplay();
+        function setDest(d) {
+            dest = d;
+            ['link','task','note','web'].forEach(x => document.getElementById('btn-'+x).classList.toggle('active', x === d));
+            document.getElementById('custom-link-name').classList.toggle('hidden', d !== 'link');
+            const inp = document.getElementById('smart-input');
+            if (inp.value.trim()) submitInput(); else inp.focus();
         }
 
-        function saveState() {
-            localStorage.setItem('myhub_v11_state', JSON.stringify(state));
-            renderAll();
-        }
-
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            document.getElementById('toast-msg').textContent = msg;
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 2500);
-        }
-
-        function toggleLanguage() {
-            state.lang = state.lang === 'fr' ? 'en' : 'fr';
-            saveState();
-            updateSiteUptimeCounter();
-            showToast(i18n[state.lang].toastLangChanged);
-        }
-
-        function toggleAdminPanel() {
-            if (!isAdmin) return;
-            document.getElementById('admin-panel').classList.toggle('hidden');
-            updateAdminVisitorDisplay();
-        }
-
-        function updateStyleSetting(key, value) { state.settings[key] = value; applySettings(); saveState(); }
-        function updateTextSetting(key, value) { state.settings[key] = value; applySettings(); saveState(); }
-        function updateToggleSetting(key, value) { state.settings[key] = value; applySettings(); saveState(); }
-
-        function applySettings() {
-            const root = document.documentElement;
-            const s = state.settings;
-            const t = i18n[state.lang] || i18n.fr;
-            document.documentElement.lang = state.lang;
-            if (document.getElementById('current-lang-label')) document.getElementById('current-lang-label').textContent = state.lang.toUpperCase();
-            if (s.bgColor) root.style.setProperty('--bg-color', s.bgColor);
-            if (s.cardBg) root.style.setProperty('--card-bg', s.cardBg);
-            if (s.borderColor) root.style.setProperty('--border-color', s.borderColor);
-            if (s.accentColor) root.style.setProperty('--accent-color', s.accentColor);
-            if (s.cardRadius) root.style.setProperty('--card-radius', s.cardRadius);
-
-            if(document.getElementById('header-brand-name')) document.getElementById('header-brand-name').textContent = s.brandName || 'MyHub';
-            if(document.getElementById('page-title')) document.getElementById('page-title').textContent = (s.brandName || 'MyHub') + ' v1.1';
-            if(document.getElementById('mode-badge')) document.getElementById('mode-badge').textContent = t.modeBadge;
-            if(document.getElementById('lbl-online')) document.getElementById('lbl-online').textContent = t.online;
-            if(document.getElementById('lbl-uptime-prefix')) document.getElementById('lbl-uptime-prefix').textContent = t.uptimePrefix;
-            if(document.getElementById('lbl-comments-btn')) document.getElementById('lbl-comments-btn').textContent = t.commentsBtn;
-            if(document.getElementById('lbl-dest-link')) document.getElementById('lbl-dest-link').textContent = t.destLink;
-            if(document.getElementById('lbl-dest-task')) document.getElementById('lbl-dest-task').textContent = t.destTask;
-            if(document.getElementById('lbl-dest-note')) document.getElementById('lbl-dest-note').textContent = t.destNote;
-            if(document.getElementById('lbl-add-ws')) document.getElementById('lbl-add-ws').textContent = t.addWs;
-            if(document.getElementById('lbl-changelog-title')) document.getElementById('lbl-changelog-title').textContent = t.changelogTitle;
-            if(document.getElementById('lbl-comments-modal-title')) document.getElementById('lbl-comments-modal-title').textContent = t.commentsModalTitle;
-            if(document.getElementById('lbl-comments-subtitle')) document.getElementById('lbl-comments-subtitle').textContent = t.commentsSubtitle;
-            if(document.getElementById('comment-author-input')) document.getElementById('comment-author-input').placeholder = t.commentAuthorPlaceholder;
-            if(document.getElementById('comment-text-input')) document.getElementById('comment-text-input').placeholder = t.commentTextPlaceholder;
-            if(document.getElementById('lbl-comment-send')) document.getElementById('lbl-comment-send').textContent = t.commentSend;
-
-            const linksTitle = s.linksTitle || t.linksTitle;
-            const tasksTitle = s.tasksTitle || t.tasksTitle;
-            const notesTitle = s.notesTitle || t.notesTitle;
-            const placeholderText = s.searchPlaceholder || t.searchPlaceholder;
-
-            if(document.getElementById('title-links-heading')) document.getElementById('title-links-heading').innerHTML = `<i data-lucide="layout-grid" class="w-3.5 h-3.5"></i> ${linksTitle}`;
-            if(document.getElementById('title-tasks-heading')) document.getElementById('title-tasks-heading').innerHTML = `<i data-lucide="check-square" class="w-3.5 h-3.5"></i> ${tasksTitle}`;
-            if(document.getElementById('title-notes-heading')) document.getElementById('title-notes-heading').innerHTML = `<i data-lucide="file-text" class="w-3.5 h-3.5"></i> ${notesTitle}`;
-            if(document.getElementById('smart-input')) document.getElementById('smart-input').placeholder = placeholderText;
-
-            if(document.getElementById('txt-brand')) document.getElementById('txt-brand').value = s.brandName || '';
-            if(document.getElementById('txt-links')) document.getElementById('txt-links').value = s.linksTitle || '';
-            if(document.getElementById('txt-tasks')) document.getElementById('txt-tasks').value = s.tasksTitle || '';
-            if(document.getElementById('txt-notes')) document.getElementById('txt-notes').value = s.notesTitle || '';
-            if(document.getElementById('txt-placeholder')) document.getElementById('txt-placeholder').value = s.searchPlaceholder || '';
-            if(document.getElementById('bg-color-picker')) document.getElementById('bg-color-picker').value = s.bgColor || '#09090b';
-            if(document.getElementById('card-bg-picker')) document.getElementById('card-bg-picker').value = s.cardBg || '#111113';
-            if(document.getElementById('border-color-picker')) document.getElementById('border-color-picker').value = s.borderColor || '#27272a';
-            if(document.getElementById('accent-color-picker')) document.getElementById('accent-color-picker').value = s.accentColor || '#fafafa';
-            if(document.getElementById('radius-select')) document.getElementById('radius-select').value = s.cardRadius || '0.5rem';
-            if(document.getElementById('site-created-input')) document.getElementById('site-created-input').value = (s.createdAt || DEFAULT_SITE_CREATION_ISO).slice(0, 16);
-            if(document.getElementById('toggle-notes')) document.getElementById('toggle-notes').checked = s.showNotes;
-            if(document.getElementById('toggle-capture')) document.getElementById('toggle-capture').checked = s.showCapture;
-            if(document.getElementById('toggle-online')) document.getElementById('toggle-online').checked = s.showOnline !== false;
-            if(document.getElementById('toggle-uptime')) document.getElementById('toggle-uptime').checked = s.showUptime !== false;
-
-            const notesWidget = document.getElementById('notes-widget-container');
-            const mainSection = document.getElementById('main-links-section');
-            if (notesWidget) {
-                notesWidget.style.display = s.showNotes ? 'flex' : 'none';
-                mainSection.className = s.showNotes ? "lg:col-span-8 flex flex-col gap-4" : "lg:col-span-12 flex flex-col gap-4";
-            }
-            if (document.getElementById('capture-section')) document.getElementById('capture-section').style.display = s.showCapture ? 'block' : 'none';
-            if (document.getElementById('online-counter-badge')) document.getElementById('online-counter-badge').style.display = (s.showOnline !== false) ? 'flex' : 'none';
-            if (document.getElementById('uptime-counter-badge')) document.getElementById('uptime-counter-badge').style.display = (s.showUptime !== false) ? 'flex' : 'none';
-
-            updateSiteUptimeCounter();
-            lucide.createIcons();
-        }
-
-        function exportData() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
-            const dlAnchorElem = document.createElement('a');
-            dlAnchorElem.setAttribute("href", dataStr);
-            dlAnchorElem.setAttribute("download", "myhub_v11_config.json");
-            dlAnchorElem.click();
-            showToast('Export OK');
-        }
-
-        let globalSocket = null;
-        let publicComments = JSON.parse(localStorage.getItem('myhub_public_comments') || '[]');
-
-        function savePublicComments() {
-            localStorage.setItem('myhub_public_comments', JSON.stringify(publicComments));
-            renderCommentsList();
-        }
-
-        function escapeHTML(str) {
-            return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
-        }
-
-        function renderCommentsList() {
-            const container = document.getElementById('public-comments-list');
-            const badge = document.getElementById('comments-badge-count');
-            const t = i18n[state.lang] || i18n.fr;
-            if (badge) badge.textContent = publicComments.length;
-            if (!container) return;
-            if (publicComments.length === 0) {
-                container.innerHTML = `<div class="text-center py-8 text-xs" style="color: var(--text-muted);">${t.noComments}</div>`;
-                return;
-            }
-            const sorted = [...publicComments].sort((a, b) => b.timestamp - a.timestamp);
-            container.innerHTML = sorted.map(c => {
-                const dateStr = new Date(c.timestamp).toLocaleDateString(state.lang === 'fr' ? 'fr-FR' : 'en-US', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
-                const deleteBtn = isAdmin ? `<button onclick="deletePublicComment('${c.id}')" class="text-zinc-500 hover:text-red-400"><i data-lucide="trash-2" class="w-3 h-3"></i></button>` : '';
-                return `
-                    <div class="p-3 rounded border flex flex-col gap-1" style="background-color: var(--bg-color); border-color: var(--border-color);">
-                        <div class="flex items-center justify-between gap-2">
-                            <span class="text-xs font-semibold text-sky-400">${escapeHTML(c.author || 'Anonyme')}</span>
-                            <div class="flex items-center gap-2">
-                                <span class="text-[10px] mono" style="color: var(--text-muted);">${dateStr}</span>
-                                ${deleteBtn}
-                            </div>
-                        </div>
-                        <p class="text-xs leading-relaxed break-words" style="color: var(--text-main);">${escapeHTML(c.text)}</p>
-                    </div>`;
-            }).join('');
-            lucide.createIcons();
-        }
-
-        function openCommentsModal() {
-            renderCommentsList();
-            const m = document.getElementById('comments-modal');
-            m.classList.remove('hidden'); m.classList.add('flex');
-        }
-
-        function closeCommentsModal() {
-            const m = document.getElementById('comments-modal');
-            m.classList.add('hidden'); m.classList.remove('flex');
-        }
-
-        function submitPublicComment(e) {
-            e.preventDefault();
-            const authorEl = document.getElementById('comment-author-input');
-            const textEl = document.getElementById('comment-text-input');
-            const text = textEl.value.trim();
-            if (!text) return;
-            const commentObj = {
-                id: 'cmt_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
-                author: authorEl.value.trim() || (state.lang === 'fr' ? 'Visiteur' : 'Visitor'),
-                text,
-                timestamp: Date.now()
-            };
-            publicComments.push(commentObj);
-            savePublicComments();
-            textEl.value = '';
-            showToast(i18n[state.lang].toastCommentAdded);
-            if (globalSocket && globalSocket.readyState === WebSocket.OPEN) {
-                globalSocket.send(JSON.stringify({ type: 'new_comment', comment: commentObj }));
-            }
-        }
-
-        function deletePublicComment(id) {
-            if (!isAdmin) return;
-            publicComments = publicComments.filter(c => c.id !== id);
-            savePublicComments();
-        }
-
-        function syncVisitorStats() {
-            updateAdminVisitorDisplay();
-            showToast('Statistiques actualisées');
-        }
-
-        (function initRealtimeNetwork() {
-            const activeDevices = new Map();
-            activeDevices.set(deviceId, Date.now());
-            function updateOnlineUI() {
-                const now = Date.now();
-                for (const [id, lastSeen] of activeDevices.entries()) {
-                    if (id !== deviceId && now - lastSeen > 12000) activeDevices.delete(id);
-                }
-                const el = document.getElementById('online-count');
-                if (el) el.textContent = activeDevices.size;
-            }
-            if ('BroadcastChannel' in window) {
-                const bc = new BroadcastChannel('myhub_presence_local');
-                bc.onmessage = (e) => {
-                    if (e.data && e.data.deviceId) {
-                        if (e.data.type === 'bye') activeDevices.delete(e.data.deviceId);
-                        else activeDevices.set(e.data.deviceId, Date.now());
-                        updateOnlineUI();
-                    }
-                };
-                setInterval(() => bc.postMessage({ type: 'ping', deviceId }), 3000);
-            }
-            setInterval(updateOnlineUI, 3000);
-        })();
-
-        const smartInput = document.getElementById('smart-input');
-        function setTargetDestination(dest) {
-            selectedDestination = dest;
-            ['link', 'task', 'note'].forEach(d => {
-                const btn = document.getElementById('btn-dest-' + d);
-                if (btn) btn.classList.toggle('active', d === dest);
-            });
-            if (smartInput && smartInput.value.trim() !== '') submitSmartInput();
-            else if (smartInput) smartInput.focus();
-        }
-
-        function submitSmartInput() {
-            if (!smartInput) return;
-            const raw = smartInput.value.trim();
+        function submitInput() {
+            const inp = document.getElementById('smart-input');
+            const nameInp = document.getElementById('custom-link-name');
+            let raw = inp.value.trim();
             if (!raw) return;
-            const t = i18n[state.lang] || i18n.fr;
-            if (selectedDestination === 'link') {
-                let url = raw.startsWith('http://') || raw.startsWith('https://') ? raw : 'https://' + raw;
-                let title = url;
-                try {
-                    const parsed = new URL(url);
-                    title = parsed.hostname.replace('www.', '').split('.')[0];
-                    title = title.charAt(0).toUpperCase() + title.slice(1);
-                } catch (e) {}
-                state.links.unshift({ id: 'l_' + Date.now(), title, url, clicks: 1, attached: [] });
-                showToast(t.toastLinkAdded);
-            } else if (selectedDestination === 'task') {
-                state.tasks.unshift({ id: 't_' + Date.now(), text: raw, done: false });
-                showToast(t.toastTaskAdded);
-            } else {
-                state.notes.unshift({ id: 'n_' + Date.now(), text: raw });
-                showToast(t.toastNoteAdded);
+            if (raw.startsWith('?') || raw.toLowerCase().startsWith('g ')) {
+                const q = raw.startsWith('?') ? raw.slice(1).trim() : raw.slice(2).trim();
+                if (q) window.open('https://www.google.com/search?q=' + encodeURIComponent(q), '_blank');
+                inp.value = ''; return;
             }
-            smartInput.value = '';
-            saveState();
+            if (dest === 'web') { window.open('https://www.google.com/search?q=' + encodeURIComponent(raw), '_blank'); inp.value = ''; return; }
+            if (dest === 'link') {
+                let title = nameInp.value.trim();
+                if (!title && raw.includes('|')) { const p = raw.split('|'); title = p[0].trim(); raw = p.slice(1).join('|').trim(); }
+                const url = raw.startsWith('http') ? raw : 'https://' + raw;
+                if (!title) { try { const h = new URL(url).hostname.replace('www.','').split('.')[0]; title = h[0].toUpperCase() + h.slice(1); } catch { title = raw; } }
+                state.links.unshift({ id: 'l'+Date.now(), title, url, clicks: 1 });
+                nameInp.value = ''; toast('Lien ajouté');
+            } else if (dest === 'task') { state.tasks.unshift({ id: 't'+Date.now(), text: raw, done: false }); toast('Tâche ajoutée'); }
+            else { state.notes.unshift({ id: 'n'+Date.now(), text: raw }); toast('Note ajoutée'); }
+            inp.value = ''; save();
         }
 
-        if (smartInput) {
-            smartInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' && smartInput.value.trim() !== '') submitSmartInput();
-            });
-        }
+        document.getElementById('smart-input').addEventListener('keydown', e => { if (e.key === 'Enter') submitInput(); });
+        document.getElementById('custom-link-name').addEventListener('keydown', e => { if (e.key === 'Enter') submitInput(); });
+        document.addEventListener('keydown', e => {
+            const tag = document.activeElement?.tagName.toLowerCase();
+            const typing = tag === 'input' || tag === 'textarea';
+            if (e.key === 'Escape') { ['changelog-modal','shortcuts-modal','ws-modal'].forEach(closeModal); return; }
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); document.getElementById('smart-input').focus(); }
+            else if (e.altKey && ['1','2','3','4'].includes(e.key)) { e.preventDefault(); setDest({'1':'link','2':'task','3':'note','4':'web'}[e.key]); }
+            else if (!typing && e.key === '/') { e.preventDefault(); document.getElementById('smart-input').focus(); }
+            else if (!typing && e.key === '?') { e.preventDefault(); openShortcuts(); }
+        });
 
-        function renderLinks() {
-            const grid = document.getElementById('links-grid');
-            const t = i18n[state.lang] || i18n.fr;
-            document.getElementById('links-count').textContent = `${state.links.length} ${state.links.length > 1 ? t.linksUnit : t.linkUnit}`;
-            const sortedLinks = [...state.links].sort((a, b) => b.clicks - a.clicks);
-            grid.innerHTML = sortedLinks.map((link) => {
-                let domain = link.url;
-                try { domain = new URL(link.url).hostname; } catch (e) {}
-                const favicon = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
-                return `
-                    <div class="link-card surface-card p-3.5 flex flex-col justify-between gap-3 cursor-pointer" onclick="openLink('${link.id}', '${link.url}')">
-                        <div class="flex items-start justify-between gap-2">
-                            <div class="flex items-center gap-3 overflow-hidden">
-                                <img src="${favicon}" alt="" class="w-6 h-6 rounded p-0.5 border shrink-0" style="background-color: var(--bg-color); border-color: var(--border-color);">
-                                <div class="truncate">
-                                    <h3 class="font-medium text-sm truncate" style="color: var(--text-main);">${escapeHTML(link.title)}</h3>
-                                    <p class="text-[11px] truncate" style="color: var(--text-muted);">${escapeHTML(domain)}</p>
-                                </div>
-                            </div>
-                            <button onclick="event.stopPropagation(); deleteLink('${link.id}')" class="p-1.5 rounded hover:text-red-400" style="color: var(--text-muted);"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
-                        </div>
-                    </div>`;
-            }).join('');
+        function openChangelog() { const m = document.getElementById('changelog-modal'); m.classList.remove('hidden'); m.classList.add('flex'); lucide.createIcons(); }
+        function openShortcuts() { const m = document.getElementById('shortcuts-modal'); m.classList.remove('hidden'); m.classList.add('flex'); lucide.createIcons(); }
+        function closeModal(id) { const m = document.getElementById(id); m.classList.add('hidden'); m.classList.remove('flex'); }
+        function openWsModal() {
+            document.getElementById('ws-selection').innerHTML = state.links.map(l => `<label class="flex items-center gap-2 text-xs text-zinc-300"><input type="checkbox" value="${l.id}" class="ws-cb"> ${esc(l.title)}</label>`).join('');
+            const m = document.getElementById('ws-modal'); m.classList.remove('hidden'); m.classList.add('flex');
         }
-
-        function renderTasks() {
-            const list = document.getElementById('tasks-list');
-            const t = i18n[state.lang] || i18n.fr;
-            if (state.tasks.length === 0) { list.innerHTML = `<li class="text-xs py-2" style="color: var(--text-muted);">${t.noTasks}</li>`; return; }
-            list.innerHTML = state.tasks.map(task => `
-                <li class="flex items-center justify-between gap-2 p-2 rounded border group" style="background-color: var(--bg-color); border-color: var(--border-color);">
-                    <div class="flex items-center gap-2.5 overflow-hidden">
-                        <input type="checkbox" ${task.done ? 'checked' : ''} onchange="toggleTask('${task.id}')" class="rounded cursor-pointer">
-                        <span class="text-xs ${task.done ? 'line-through opacity-50' : ''} truncate" style="color: var(--text-main);">${escapeHTML(task.text)}</span>
-                    </div>
-                    <button onclick="deleteTask('${task.id}')" class="opacity-0 group-hover:opacity-100 hover:text-red-400" style="color: var(--text-muted);"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
-                </li>`).join('');
-        }
-
-        function renderNotes() {
-            const list = document.getElementById('notes-list');
-            const t = i18n[state.lang] || i18n.fr;
-            if (!list) return;
-            if (state.notes.length === 0) { list.innerHTML = `<p class="text-xs py-2" style="color: var(--text-muted);">${t.noNotes}</p>`; return; }
-            list.innerHTML = state.notes.map(note => `
-                <div class="p-2.5 rounded border text-xs flex justify-between items-start gap-2 group" style="background-color: var(--bg-color); border-color: var(--border-color); color: var(--text-main);">
-                    <p class="leading-relaxed">${escapeHTML(note.text)}</p>
-                    <button onclick="deleteNote('${note.id}')" class="opacity-0 group-hover:opacity-100 hover:text-red-400" style="color: var(--text-muted);"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
-                </div>`).join('');
-        }
-
-        function renderWorkspaces() {
-            const container = document.getElementById('workspaces-container');
-            const t = i18n[state.lang] || i18n.fr;
-            container.innerHTML = `<span id="lbl-workspaces" class="text-xs mr-1 hidden sm:inline" style="color: var(--text-muted);">${t.workspaces}</span>` + state.workspaces.map(ws => `
-                <div class="inline-flex items-center rounded surface-card overflow-hidden">
-                    <button onclick="launchWorkspace('${ws.id}')" class="px-2.5 py-1 text-xs font-medium hover:opacity-80 transition flex items-center gap-1.5" style="color: var(--text-main);">
-                        <i data-lucide="play" class="w-2.5 h-2.5 text-emerald-400"></i> ${escapeHTML(ws.name)}
-                    </button>
-                    <button onclick="deleteWorkspace('${ws.id}')" class="px-1.5 py-1 hover:text-red-400 border-l transition" style="color: var(--text-muted); border-color: var(--border-color);">
-                        <i data-lucide="x" class="w-2.5 h-2.5"></i>
-                    </button>
-                </div>`).join('');
-        }
-
-        function renderAll() { renderLinks(); renderTasks(); renderNotes(); renderWorkspaces(); renderCommentsList(); applySettings(); }
-        function openLink(id, url) { const link = state.links.find(l => l.id === id); if (link) { link.clicks += 1; saveState(); } window.open(url, '_blank'); }
-        function deleteLink(id) { state.links = state.links.filter(l => l.id !== id); saveState(); }
-        function toggleTask(id) { const t = state.tasks.find(t => t.id === id); if (t) { t.done = !t.done; saveState(); } }
-        function deleteTask(id) { state.tasks = state.tasks.filter(t => t.id !== id); saveState(); }
-        function deleteNote(id) { state.notes = state.notes.filter(n => n.id !== id); saveState(); }
-        function launchWorkspace(wsId) { const ws = state.workspaces.find(w => w.id === wsId); if (ws) ws.linkIds.map(id => state.links.find(l => l.id === id)?.url).filter(Boolean).forEach(url => window.open(url, '_blank')); }
-        function deleteWorkspace(wsId) { state.workspaces = state.workspaces.filter(w => w.id !== wsId); saveState(); }
-        function openWorkspaceModal() {
-            document.getElementById('ws-links-selection').innerHTML = state.links.map(l => `<label class="flex items-center gap-2 text-xs cursor-pointer p-1" style="color: var(--text-main);"><input type="checkbox" value="${l.id}" class="ws-link-cb rounded"> <span>${escapeHTML(l.title)}</span></label>`).join('');
-            document.getElementById('workspace-modal').classList.remove('hidden'); document.getElementById('workspace-modal').classList.add('flex');
-        }
-        function closeWorkspaceModal() { document.getElementById('workspace-modal').classList.add('hidden'); document.getElementById('workspace-modal').classList.remove('flex'); }
-        function saveWorkspace() {
+        function saveWs() {
             const name = document.getElementById('ws-name').value.trim();
-            const checked = Array.from(document.querySelectorAll('.ws-link-cb:checked')).map(cb => cb.value);
-            if (!name || checked.length === 0) return;
-            state.workspaces.push({ id: 'w_' + Date.now(), name, linkIds: checked });
-            document.getElementById('ws-name').value = ''; closeWorkspaceModal(); saveState();
+            const ids = Array.from(document.querySelectorAll('.ws-cb:checked')).map(c => c.value);
+            if (!name || !ids.length) return;
+            state.workspaces.push({ id: 'w'+Date.now(), name, linkIds: ids });
+            document.getElementById('ws-name').value = ''; closeModal('ws-modal'); save();
         }
-        function openContextModal() {}
-        function closeContextModal() { document.getElementById('context-modal').classList.add('hidden'); document.getElementById('context-modal').classList.remove('flex'); }
+        function renameLink(id) { const l = state.links.find(x => x.id === id); if (!l) return; const v = prompt('Nouveau nom :', l.title); if (v && v.trim()) { l.title = v.trim(); save(); } }
 
-        applySettings();
-        renderAll();
-        openChangelogModal();
+        function render() {
+            document.getElementById('links-count').textContent = `${state.links.length} liens`;
+            document.getElementById('links-grid').innerHTML = [...state.links].sort((a,b)=>b.clicks-a.clicks).map(l => {
+                let host = l.url; try { host = new URL(l.url).hostname; } catch {}
+                return `<div class="link-card surface-card p-3.5 flex items-center justify-between gap-2 cursor-pointer" onclick="lClick('${l.id}','${l.url}')">
+                    <div class="flex items-center gap-2.5 overflow-hidden">
+                        <img src="https://www.google.com/s2/favicons?domain=${host}&sz=64" class="w-6 h-6 rounded bg-zinc-950 p-0.5 border border-zinc-800 shrink-0">
+                        <div class="truncate"><div class="text-sm font-medium truncate">${esc(l.title)}</div><div class="text-[11px] text-zinc-500 truncate">${esc(host)}</div></div>
+                    </div>
+                    <div class="flex items-center gap-1 shrink-0" onclick="event.stopPropagation()">
+                        <button type="button" onclick="renameLink('${l.id}')" class="p-1 text-zinc-500 hover:text-emerald-400"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button>
+                        <button type="button" onclick="state.links=state.links.filter(x=>x.id!=='${l.id}');save()" class="p-1 text-zinc-500 hover:text-red-400"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                    </div>
+                </div>`;
+            }).join('');
+            document.getElementById('tasks-list').innerHTML = state.tasks.length ? state.tasks.map(t => `<li class="flex items-center justify-between gap-2 p-2.5 rounded-lg bg-zinc-950/60 border border-zinc-800/80 text-xs"><label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" ${t.done?'checked':''} onchange="tTog('${t.id}')"><span class="${t.done?'line-through text-zinc-500':''}">${esc(t.text)}</span></label><button type="button" onclick="state.tasks=state.tasks.filter(x=>x.id!=='${t.id}');save()" class="text-zinc-500 hover:text-red-400"><i data-lucide="x" class="w-3.5 h-3.5"></i></button></li>`).join('') : '<li class="text-xs text-zinc-500">Aucune tâche.</li>';
+            document.getElementById('notes-list').innerHTML = state.notes.length ? state.notes.map(n => `<div class="p-2.5 rounded-lg bg-zinc-950/60 border border-zinc-800/80 text-xs flex justify-between gap-2"><p>${esc(n.text)}</p><button type="button" onclick="state.notes=state.notes.filter(x=>x.id!=='${n.id}');save()" class="text-zinc-500 hover:text-red-400"><i data-lucide="x" class="w-3.5 h-3.5"></i></button></div>`).join('') : '<p class="text-xs text-zinc-500">Aucune note.</p>';
+            document.getElementById('workspaces-container').innerHTML = state.workspaces.map(w => `<button type="button" onclick="wLaunch('${w.id}')" class="px-2.5 py-1 rounded-md bg-zinc-900 border border-zinc-800 text-xs hover:border-emerald-500/50 flex items-center gap-1"><i data-lucide="play" class="w-2.5 h-2.5 text-emerald-400"></i> ${esc(w.name)}</button>`).join('');
+            lucide.createIcons();
+        }
+        window.lClick = (id, url) => { const l = state.links.find(x=>x.id===id); if(l){l.clicks++;save();} window.open(url,'_blank'); };
+        window.tTog = id => { const t = state.tasks.find(x=>x.id===id); if(t){t.done=!t.done;save();} };
+        window.wLaunch = id => { const w = state.workspaces.find(x=>x.id===id); if(w) w.linkIds.map(i=>state.links.find(l=>l.id===i)?.url).filter(Boolean).forEach(u=>window.open(u,'_blank')); };
+        render(); updatePomo();
     </script>
 </body>
 </html>
